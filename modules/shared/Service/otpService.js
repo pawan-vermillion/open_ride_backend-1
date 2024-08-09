@@ -10,7 +10,7 @@ const storeOtp = async (mobileNumber, otp) => {
 
 const getStoredOtp = async (mobileNumber) => {
   const otp = otpStore[mobileNumber];
-  // console.log(`Retrieved OTP for ${mobileNumber}: ${otp}`); 
+  console.log(`Retrieved OTP for ${mobileNumber}: ${otp}`); 
   return otp;
 };
 
