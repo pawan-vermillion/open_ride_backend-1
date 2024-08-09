@@ -41,13 +41,27 @@ class AdminService {
         try {
             const admin = await Admin.findById(adminId).select("-__v -password -createdAt -updatedAt");
             if(!admin){
-                const error  = new error("admin not found")
+                const error = new Error("Admin not found");
                 error.statusCode = 404;
                 throw error;
             }
             return admin;
         } catch (error) {
             throw error;
+        }
+    }
+
+    async updateAdmin(adminDATA , adminId){
+        try {
+            const admin = await Admin.findById(adminId)
+            if(!admin){
+                const error = new Error("Admin not found")
+            }
+
+            const updateAdmin = await Admin.findByIdAndUpdate(adminId , adminDATA , {new:true})
+            return updateAdmin
+        } catch (error) {
+            throw error
         }
     }
     

@@ -7,16 +7,16 @@ const PasswordvalidationRule =()=>{
         .withMessage("New Password Is Required")
         .notEmpty()
         .withMessage("New Password cannot be empty")
-        .isLength({min:6})
-        .withMessage("New Password must be at least 6 character"),
+        .isLength({min:8})
+        .withMessage("New Password must be at least 8 character"),
 
         body("oldPassword")
         .exists()
         .withMessage("Old Password Is Required")
         .notEmpty()
         .withMessage("Old Password cannot be empty")
-        .isLength({min:6})
-        .withMessage("Old Password must be at least 6 character"),
+        .isLength({min:8})
+        .withMessage("Old Password must be at least 8 character"),
 
         body("userType")
         .exists()

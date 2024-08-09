@@ -22,12 +22,14 @@ class UserController {
             const userData = req.body;
 
 
-            const result = await UserService.updateUser(userId , userData)
+            const result = await UserService.updateUser( userData , userId)
             return res.status(200).json({message :" User Update Successfully" , result})
 
         } catch (error) {
-          throw error;
+          return res.status(404).json({message : error.message})
         }
     }
+
+   
 }
 module.exports = new UserController()

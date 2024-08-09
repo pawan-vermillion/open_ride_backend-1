@@ -17,7 +17,7 @@ class AuthController {
             }
             const adminData = req.body;
             
-            const result = await AdminService.createAdmin({adminData})
+            const result = await AdminService.createAdmin(adminData)
     
             await removeOtp(phoneNumber)
             return res.status(201).json(result)

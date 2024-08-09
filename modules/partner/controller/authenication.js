@@ -55,7 +55,7 @@ class PartnerController {
             }
             return res
               .status(500)
-              .json({ message: "Error logging in Partner", error: error.message });
+              .json({ message: "Error logging in User", error: error.message });
           }
       
 }

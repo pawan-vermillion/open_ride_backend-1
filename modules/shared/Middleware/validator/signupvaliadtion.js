@@ -35,8 +35,8 @@ const signupvalidationRule = () => {
       .withMessage("password is required")
       .notEmpty()
       .withMessage("password cannot be empty")
-      .isLength({ min: 6 })
-      .withMessage("password is must be 6 characters"),
+      .isLength({ min: 8 })
+      .withMessage("password is must be 8 characters"),
 
     body("otp")
     .exists()

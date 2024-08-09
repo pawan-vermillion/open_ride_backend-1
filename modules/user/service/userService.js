@@ -50,21 +50,19 @@ class UserService {
     }
  }
 
- async updateUser(userData , userId){
+ async updateUser(userData, userId) {
     try {
-        const user = await User.findById(userId)
-        if(!user){
-            const error = new Error("user not found")
+        const user = await User.findById(userId);
+        if (!user) {
+            const error = new Error("User not found");
             error.statusCode = 404;
             throw error;
         }
-        const updateUser = await User.findByIdAndUpdate(userId , userData , {new:true}).select("-__v -password -createdAt -updateAt")
-        return updateUser
-
-
+        const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true }).select("-__v -password -createdAt -updatedAt");
+        return updatedUser;
     } catch (error) {
         throw error;
     }
- }
+}
 }
 module.exports = new UserService();
