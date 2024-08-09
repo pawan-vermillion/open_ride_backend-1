@@ -1,4 +1,4 @@
-const AdminService = require("../../services/shared/AdminService")
+const AdminService = require("../../services/shared/adminService")
 
 const { verifyOtp, removeOtp } = require("../../../shared/Service/otpService")
 const Admin = require("../../model/admin")
