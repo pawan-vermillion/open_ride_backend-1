@@ -4,10 +4,10 @@ class PartnerController {
     getPartner = async (req, res, next) => {
         try {
           const PartnerId = req.user.id;
-          const result = await PartnerService.getUserById({PartnerId});
+          const result = await PartnerService.getPartnerById({PartnerId});
           return res.status(200).json(result);
         } catch (error) {
-          throw error;
+         res.status(404).json({message:error.message})
         }
 }
 }

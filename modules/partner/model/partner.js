@@ -3,11 +3,11 @@ const bcrypt = require('bcrypt')
 const {generateToken} = require("../../shared/Service/authenication")
 
 const partnerSchema = new Schema({
-    firstname:{
+    firstName:{
         type:String,
         require:true,
     },
-    lastname:{
+    lastName:{
         type:String,
         require:true
     },

@@ -26,7 +26,7 @@ class PasswordController {
             res.status(200).json(result)
             
         } catch (error) {
-            throw error
+           res.status(404).json({message:error.message})
         }
     }
 }

@@ -20,13 +20,15 @@ class PartnerService {
 
             const handelPassword = await bcrypt.hash(password , 10)
             const partner = await Partner.create({
-                firstName , 
+                firstName, 
                 lastName,
                 emailAddress , 
                 password:handelPassword,
                 phoneNumber
-            })
-            const token =  generateToken(Partner, "Partner");
+            });
+            console.log(partner);
+            
+            const token =  generateToken(partner, "Partner");
 
             return{
                 message :"Partner create Successfully",
@@ -38,9 +40,10 @@ class PartnerService {
         }
     }
 
-    async getUserById({PartnerId}){
+    async getPartnerById({PartnerId}){
         try {
-            const partner = await Partner.findById(PartnerId).select("-__v -password -createdAt -updatedAt");
+            const partner = await Partner.findById(PartnerId).select("-__v -password -updatedAt");
+            
             if (!partner) {
               const error = new Error("Partner not found");
               error.statusCode = 404;

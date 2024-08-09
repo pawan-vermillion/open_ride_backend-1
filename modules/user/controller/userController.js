@@ -26,7 +26,7 @@ class UserController {
             return res.status(200).json({message :" User Update Successfully" , result})
 
         } catch (error) {
-          next(error);  
+          throw error;
         }
     }
 }

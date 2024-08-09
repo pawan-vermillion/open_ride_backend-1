@@ -7,7 +7,7 @@ class PartnerController {
     handleCreatePartner = async(req,res)=>{
         try {
             const { phoneNumber, otp } = req.body
-    
+           
             const isOtpValid = await verifyOtp(otp, phoneNumber)
             // console.log(`OTP verification result: ${isOtpValid}`);
             if (!isOtpValid) {
