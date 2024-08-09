@@ -1,5 +1,4 @@
-const AdminService = require("../../services/shared/AdminService");
-
+const AdminService = require("../../services/shared/adminService");
 
 
 class AdminController {
