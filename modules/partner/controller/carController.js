@@ -4,8 +4,6 @@ const { uploadToCloudinary } = require('../../shared/config/multer');
 
 class CarController {
     createCar = async (req, res) => {
-
-
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(422).json({ message: errors.array()[0].msg });
@@ -13,7 +11,7 @@ class CarController {
 
         req.body.type = "Partner";
 
-        if (!req.files || req.files.length === 0) {
+        if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(422).json({ message: "At least one image file is required" });
         }
 
@@ -21,18 +19,19 @@ class CarController {
             const exteriorImages = req.files['exteriorImage'] || [];
             const interiorImages = req.files['interiorImage'] || [];
             const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
-        
+
+            // Upload all images to Cloudinary
             const uploadPromises = [
-                ...exteriorImages.map(file => uploadToCloudinary(req, file.path, file.fieldname)),
-                ...interiorImages.map(file => uploadToCloudinary(req, file.path, file.fieldname))
+                ...exteriorImages.map(file => uploadToCloudinary(req, file.buffer, file.fieldname)),
+                ...interiorImages.map(file => uploadToCloudinary(req, file.buffer, file.fieldname))
             ];
-        
+
             if (rcPhoto) {
-                uploadPromises.push(uploadToCloudinary(req, rcPhoto.path, rcPhoto.fieldname));
+                uploadPromises.push(uploadToCloudinary(req, rcPhoto.buffer, rcPhoto.fieldname));
             }
-        
+
             const uploadedImages = await Promise.all(uploadPromises);
-        
+
             const carData = {
                 ...req.body,
                 partnerId: req.user.id,
@@ -40,12 +39,12 @@ class CarController {
                 interiorImage: uploadedImages.slice(exteriorImages.length, exteriorImages.length + interiorImages.length).join(',') || undefined,
                 rcPhoto: rcPhoto ? uploadedImages[uploadedImages.length - 1] : undefined,
             };
-        
+
             const result = await CarService.createCarService(carData);
             return res.status(201).json(result);
         } catch (error) {
             res.status(500).json({ message: error.message });
-            console.log(error);
+            console.error(error);
         }
     }
 }
