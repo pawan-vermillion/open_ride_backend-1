@@ -9,7 +9,9 @@ const OtpRoutes = require("./modules/shared/Route/otpRoute");
 const adminRoute = require("./modules/admin/routes/shared/adminRoute")
 const partnerRoute = require("./modules/partner/Route/partnerRoute")
 const userRoute = require("./modules/user/Route/userRoute")
-const passwordRoute = require("./modules/shared/Route/passwordRoute")
+const passwordRoute = require("./modules/shared/Route/passwordRoute");
+const { upload } = require("./modules/shared/config/multer");
+
 
 
 
@@ -18,6 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(express.urlencoded({extended:true}))
 const PORT = process.env.PORT || 3000;
 //  Connect MongoDB
 
@@ -30,11 +33,13 @@ connectMongoDb(process.env.DB_URL)
   app.get('/', (req, res) => {
     res.status(200).json("Welcome To The Open Ride Backend");
   });
+
 app.use("/api/otp",OtpRoutes)
 app.use("/api/admin",adminRoute)
 app.use("/api/partner",partnerRoute)
 app.use("/api/user",userRoute)
-app.use("/api/password", passwordRoute)
+app.use("/api/password", passwordRoute);
+
 
 
 

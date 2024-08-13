@@ -9,7 +9,7 @@ class PartnerController {
             const { phoneNumber, otp } = req.body
            
             const isOtpValid = await verifyOtp(otp, phoneNumber)
-            // console.log(`OTP verification result: ${isOtpValid}`);
+           
             if (!isOtpValid) {
                 return res.status(400).json({ message: "Invalid OTP" })
             }

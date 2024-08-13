@@ -4,7 +4,7 @@ const { storeOtp } = require("../Service/otpService");
 exports.sendOTP = async (emailAddress, phoneNumber) => {
   try {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`Generated OTP: ${otp} for phone number: ${phoneNumber}`); // Log the generated OTP
+   
     await storeOtp(phoneNumber, otp);
     
     const transporter = nodemailer.createTransport({

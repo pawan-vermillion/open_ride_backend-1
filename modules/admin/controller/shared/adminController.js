@@ -1,6 +1,6 @@
 
 const AdminService = require("../../services/shared/adminService");
-
+const {uploadToCloudinary} = require('../../../shared/config/multer')
 
 class AdminController {
     getAdmin = async (req, res) => {
@@ -18,6 +18,13 @@ class AdminController {
         try {
             const AdminId = req.user.id;
             const AdminData = req.body
+
+            if(req.file)
+                {
+                  const result = await uploadToCloudinary(req,req.file.path);
+                  AdminData.profileImage = result.secure_url;
+                }
+          
             const result = await AdminService.updateAdmin(AdminData , AdminId )
       return res.status(201).json({message:"Admin Update Successfully" , result })
 

@@ -13,6 +13,7 @@ class PartnerService {
             const exitingPartner = await Partner.findOne({
                 $or: [{ emailAddress }, { phoneNumber }]
             })
+           
             if (exitingPartner) {
                 const error = new Error("Youre Account Is Already Exists")
                 error.statusCode = 409
@@ -27,7 +28,7 @@ class PartnerService {
                 password: handelPassword,
                 phoneNumber
             });
-            console.log(partner);
+          
 
             const token = generateToken(partner, "Partner");
 

@@ -1,6 +1,7 @@
 
 
 const UserService = require("../service/userService")
+const {uploadToCloudinary} = require('../../shared/config/multer')
 
 class UserController {
     getUser = async (req, res) => {
@@ -20,7 +21,13 @@ class UserController {
         try {
             const userId = req.user.id;
             const userData = req.body;
-
+            
+            if(req.file)
+                {
+                  const imageUrl = await uploadToCloudinary(req,req.file.path);
+                  userData.profileImage = imageUrl;
+                }
+               
 
             const result = await UserService.updateUser( userData , userId)
             return res.status(200).json({message :" User Update Successfully" , result})
