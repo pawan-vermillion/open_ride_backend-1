@@ -3,8 +3,7 @@ const mongoose = require("mongoose")
 const CarDetails = new mongoose.Schema({
     partnerId:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        ref:'Partner',
+        ref: "Partner",
         required:true
     },
     ownerFullName:{

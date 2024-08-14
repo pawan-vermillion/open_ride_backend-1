@@ -29,7 +29,7 @@ class AdminService {
             })
             const token = generateToken(admin , "Admin");
             return {
-                message : "User create Succeessfully",
+                message : "Admin create Succeessfully",
                 token
             }
         }  catch (error) {

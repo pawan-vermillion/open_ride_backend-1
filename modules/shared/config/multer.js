@@ -51,37 +51,26 @@ const upload = multer({
   }
 });
 
-const uploadToCloudinary = async (req, filePath, fieldname) => {
-  let folder;
-
-  if (req.type === 'Partner') {
-    if (fieldname === 'profileImage') {
-      folder = 'uploads/partner/profile/';
-    } else if (fieldname === 'exteriorImage') {
-      folder = 'uploads/partner/car/exterior';
-    } else if (fieldname === 'interiorImage') {
-      folder = 'uploads/partner/car/interior';
-    } else if (fieldname === 'rcPhoto') {
-      folder = 'uploads/partner/car/rcBook';
-    }
-  } else if (req.type === 'User') {
-    if (fieldname === 'profileImage') {
-      folder = 'uploads/user/profile/';
-    }
-  } else {
-    folder = 'uploads/other/';
+const uploadToCloudinary = async (filePath) => {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: 'uploads/partner/profile/', 
+      public_id: Date.now().toString(),
+      transformation: [{ quality: 'auto' }],
+    });
+    return result.secure_url;
+  } catch (error) {
+    console.error('Cloudinary upload error:', error);
+    throw new Error('Error uploading to Cloudinary');
   }
-
-  const result = await cloudinary.uploader.upload_stream(filePath, {
-    folder: folder,
-    public_id: Date.now().toString(),
-    transformation: [{ quality: 'auto' }]
-  });
-
-  return result.secure_url;
 };
-
+const uploadMultiple = upload.fields([
+  { name: 'exteriorImage', maxCount: 5 },
+  { name: 'interiorImage', maxCount: 5 },
+  { name: 'rcPhoto', maxCount: 1 }
+]);
 module.exports = {
   upload,
-  uploadToCloudinary
+  uploadToCloudinary,
+  uploadMultiple
 };

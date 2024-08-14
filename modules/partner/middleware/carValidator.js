@@ -1,4 +1,4 @@
-const { body ,validationResult} = require("express-validator");
+const { body, validationResult } = require("express-validator");
 
 const CarValidationRules = () => {
     return [
@@ -22,9 +22,20 @@ const CarValidationRules = () => {
             .notEmpty().withMessage("AC status cannot be empty"),
 
         body("sunRoof")
-            .exists().withMessage("Sunroof status is required")
-            .isBoolean().withMessage("Sunroof status must be a boolean value")
-            .notEmpty().withMessage("Sunroof status cannot be empty"),
+            .exists().withMessage("sunRoof status is required")
+            .isBoolean().withMessage("sunRoof status must be a boolean value")
+            .notEmpty().withMessage("sunRoof status cannot be empty"),
+
+        body("fuelType")
+            .exists().withMessage("fuelType status is required")
+            .notEmpty().withMessage("fuelType status cannot be empty"),
+
+        body("transmission")
+            .exists().withMessage("transmission status is required")
+          
+            .notEmpty().withMessage("transmission status cannot be empty"),
+
+
 
         body("carNumber")
             .exists().withMessage("Car number is required")
@@ -46,6 +57,10 @@ const CarValidationRules = () => {
             .exists().withMessage("Rate is required")
             .notEmpty().withMessage("Rate cannot be empty"),
 
+        body("unit")
+            .exists().withMessage("unit is required")
+            .notEmpty().withMessage("unit cannot be empty"),
+
         body("description")
             .exists().withMessage("Description is required")
             .notEmpty().withMessage("Description cannot be empty"),
@@ -62,6 +77,9 @@ const CarValidationRules = () => {
         body("longitude")
             .exists().withMessage("Longitude is required")
             .notEmpty().withMessage("Longitude cannot be empty"),
+
+       
+
 
         // body("rcPhoto")
         //     .exists().withMessage("RC photo is required")
@@ -81,16 +99,16 @@ const CarValidationRules = () => {
     ];
 }
 
-const carValidation = (req,res,next)=>{
+const carValidation = (req, res, next) => {
     const error = validationResult(req);
 
-    if(error.isEmpty())
+    if (error.isEmpty())
         return next();
 
-    const extractdErrors =[];
+    const extractdErrors = [];
     error.array().map((error) => extractdErrors.push(error.msg));
-    return res.status(422).json({message : extractdErrors[0]})
+    return res.status(422).json({ message: extractdErrors[0] })
 
-    
+
 }
-module.exports = {CarValidationRules , carValidation};
+module.exports = { CarValidationRules, carValidation };
