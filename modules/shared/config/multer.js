@@ -22,12 +22,12 @@ const storage = new CloudinaryStorage({
         folder = 'uploads/user/profile/';
       }
     } else {
-      folder = 'uploads/other/';
+      folder = 'uploads/other/profile';
     }
 
     return {
       folder: folder,
-      format: path.extname(file.originalname).substring(1), // e.g., jpeg, jpg, png
+      format: path.extname(file.originalname).substring(1), 
       public_id: Date.now().toString(),
       transformation: [{ quality: 'auto' }],
     };
@@ -51,13 +51,36 @@ const upload = multer({
   }
 });
 
-const uploadToCloudinary = async (filePath) => {
+const uploadToCloudinary = async (req, filePath ,fieldname ) => {
   try {
+    let folder;
+
+    if (req.type === 'Partner') {
+      if (fieldname === 'profileImage') {
+        folder = 'uploads/partner/profile/';
+      } else if (fieldname === 'exteriorImage') {
+        folder = 'uploads/partner/car/exterior';
+      } else if (fieldname === 'interiorImage') {
+        folder = 'uploads/partner/car/interior';
+      } else if (fieldname === 'rcPhoto') {
+        folder = 'uploads/partner/car/rcBook';
+      }
+    } else if (req.type === 'User') {
+      if (fieldname === 'profileImage') {
+        folder = 'uploads/user/profile/';
+      }
+    } else {
+      folder = 'uploads/other/profile';
+    }
+  
+    // console.log(`Uploading ${filePath} to folder ${folder}`);
+
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: 'uploads/partner/profile/', 
+      folder, 
       public_id: Date.now().toString(),
       transformation: [{ quality: 'auto' }],
     });
+
     return result.secure_url;
   } catch (error) {
     console.error('Cloudinary upload error:', error);

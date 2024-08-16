@@ -1,6 +1,7 @@
 const Admin = require("../../model/admin")
 const bcrypt = require("bcrypt")
 const { generateToken } = require("../../../shared/Service/authenication")
+const cloudinary = require("../../../shared/config/cloudinary")
 
 
 class AdminService {
@@ -50,20 +51,29 @@ class AdminService {
             throw error;
         }
     }
-
-    async updateAdmin(adminDATA , adminId){
+    async updateAdmin(adminData, adminId) {
         try {
-            const admin = await Admin.findById(adminId)
-            if(!admin){
-                const error = new Error("Admin not found")
+            const admin = await Admin.findById(adminId);
+            if (!admin) {
+                const error = new Error("Admin not found");
+                error.statusCode = 404;
+                throw error;
             }
-
-            const updateAdmin = await Admin.findByIdAndUpdate(adminId , adminDATA , {new:true})
-            return updateAdmin
+    
+            if (adminData.profileImage && admin.profileImage) {
+                const oldImagePublicId = admin.profileImage.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(`uploads/other/profile/${oldImagePublicId}`);
+            }
+            const updatedAdmin = await Admin.findByIdAndUpdate(adminId, adminData, { new: true }).select("-__v -password -createdAt -updatedAt");
+    
+            return updatedAdmin;
         } catch (error) {
-            throw error
+            throw error;
         }
     }
+    
+    
+    
     
 }
 

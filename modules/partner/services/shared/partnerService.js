@@ -1,6 +1,7 @@
 const Partner = require("../../model/partner")
 const bcrypt = require("bcrypt")
 const { generateToken } = require("../../../shared/Service/authenication")
+const cloudinary = require("../../../shared/config/cloudinary")
 
 
 
@@ -61,12 +62,22 @@ class PartnerService {
 
     async updatePartner(partnerData , PartnerId){
         try {
-            const partner = await Partner.findById(PartnerId)
-            if(!partner){
-                const error = new Error("Partner not found")
-            }
+            const partner = await Partner.findById(PartnerId);
+        if (!partner) {
+            const error = new Error("Partner not found");
+            throw error;
+        }
 
-            const updatePartner = await Partner.findByIdAndUpdate(PartnerId , partnerData , {new:true})
+        
+        if (partnerData.profileImage && partner.profileImage) {
+            
+            const oldImagePublicId = partner.profileImage.split('/').pop().split('.')[0];
+
+           
+            await cloudinary.uploader.destroy(`uploads/partner/profile/${oldImagePublicId}`);
+        }
+
+            const updatePartner = await Partner.findByIdAndUpdate(PartnerId , partnerData , {new:true}).select("-__v -password -createdAt -updatedAt");
             return updatePartner
             
 

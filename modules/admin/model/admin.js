@@ -29,7 +29,7 @@ const adminSchema = new mongoose.Schema({
         type:String,
         require:true
     }
-})
+},{timestamps:true})
 
 adminSchema.statics.matchPasswordAndGenerateToken = async function(phone , password){
     try {

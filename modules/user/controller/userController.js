@@ -17,26 +17,24 @@ class UserController {
         }
     }
 
-    updateUser = async(req,res)=>{
+    updateUser = async (req, res) => {
         try {
             const userId = req.user.id;
             const userData = req.body;
+
+         
+            if (req.file) {
             
-            if(req.file)
-                {
-                  const imageUrl = await uploadToCloudinary(req,req.file.path);
-                  userData.profileImage = imageUrl;
-                }
-               
+                userData.profileImage = req.file.path;
+            }
 
-            const result = await UserService.updateUser( userData , userId)
-            return res.status(200).json({message :" User Update Successfully" , result})
-
+            const result = await UserService.updateUser(userData, userId);
+            return res.status(200).json({ message: "User updated successfully", result });
         } catch (error) {
-          return res.status(404).json({message : error.message})
+            return res.status(404).json({ message: error.message });
         }
     }
-
-   
 }
+   
+
 module.exports = new UserController()

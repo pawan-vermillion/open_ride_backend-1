@@ -1,6 +1,7 @@
 const User = require("../model/user")
 const bcrypt = require("bcrypt")
 const {generateToken} = require("../../shared/Service/authenication")
+const cloudinary = require("../../shared/config/cloudinary")
 
 
 class UserService {
@@ -52,11 +53,19 @@ class UserService {
 
  async updateUser(userData, userId) {
     try {
+        
         const user = await User.findById(userId);
         if (!user) {
             const error = new Error("User not found");
             error.statusCode = 404;
             throw error;
+        }
+        if (userData.profileImage && user.profileImage) {
+            
+            const oldImagePublicId = user.profileImage.split('/').pop().split('.')[0];
+
+           
+            await cloudinary.uploader.destroy(`uploads/user/profile/${oldImagePublicId}`);
         }
         const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true }).select("-__v -password -createdAt -updatedAt");
         return updatedUser;

@@ -18,8 +18,7 @@ class PartnerController {
       
       if(req.file)
         {
-          const imageUrl = await uploadToCloudinary(req, req.file.path);
-          partnerData.profileImage = imageUrl;
+          partnerData.profileImage = req.file.path;
         }
 
       const result = await PartnerService.updatePartner(partnerData , PartnerId)

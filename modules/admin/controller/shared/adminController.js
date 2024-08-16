@@ -14,22 +14,21 @@ class AdminController {
             return res.status(statusCode).json({ message: error.message });
         }
     }
-    updateAdmin = async(req,res)=>{
+    updateAdmin = async(req, res) => {
         try {
-            const AdminId = req.user.id;
-            const AdminData = req.body
-
-            if(req.file)
-                {
-                  const result = await uploadToCloudinary(req,req.file.path);
-                  AdminData.profileImage = result.secure_url;
-                }
-          
-            const result = await AdminService.updateAdmin(AdminData , AdminId )
-      return res.status(201).json({message:"Admin Update Successfully" , result })
-
+            const adminId = req.user.id;
+            const adminData = req.body;
+    
+            if (req.file) {
+               
+                adminData.profileImage = req.file.path;
+            }
+    
+            const result = await AdminService.updateAdmin(adminData, adminId);
+            return res.status(201).json({ message: "Admin Updated Successfully", result });
+    
         } catch (error) {
-            return res.status(404).json({message:error.message})
+            return res.status(404).json({ message: error.message });
         }
     }
 }
