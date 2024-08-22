@@ -1,4 +1,4 @@
-const {body, validayionResult, validationResult} = require("express-validator")
+const {body, validationResult} = require("express-validator")
 
 const favoriteCarValidationRules = () => {
     return[

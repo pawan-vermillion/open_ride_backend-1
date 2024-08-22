@@ -9,9 +9,12 @@ class AuthController {
 
     handleCreateAdmin = async (req,res) =>{
         try {
-            const { phoneNumber, otp } = req.body
+            const { phoneNumber, phoneOtp,emailOtp } = req.body
     
-            const isOtpValid = await verifyOtp(otp, phoneNumber)
+            if(phoneOtp == 123456){
+              return res.status(404).json({message : "PhoneNumber  Otp is not valid"})
+            }
+            const isOtpValid = await verifyOtp(emailOtp, phoneNumber)
             if (!isOtpValid) {
                 return res.status(400).json({ message: "Invalid OTP" })
             }

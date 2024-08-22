@@ -32,7 +32,7 @@ const CarValidationRules = () => {
 
         body("transmission")
             .exists().withMessage("transmission status is required")
-          
+
             .notEmpty().withMessage("transmission status cannot be empty"),
 
 
@@ -77,23 +77,16 @@ const CarValidationRules = () => {
         body("longitude")
             .exists().withMessage("Longitude is required")
             .notEmpty().withMessage("Longitude cannot be empty"),
+            
+        body("deleteExteriorImage")
+            .exists().withMessage("deleteExteriorImage is required"),
 
-       
+        body("deleteInteriorImage")
+            .exists().withMessage("deleteExteriorImage is required"),
 
+        body("deleteRcPhoto")
+            .exists().withMessage("deleteExteriorImage is required")
 
-        // body("rcPhoto")
-        //     .exists().withMessage("RC photo is required")
-        //     .notEmpty().withMessage("RC photo cannot be empty"),
-
-
-        // body("exteriorImage")
-        //     .exists().withMessage("exteriorImage is required")
-        //     .notEmpty().withMessage("exteriorImage cannot be empty"),
-
-
-        // body("interiorImage")
-        //     .exists().withMessage("interiorImage is required")
-        //     .notEmpty().withMessage("interiorImage cannot be empty")
 
 
     ];

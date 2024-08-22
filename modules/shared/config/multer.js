@@ -53,6 +53,7 @@ const upload = multer({
 
 const uploadToCloudinary = async (req, filePath ,fieldname ) => {
   try {
+    console.log(`Uploading file from path: ${filePath} to folder: ${folder}`);
     let folder;
 
     if (req.type === 'Partner') {
@@ -73,13 +74,14 @@ const uploadToCloudinary = async (req, filePath ,fieldname ) => {
       folder = 'uploads/other/profile';
     }
   
-    // console.log(`Uploading ${filePath} to folder ${folder}`);
+  
 
     const result = await cloudinary.uploader.upload(filePath, {
       folder, 
       public_id: Date.now().toString(),
       transformation: [{ quality: 'auto' }],
     });
+    console.log('Upload result:', result);
 
     return result.secure_url;
   } catch (error) {

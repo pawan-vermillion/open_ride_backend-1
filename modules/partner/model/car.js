@@ -25,7 +25,7 @@ const CarDetails = new mongoose.Schema({
     },
     transmission:{
         type:String,
-        enum:["Automatic" , "Menual" ],
+        enum:["Automatic" , "Manual" ],
         required:true
     },
     ac:{
@@ -58,7 +58,7 @@ const CarDetails = new mongoose.Schema({
     },
     unit:{
         type:String,
-        enum:["Km" , "Day" , "Hour"],
+        enum:[ "Hour"],
         required:true
     },
     description:{

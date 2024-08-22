@@ -38,15 +38,25 @@ const signupvalidationRule = () => {
       .isLength({ min: 8 })
       .withMessage("password is must be 8 characters"),
 
-    body("otp")
+    body("emailOtp")
     .exists()
-    .withMessage("OTP is required")
+    .withMessage("emailOtp is required")
     .notEmpty()
-    .withMessage("OTP cannot be empty")
+    .withMessage("emailOtp cannot be empty")
     .isString()
-    .withMessage("OTP must be a string")
+    .withMessage("emailOtp must be a string")
     .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be exactly 6 characters"),
+    .withMessage("emailOtp must be exactly 6 characters"),
+
+    body("phoneOtp")
+    .exists()
+    .withMessage("phoneOtp is required")
+    .notEmpty()
+    .withMessage("phoneOtp cannot be empty")
+    .isString()
+    .withMessage("phoneOtp must be a string")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("phoneOtp must be exactly 6 characters"),
   ];
 };
 
