@@ -9,4 +9,5 @@ router.use("/auth",authRoute);
 router.use("/profile" ,partnerProfileRoute);
 router.use("/car" , carRoute)
 
+
 module.exports = router;

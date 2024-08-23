@@ -12,7 +12,7 @@ class CarBookingController {
         }
 
         const availability = await CarBookingService.checkCarAvailable({carId});
-        console.log('Availability:', availability);
+      
         res.status(200).json(availability);
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -24,6 +24,7 @@ class CarBookingController {
           const userId = req.user.id;
           const carId = req.params.carId;
           const data = req.body;
+         
   
           
           if (!data.pickUpData || !data.returnData || !data.member) {

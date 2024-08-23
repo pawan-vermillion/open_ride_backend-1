@@ -60,15 +60,16 @@ class PartnerService {
 
     }
 
-    async updatePartner(partnerData , PartnerId){
+    async updatePartner(partnerData , PartnerId , amount){
         try {
+           
             const partner = await Partner.findById(PartnerId);
         if (!partner) {
             const error = new Error("Partner not found");
             throw error;
         }
 
-        
+         await partner.save();
         if (partnerData.profileImage && partner.profileImage) {
             
             const oldImagePublicId = partner.profileImage.split('/').pop().split('.')[0];

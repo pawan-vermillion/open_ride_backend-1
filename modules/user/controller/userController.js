@@ -21,7 +21,7 @@ class UserController {
         try {
             const userId = req.user.id;
             const userData = req.body;
-
+           
          
             if (req.file) {
             
@@ -29,7 +29,10 @@ class UserController {
             }
 
             const result = await UserService.updateUser(userData, userId);
-            return res.status(200).json({ message: "User updated successfully", result });
+            return res.status(200).json({
+                message: 'Money added successfully.',
+                walletBalance: result.walletBalance,
+              });
         } catch (error) {
             return res.status(404).json({ message: error.message });
         }

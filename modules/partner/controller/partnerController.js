@@ -1,5 +1,5 @@
 const PartnerService = require("../services/shared/partnerService");
-const {uploadToCloudinary} = require('../../shared/config/multer');
+
 
 class PartnerController {
   getPartner = async (req, res, next) => {
@@ -11,21 +11,24 @@ class PartnerController {
       res.status(404).json({ message: error.message })
     }
   }
-  updatePartner = async(req,res)=>{
+  updatePartner = async (req, res) => {
     try {
       const PartnerId = req.user.id;
-      const partnerData = req.body
-      
-      if(req.file)
-        {
-          partnerData.profileImage = req.file.path;
-        }
+      const { partnerData } = req.body
 
-      const result = await PartnerService.updatePartner(partnerData , PartnerId)
-      return res.status(201).json({message:"Partner Update Successfully" , result })
-     
+      if (req.file) {
+        partnerData.profileImage = req.file.path;
+      }
+
+      const result = await PartnerService.updatePartner(partnerData, PartnerId)
+      return res.status(201).json({
+        message: 'Update Successfully',
+      
+        result
+      })
+
     } catch (error) {
-      return res.status(404).json({message:error.message})
+      return res.status(404).json({ message: error.message })
     }
   }
 }

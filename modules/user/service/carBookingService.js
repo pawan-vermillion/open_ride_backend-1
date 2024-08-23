@@ -2,6 +2,7 @@ const CarBooking = require("../../shared/model/booking");
 const Car = require("../../partner/model/car");
 const moment = require("moment")
 const crypto = require("crypto")
+const Partner = require("../../partner/model/partner")
 
 
 
@@ -178,47 +179,60 @@ class CarBookingService {
     bookingVerification = async ({ orderId, paymentId, signature, bookingId }) => {
         try {
             const booking = await CarBooking.findById({ _id: bookingId });
-           
-    
+
+
             if (!booking) {
                 throw new Error('Booking not found');
             }
-    
+
+
+
             const isPaymentVerified = await this.verifyPayment(orderId, paymentId, signature);
-    
             if (!isPaymentVerified) {
                 throw new Error('Payment verification failed');
             }
-            
+
             booking.status = 'confirmed';
             booking.paymentDetails.isPaymentVerified = true;
             booking.paymentDetails.paymentId = paymentId;
             booking.paymentDetails.orderId = orderId;
             await booking.save();
-        
 
-            return booking; 
+            const partner = await Partner.findById(booking.partnerId);
+
+            if (!partner) {
+                throw new Error('Partner not found');
+            }
+
+            const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
+
+
+        
+        partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+        console.log('Updated Wallet Balance:', partner.walletBalance);
+
+        await partner.save().catch(err => console.error('Save Error:', err));
+            return booking;
         } catch (error) {
             throw new Error(error.message);
         }
     };
-    
+
     verifyPayment = async (orderId, paymentId, signature) => {
         const generatedSignature = crypto
             .createHmac('sha256', 'your_secret_key')
             .update(`${orderId}|${paymentId}`)
             .digest('hex');
-    
+
         return true;
     };
 
-      
-          
-       
-  
-   
+
+
+
+
 }
-        
+
 
 
 

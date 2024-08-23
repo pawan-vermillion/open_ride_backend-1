@@ -27,7 +27,12 @@ const partnerSchema = new Schema({
     profileImage:{
         type:String,
         require:true
+    },
+    walletBalance: {
+        type: Number,
+        default: 0
     }
+
 },
     {timestamps : true}
 )

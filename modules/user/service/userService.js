@@ -53,13 +53,14 @@ class UserService {
 
  async updateUser(userData, userId) {
     try {
-        
+       
         const user = await User.findById(userId);
         if (!user) {
             const error = new Error("User not found");
             error.statusCode = 404;
             throw error;
         }
+
         if (userData.profileImage && user.profileImage) {
             
             const oldImagePublicId = user.profileImage.split('/').pop().split('.')[0];

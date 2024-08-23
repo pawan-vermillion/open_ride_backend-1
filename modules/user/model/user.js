@@ -36,6 +36,7 @@ userSchema.statics.matchPasswordGenerateToken = async function (phone, password)
         if (!user) {
             throw new Error("User not found");
         }
+        
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
