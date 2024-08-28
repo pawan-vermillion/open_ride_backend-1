@@ -35,9 +35,9 @@ class BookingController {
         const entityType = req.type;
         const entityId = req.user.id;
 
-        console.log("Entity Type:", entityType);
-        console.log("Entity ID:", entityId);
-        console.log("Status:", status);
+        // console.log("Entity Type:", entityType);
+        // console.log("Entity ID:", entityId);
+        // console.log("Status:", status);
 
         const validStatuses = ['pending', 'confirmed', 'complete', 'cancelled', 'all'];
         if (!validStatuses.includes(status)) {

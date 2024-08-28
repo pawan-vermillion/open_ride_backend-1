@@ -3,7 +3,7 @@ const Car = require("../../partner/model/car");
 const moment = require("moment")
 const crypto = require("crypto")
 const Partner = require("../../partner/model/partner")
-
+const walletHistory = require("../../partner/model/walletBalance")
 
 
 class CarBookingService {
@@ -176,7 +176,7 @@ class CarBookingService {
         }
     };
 
-    bookingVerification = async ({ orderId, paymentId, signature, bookingId }) => {
+    bookingVerification = async ({  orderId, paymentId, signature, bookingId }) => {
         try {
             const booking = await CarBooking.findById({ _id: bookingId });
 
@@ -204,13 +204,30 @@ class CarBookingService {
                 throw new Error('Partner not found');
             }
 
+            
             const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
+            
+            
+            // add wallet balance in partner account
+            partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+            // GENERATE   PARTNER WALLET TRANSACTION
+           
+            const userId = booking.userId;
+            const transactionType = 'Credit';
+       
+const walletHistoryEntry = new walletHistory({
+    partnerId : booking.partnerId,
+    userId,
+    transactionType,
+    amount: totalAmount,
+    bookingId: booking._id,
+});
+
+await walletHistoryEntry.save();
+
 
 
         
-        partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
-        console.log('Updated Wallet Balance:', partner.walletBalance);
-
         await partner.save().catch(err => console.error('Save Error:', err));
             return booking;
         } catch (error) {

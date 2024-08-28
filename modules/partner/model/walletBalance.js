@@ -27,7 +27,7 @@ const walletHistorySchema = new Schema({
     type :String,
     required:false
    },
-   ammount :{
+   amount :{
     type :Number,
     required:true
    },
