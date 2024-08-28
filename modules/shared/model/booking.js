@@ -62,24 +62,6 @@ const carBooking = new mongoose.Schema({
             required: true
         }
     },
-    member: {
-        totalMember: {
-            type: Number,
-            required: true
-        },
-        memberDetails: [
-            {
-                fullName: {
-                    type: String,
-                    required: true
-                },
-                age: {
-                    type: Number,
-                    required: true
-                }
-            }
-        ]
-    },
     summary: {
         unit: {
             type: String,

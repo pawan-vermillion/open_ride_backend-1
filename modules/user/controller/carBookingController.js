@@ -27,7 +27,7 @@ class CarBookingController {
          
   
           
-          if (!data.pickUpData || !data.returnData || !data.member) {
+          if (!data.pickUpData || !data.returnData) {
               return res.status(400).json({ error: 'Missing required booking details' });
           }
   

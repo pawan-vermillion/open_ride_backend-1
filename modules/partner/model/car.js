@@ -102,4 +102,4 @@ const CarDetails = new mongoose.Schema({
 },{timestamps:true})
 
 const carDetails = mongoose.model("Car",CarDetails);
-module.exports = carDetails
+module.exports =    carDetails

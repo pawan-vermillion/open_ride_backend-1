@@ -73,7 +73,7 @@ class CarBookingService {
 
     getBookingSummary = async ({ userId, carId, data }) => {
         try {
-            const { pickUpData, returnData, member } = data;
+            const { pickUpData, returnData } = data;
 
             const car = await Car.findById(carId);
             if (!car) {
@@ -133,7 +133,7 @@ class CarBookingService {
                 userId,
                 pickUpData,
                 returnData,
-                member,
+               
                 summary: {
                     unit: 'Hour',
                     rate: car.rate,
