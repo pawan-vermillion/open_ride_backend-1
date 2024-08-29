@@ -1,5 +1,5 @@
 const CarBooking = require("../model/booking");
-
+const User = require("../../user/model/user")
 class BookingService {
     cancelBooking = async ({ userType, bookingId, cancelReason }) => {
         try {
@@ -11,14 +11,35 @@ class BookingService {
             }
 
             if (booking.isCancel) {
+               
                 return { error: "Booking has already been cancelled", statusCode: 400 };
             }
 
+
+         
             booking.status = "cancelled";
             booking.cancelBy = userType;
             booking.cancelReason = cancelReason;
             booking.isCancel = true;
 
+            const refundAmount = booking.refundAmount; 
+            if (refundAmount === 0) {
+                console.log("Refund amount is zero. Wallet balance will not be updated.");
+            }
+    
+          
+            if (userType === "user" || userType === "partner") {
+              const user = await User.findOne({ _id: booking.userId });
+              if (!user) {
+                return { error: "User not found", statusCode: 404 };
+              }
+          
+              user.walletBalance += refundAmount;
+             
+              await user.save();
+            
+            }
+           
             await booking.save();
 
             return { message: "Booking cancelled Successfully" };
@@ -28,7 +49,7 @@ class BookingService {
             return { error: "Internal Server Error", statusCode: 500 };
         }
     };
-
+  
     getBooking = async ({ entityType, entityId, status, page, limit }) => {
         let query = {};
         if (entityType === 'User') {
@@ -39,10 +60,8 @@ class BookingService {
             throw new Error('Invalid entityType');
         }
     
-        if (status && status !== 'all') {
-            query.status = status.toLowerCase();
-        }
-    
+      
+        
         try {
       
             const totalDocuments = await CarBooking.countDocuments(query).exec();
@@ -54,11 +73,8 @@ class BookingService {
                 .populate("partnerId", 'emailAddress phoneNumber firstName lastName')
                 .exec();
     
-            
     
-                if (bookings.length === 0) {
-                    console.log("No bookings found for the given criteria.");
-                } 
+               
     
             const totalPages = Math.ceil(totalDocuments / limit);
     

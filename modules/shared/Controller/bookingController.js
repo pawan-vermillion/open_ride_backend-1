@@ -10,7 +10,7 @@ class BookingController {
       return res.status(400).json({ error: "bookingId is required" });
     }
 
-
+    
 
     try {
       const result = await BookingService.cancelBooking({ userType, bookingId, cancelReason });

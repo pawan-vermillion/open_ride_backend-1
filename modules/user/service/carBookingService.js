@@ -28,13 +28,13 @@ class CarBookingService {
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + 14);
 
-            const bookings = await CarBooking.find({ carId }).select('bookedDates');
+            const bookings = await CarBooking.find({ carId }).select('bookedDates  isCancel');
 
 
             const bookedDates = bookings.flatMap(booking =>
-                booking.bookedDates.map(date => date.toISOString().split('T')[0])
+                !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
             );
-
+    
 
             const checkDates = [];
             for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
@@ -57,9 +57,8 @@ class CarBookingService {
             const bookings = await CarBooking.find({ carId }).select('bookedDates');
 
             const bookedDates = bookings.flatMap(booking =>
-                booking.bookedDates.map(date => date.toISOString().split('T')[0])
+                !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
             );
-
             const checkDates = this.generateDateRange(startDate, endDate);
 
             return checkDates.map(date => ({
@@ -210,6 +209,8 @@ class CarBookingService {
             
             // add wallet balance in partner account
             partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+
+            
             // GENERATE   PARTNER WALLET TRANSACTION
            
             const userId = booking.userId;

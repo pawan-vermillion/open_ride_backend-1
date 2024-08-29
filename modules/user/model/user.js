@@ -26,7 +26,12 @@ const userSchema = new mongoose.Schema({
     profileImage:{ 
         type:String,
         require:true
-    }
+    },
+    walletBalance: {
+        type: Number,
+        required:false,
+        default: 0
+      }
 }, {timestamps : true})
 
 userSchema.statics.matchPasswordGenerateToken = async function (phone, password) {

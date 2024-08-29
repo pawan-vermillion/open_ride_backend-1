@@ -168,6 +168,11 @@ const carBooking = new mongoose.Schema({
         required: true,
         default: "pending",
       },
+      refundAmount: {
+        type: Number,
+        default: 0,
+        required:false
+      },
     
 
 }, { timestamps: true })
