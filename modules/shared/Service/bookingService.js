@@ -1,21 +1,18 @@
 const CarBooking = require("../model/booking");
 const User = require("../../user/model/user")
+const Partner = require("../../partner/model/partner")
 class BookingService {
   cancelBooking = async ({ userType, bookingId, cancelReason }) => {
     try {
-      console.log("Starting booking cancellation process");
-  
-      // Find the booking by its ID
+     
+    
       const booking = await CarBooking.findById(bookingId);
-      console.log("Booking found:", booking);
   
       if (!booking) {
-        console.log("Booking not found for ID:", bookingId);
         return { error: "Booking not found", statusCode: 404 };
       }
   
       if (booking.isCancel) {
-        console.log("Booking already cancelled");
         return { error: "Booking has already been cancelled", statusCode: 400 };
       }
   
@@ -25,31 +22,28 @@ class BookingService {
       booking.cancelReason = cancelReason;
       booking.isCancel = true;
   
-      // Fixed refund amount
-      const refundAmount = 100;
-      console.log("Refund amount:", refundAmount);
   
-      if (userType === "user" || userType === "partner") {
-        console.log("Finding user with ID:", booking.userId);
-  
-        const user = await User.findById(booking.userId);
-        console.log("User found:", user);
-  
+      const user = await User.findById(booking.userId);
+       
         if (!user) {
-          console.log("User not found for ID:", booking.userId);
+      
           return { error: "User not found", statusCode: 404 };
         }
   
         // Update wallet balance with the refund amount
-        user.walletBalance += refundAmount;
-        console.log("Updated wallet balance:", user.walletBalance);
-  
+        user.walletBalance += booking.summary.subTotal;
+       
         await user.save();
-        console.log("User wallet balance saved");
-      }
-  
+
+        const partner = await Partner.findById(booking.partnerId);
+        if(!partner){
+          return { error: "Partner not found", statusCode: 404 };
+        }
+        partner.walletBalance -= booking.summary.subTotal
+
+        await partner.save()
       await booking.save();
-      console.log("Booking cancellation saved successfully");
+  
   
       return { message: "Booking cancelled successfully" };
     } catch (error) {

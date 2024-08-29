@@ -54,7 +54,7 @@ class CarBookingService {
 
     checkAvailabilityForRange = async ({ carId, startDate, endDate }) => {
         try {
-            const bookings = await CarBooking.find({ carId }).select('bookedDates');
+            const bookings = await CarBooking.find({ carId }).select('bookedDates isCancel');
 
             const bookedDates = bookings.flatMap(booking =>
                 !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
@@ -210,7 +210,7 @@ class CarBookingService {
             // add wallet balance in partner account
             partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
 
-            
+            //  user.walletBalance += booking.summary.subTotal;
             // GENERATE   PARTNER WALLET TRANSACTION
            
             const userId = booking.userId;
