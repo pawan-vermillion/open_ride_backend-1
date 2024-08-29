@@ -10,7 +10,7 @@ class UserService {
             const skip = (currentPage - 1) * pageSize;
             const users = await User.find().select("-__v -password -updatedAt").skip(skip)
                 .limit(pageSize);
-
+                const total = await User.countDocuments()
             if (!users) {
                 const error = new Error("User not found");
                 error.statusCode = 404;
@@ -20,6 +20,7 @@ class UserService {
             return {
                 page: currentPage,
                 limit: pageSize,
+                total,
                 users
             };
 

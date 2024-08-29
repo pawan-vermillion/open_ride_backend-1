@@ -167,12 +167,7 @@ const carBooking = new mongoose.Schema({
         enum: ["pending", "confirmed", "completed", "cancelled"],
         required: true,
         default: "pending",
-      },
-      refundAmount: {
-        type: Number,
-        default: 0,
-        required:false
-      },
+      }
     
 
 }, { timestamps: true })
