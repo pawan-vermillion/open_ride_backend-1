@@ -69,7 +69,6 @@ class PartnerService {
             throw error;
         }
 
-         await partner.save();
         if (partnerData.profileImage && partner.profileImage) {
             
             const oldImagePublicId = partner.profileImage.split('/').pop().split('.')[0];
@@ -79,10 +78,11 @@ class PartnerService {
         }
 
             const updatePartner = await Partner.findByIdAndUpdate(PartnerId , partnerData , {new:true}).select("-__v -password -createdAt -updatedAt");
-            return updatePartner
+            return updatePartner;
             
 
         } catch (error) {
+            console.error("Service Error:", error.message);
             throw error;
         }
     }

@@ -1,6 +1,6 @@
-const carDetails = require("../../../partner/model/car")
+const CarDetails = require("../../../partner/model/car")
 
-class CarService {
+class AdminCarService {
  
 
   async getAllCarsService({ page, limit }) {
@@ -8,12 +8,12 @@ class CarService {
       const pageSize = parseInt(limit) || 10;
       const currentPage = parseInt(page) || 1;
       const skip = (currentPage - 1) * pageSize;
-      const totalCars = await carDetails.countDocuments()
-      const cars = await carDetails.find().skip(skip).limit(pageSize)
+      const totalCars = await CarDetails.countDocuments()
+      const cars = await CarDetails.find().skip(skip).limit(pageSize)
       return {
         page:currentPage,
         limit:pageSize,
-        total:totalCars,
+        totalCars:totalCars,
         cars:cars
       }
     } catch (error) {
@@ -22,9 +22,11 @@ class CarService {
     }
   }
 
-  async getCarByIdService(carId) {
+  async getCarByIdService({carId}) {
     try {
-      const car = await carDetails.findById(carId);
+      console.log(carId);
+      
+      const car = await CarDetails.findById(carId);
       if (!car) {
         throw new Error("Car not found.");
       }
@@ -39,4 +41,4 @@ class CarService {
 
 }
 
-module.exports = new CarService()
+module.exports = new AdminCarService()

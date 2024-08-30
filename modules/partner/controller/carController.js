@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const CarService = require("../services/shared/carService");
+const AdminCarService = require("../../admin/services/shared/carService");
 const { uploadToCloudinary } = require('../../shared/config/multer');
 
 class CarController {
@@ -78,7 +79,7 @@ class CarController {
   getCarById = async (req, res) => {
     const carId = req.params.id;
     try {
-      const car = await CarService.getCarByIdService(carId);
+      const car = await AdminCarService.getCarByIdService({carId});
       return res.status(200).json(car);
     } catch (error) {
       res.status(500).json({ message: error.message });

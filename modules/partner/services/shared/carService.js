@@ -33,18 +33,6 @@ class CarService {
     }
   }
 
-  async getCarByIdService(carId) {
-    try {
-      const car = await carDetails.findById(carId);
-      if (!car) {
-        throw new Error("Car not found.");
-      }
-      return car;
-    } catch (error) {
-      console.log(error);
-      throw new Error("Error occurred while fetching car data by ID.");
-    }
-  }
   async updateCarService(carId, updateData) {
     try {
       const car = await carDetails.findByIdAndUpdate(carId, updateData, { new: true });

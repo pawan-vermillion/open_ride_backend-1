@@ -20,7 +20,7 @@ class UserService {
             return {
                 page: currentPage,
                 limit: pageSize,
-                total,
+                totalUser:total,
                 users
             };
 

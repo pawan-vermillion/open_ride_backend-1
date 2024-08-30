@@ -1,18 +1,14 @@
-const { validationResult } = require('express-validator');
-const CarService = require("../../services/shared/carService");
+const AdminCarService = require("../../services/shared/carService");
 
 
-class CarController {
+class AdminCarController {
  
-
-
-
   getAllCars = async (req, res) => {
     try {
       const partnerId = req.user.id;
 
       const { limit, page } = req.query;
-      const cars = await CarService.getAllCarsService({ partnerId, page, limit });
+      const cars = await AdminCarService.getAllCarsService({ partnerId, page, limit });
       return res.status(200).json(cars);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -22,7 +18,7 @@ class CarController {
   getCarById = async (req, res) => {
     const carId = req.params.id;
     try {
-      const car = await CarService.getCarByIdService(carId);
+      const car = await AdminCarService.getCarByIdService({carId});
       return res.status(200).json(car);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -36,4 +32,4 @@ class CarController {
 
 }
 
-module.exports = new CarController();
+module.exports = new AdminCarController();

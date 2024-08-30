@@ -1,14 +1,17 @@
 const{Router} = require('express')
 const router = Router()
-const{adminAuthenticate}= require("../../middleware/adminAuthenication")
+const{sharedAuthentication}= require("../../../shared/Middleware/validator/sharedAuthenication")
 const CarCompanyController = require("../../controller/shared/carCompanyController");
-const CarController = require("../../controller/shared/carController")
+const AdminCarController = require("../../controller/shared/carController")
+const CarVarificationController = require("../../controller/shared/carVerificationController")
 
-router.use(adminAuthenticate);
+router.use(sharedAuthentication);
+router.get("/",AdminCarController.getAllCars )
 router.post("/company", CarCompanyController.createCarCompnay);
 router.get("/company",CarCompanyController.getCarComapny);
-router.get("/",CarController.getAllCars )
-router.get("/:id", CarController.getCarById )
+router.get("/:id", AdminCarController.getCarById )
 router.post("/model/:companyId",CarCompanyController.createCarModel);
 router.get("/model/:companyId",CarCompanyController.getCarModel);
+router.get("/verification/unverified" ,CarVarificationController.getUnverifiedAllCar )
+router.patch("/verification/:carId", CarVarificationController.changeCarVerificationStatus )
 module.exports = router;

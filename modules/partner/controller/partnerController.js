@@ -14,7 +14,7 @@ class PartnerController {
   updatePartner = async (req, res) => {
     try {
       const PartnerId = req.user.id;
-      const { partnerData } = req.body
+      const partnerData = req.body.partnerData || {};
 
       if (req.file) {
         partnerData.profileImage = req.file.path;

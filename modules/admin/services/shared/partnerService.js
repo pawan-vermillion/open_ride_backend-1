@@ -22,9 +22,9 @@ class PartnerService {
 
             return {
 
-                currentPage,
-                pageSize,
-                total,
+                page:currentPage,
+                limit:pageSize,
+                totalPartner:total,
                 partners,
             };
         } catch (error) {

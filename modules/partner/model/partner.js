@@ -26,7 +26,7 @@ const partnerSchema = new Schema({
     },
     profileImage:{
         type:String,
-        require:true
+        require:false
     },
     walletBalance: {
         type: Number,
