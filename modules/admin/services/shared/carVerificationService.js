@@ -26,11 +26,21 @@ class CarVerificationService {
         }
     }
 
-    getUnverifiedAllCar = async ({limit, page, filter}) => {
+    getUnverifiedAllCar = async ({limit, page, filter , search}) => {
         try {
             const pageSize = parseInt(limit) || 10;
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize
+            const searchQuery = search
+            ? {
+                $or: [
+                  { carNumber: { $regex: search, $options: "i" } },
+                  { companyName: { $regex: search, $options: "i" } },
+                  { modelName: { $regex: search, $options: "i" } },
+                ],
+              }
+            : {};
+    
 
             let filterQuery = {}
             switch (filter) {
@@ -47,7 +57,7 @@ class CarVerificationService {
                     break;
             }
 
-            const query = {...filterQuery}
+            const query = {...searchQuery,  ...filterQuery}
             const allCar = await CarDetails.find(query)
             .skip(skip)
             .limit(pageSize)

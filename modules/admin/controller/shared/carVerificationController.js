@@ -23,7 +23,7 @@ class CarVarificationController {
         }
     }
     getUnverifiedAllCar = async (req,res) => {
-        const { page , limit , filter} = req.query
+        const {search, page , limit , filter} = req.query
         if( !filter || !["all" , "verified" , "unverified" ].includes(filter)){
             return res.status(400).json({
                 message:
@@ -34,6 +34,7 @@ class CarVarificationController {
             const { status, message, allCar, total } = await CarVerificationService.getUnverifiedAllCar(
                 {limit,
                 page,
+                search,
                 filter}
               );
               res.status(status).json({ message, total, allCar });
