@@ -25,7 +25,7 @@ exports.sendOTP = async (emailAddress, phoneNumber) => {
     await transporter.sendMail(mailOption);
     return { message: "OTP sent successfully" };
   } catch (error) {
-    console.error("Error in sendOTP:", error); // Log any errors in the sendOTP process
+   
     throw new Error("Failed to send OTP");
   }
 };

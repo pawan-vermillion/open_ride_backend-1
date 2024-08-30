@@ -51,7 +51,7 @@ class BookingService {
         
         await walletHistoryEntry.save();
       } catch (walletHistoryError) {
-        console.error("Error saving wallet history:", walletHistoryError);
+       
         return { error: "Failed to save wallet history", statusCode: 500 };
       }
 
@@ -70,7 +70,7 @@ class BookingService {
 
       return { message: "Booking cancelled successfully" };
     } catch (error) {
-      console.error("Error cancelling booking:", error);
+   
       return { error: "Internal Server Error", statusCode: 500 };
     }
   };
@@ -116,7 +116,7 @@ class BookingService {
         bookings
       };
     } catch (error) {
-      console.error("Error retrieving bookings:", error);
+    
       return {
         message: "Error retrieving bookings",
         error: error.message,

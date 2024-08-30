@@ -12,7 +12,7 @@ class AdminCarController {
       return res.status(200).json(cars);
     } catch (error) {
       res.status(500).json({ message: error.message });
-      console.error(error);
+      
     }
   }
   getCarById = async (req, res) => {
@@ -22,7 +22,7 @@ class AdminCarController {
       return res.status(200).json(car);
     } catch (error) {
       res.status(500).json({ message: error.message });
-      console.error(error);
+    
     }
   }
 

@@ -11,7 +11,7 @@ class CarController {
     }
 
     req.body.type = "Partner";
-    console.log(req.user.id);
+   
 
 
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -21,7 +21,7 @@ class CarController {
     try {
       const exteriorImages = req.files['exteriorImage'] ? (Array.isArray(req.files['exteriorImage']) ? req.files['exteriorImage'] : [req.files['exteriorImage']]) : [];
       const interiorImages = req.files['interiorImage'] ? (Array.isArray(req.files['interiorImage']) ? req.files['interiorImage'] : [req.files['interiorImage']]) : [];
-      console.log(interiorImages)
+     
       const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
 
       // Collect URLs from the uploaded files
@@ -58,7 +58,7 @@ class CarController {
       return res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
-      console.error(error);
+      
     }
   }
 
@@ -73,7 +73,7 @@ class CarController {
       return res.status(200).json(cars);
     } catch (error) {
       res.status(500).json({ message: error.message });
-      console.error(error);
+      
     }
   }
   getCarById = async (req, res) => {
@@ -83,20 +83,20 @@ class CarController {
       return res.status(200).json(car);
     } catch (error) {
       res.status(500).json({ message: error.message });
-      console.error(error);
+    
     }
   }
 
   updateCar = async (req, res) => {
     const carId = req.params.Id;
    
-    console.log("Update Body",req.body);
+   
     
     const updateData = req.body;
     const files = req.files || {};
     const { exteriorImage, interiorImage, rcPhoto } = files;
     
-    console.log(`Updating car with ID: ${carId}`);
+   
     try {
       const existingCar = await CarService.getCarByIdService(carId);
   
@@ -134,7 +134,7 @@ class CarController {
       const result = await CarService.updateCarService(carId, updateData);
       return res.status(200).json(result);
     } catch (error) {
-      console.error('Update car error:', error);
+  
       return res.status(500).json({ message: error.message });
     }
   };

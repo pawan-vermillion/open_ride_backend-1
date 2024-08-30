@@ -17,14 +17,14 @@ class AdminCarService {
         cars:cars
       }
     } catch (error) {
-      console.log(error);
+   
       throw new Error("Error occurred while fetching car data.");
     }
   }
 
   async getCarByIdService({carId}) {
     try {
-      console.log(carId);
+      
       
       const car = await CarDetails.findById(carId);
       if (!car) {
@@ -32,7 +32,7 @@ class AdminCarService {
       }
       return car;
     } catch (error) {
-      console.log(error);
+     
       throw new Error("Error occurred while fetching car data by ID.");
     }
   }

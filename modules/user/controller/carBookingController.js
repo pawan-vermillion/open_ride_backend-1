@@ -35,7 +35,7 @@ class CarBookingController {
   
           res.status(201).json({ message: "success", bookingSummary });
       } catch (error) {
-          console.error(error.message);
+        
           res.status(500).json({ message: error.message });
       }
   }
@@ -48,7 +48,7 @@ class CarBookingController {
 
         res.status(200).json({ message: 'Payment verified successfully', booking: result });
     } catch (error) {
-        console.error(error.message);
+    
         res.status(500).json({ message: error.message });
     }
 }

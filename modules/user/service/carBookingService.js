@@ -94,7 +94,7 @@ class CarBookingService {
             });
 
             if (availability.some(date => !date.isAvailable)) {
-                console.log('Unavailable Dates:', availability.filter(date => !date.isAvailable));
+               
                 throw new Error("Car is not available for the selected dates");
             }
 

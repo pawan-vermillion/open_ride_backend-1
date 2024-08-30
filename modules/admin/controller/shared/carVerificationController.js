@@ -18,7 +18,7 @@ class CarVarificationController {
         
               res.status(status).json({ message, car });
         } catch (error) {
-            console.log(error);
+           
             res.status(500).json({ message: "An error occurred while verification" });
         }
     }
@@ -37,7 +37,7 @@ class CarVarificationController {
                 search,
                 filter}
               );
-              res.status(status).json({ message, total, allCar });
+              res.status(status).json({ message, total, page , limit, allCar });
         } catch (error) {
             
             res

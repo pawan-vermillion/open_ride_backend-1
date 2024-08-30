@@ -66,12 +66,13 @@ class CarVerificationService {
             const total = await CarDetails.countDocuments(query)
             return {
                 status: 200,
-                message: "All Car fetched successfully",
-                allCar: allCar,
                 total,
+                page:currentPage,
+                limit:pageSize,
+                allCar: allCar,
               };
         } catch (error) {
-            console.log(error);
+         
             
             throw error;
         }

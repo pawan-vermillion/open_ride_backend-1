@@ -21,7 +21,7 @@ class BookingController {
 
       return res.json({ message: result.message });
     } catch (error) {
-      console.error(error);
+    
       return res.status(500).json({ error: "Internal Server Error" });
     }
   }
@@ -35,9 +35,7 @@ class BookingController {
         const entityType = req.type;
         const entityId = req.user.id;
 
-        // console.log("Entity Type:", entityType);
-        // console.log("Entity ID:", entityId);
-        // console.log("Status:", status);
+     
 
         const validStatuses = ['pending', 'confirmed', 'complete', 'cancelled', 'all'];
         if (!validStatuses.includes(status)) {
@@ -47,7 +45,7 @@ class BookingController {
         const result = await BookingService.getBooking({ entityType, entityId, status, page, limit });
         res.status(200).json(result); 
     } catch (error) {
-        console.error("Error retrieving bookings:", error);
+    
         res.status(500).json({ message: 'Error retrieving bookings', error: error.message });
     }
 }

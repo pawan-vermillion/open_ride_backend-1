@@ -8,8 +8,7 @@ class CarService {
 
       return { message: "New Car add successflluy" };
     } catch (error) {
-      console.log(error)
-      console.error("Error creating car:", error.message);
+     
       throw new Error("Error occurred while creating a new Car.");
     }
   }
@@ -28,7 +27,7 @@ class CarService {
         cars:cars
       }
     } catch (error) {
-      console.log(error);
+      
       throw new Error("Error occurred while fetching car data.");
     }
   }
@@ -41,7 +40,7 @@ class CarService {
       }
       return car;
     } catch (error) {
-      console.log(error);
+  
       throw new Error("Error occurred while updating car data.");
     }
   }

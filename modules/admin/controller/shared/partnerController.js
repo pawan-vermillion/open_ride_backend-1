@@ -7,7 +7,7 @@ class PartnerController {
       const PartnerId = req.user.id;
       const { limit, page } = req.query;
       const result = await PartnerService.getPartner({ PartnerId , limit ,page  });
-      console.log(result);
+     
       
       return res.status(200).json(result);
     } catch (error) {

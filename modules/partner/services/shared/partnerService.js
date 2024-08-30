@@ -82,7 +82,7 @@ class PartnerService {
             
 
         } catch (error) {
-            console.error("Service Error:", error.message);
+           
             throw error;
         }
     }
