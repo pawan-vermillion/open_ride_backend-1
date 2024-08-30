@@ -1,7 +1,7 @@
-const WalletHistory = require("../../model/walletBalance");
+const WalletHistory = require("../model/walletBalance");
 
 class WalletBalanceService {
-    async getWalletHistory(partnerId, limit, page) {
+    async getWalletHistory(userId, limit, page) {
         try {
             const pageSize = parseInt(limit) || 10;
             const currentPage = parseInt(page) || 1;
@@ -9,7 +9,7 @@ class WalletBalanceService {
             const total = await WalletHistory.countDocuments()
             
             const walletHistoryData = await WalletHistory.find({
-                partnerId: partnerId,
+                userId: userId,
             })
             .skip(skip)
             .limit(pageSize);
@@ -19,7 +19,7 @@ class WalletBalanceService {
                 currentPage,
                 total,
                 walletHistoryData
-            };
+            } ;
         } catch (error) {
             throw error;
         }

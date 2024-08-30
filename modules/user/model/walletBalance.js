@@ -36,5 +36,5 @@ const walletHistorySchema = new Schema({
     {timestamps : true}
 )
 
-const walletHistory = mongoose.model("walletHistory", walletHistorySchema)
-module.exports = walletHistory;
+const WalletHistory = mongoose.model("walletBalance", walletHistorySchema)
+module.exports = WalletHistory;
