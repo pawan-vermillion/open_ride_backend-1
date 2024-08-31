@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required:false,
         default: 0
+      },
+      rating :{
+        type: Number,
+        required:false,
       }
 }, {timestamps : true})
 

@@ -7,6 +7,7 @@ const GetReviewController = require("../Controller/reviewController")
 
 router.use(sharedAuthentication)
 router.get("/:carId" ,GetReviewController.getReviewsByCarId)
+router.get("/:userId",GetReviewController.getReviewsByUserId)
 
 
 

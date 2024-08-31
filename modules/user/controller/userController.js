@@ -32,6 +32,7 @@ class UserController {
             return res.status(200).json({
                 message: 'Money added successfully.',
                 walletBalance: result.walletBalance,
+                result,
               });
         } catch (error) {
             return res.status(404).json({ message: error.message });

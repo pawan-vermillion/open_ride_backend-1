@@ -43,7 +43,7 @@ app.use("/api/user",userRoute)
 app.use("/api/password", passwordRoute);
 app.use("/api/booking",bookingRoute)
 app.use("/api/car",carRoute)
-app.use("/api/reviews", reviewRoute)
+app.use("/api/car/reviews", reviewRoute)
 
 
 
