@@ -6,7 +6,6 @@ const favoriteCarController = require("../controller/favoriteCarController")
 
 router.use(userAuthenticate);
 router.post("/",favoriteCarValidationRules() , validate , favoriteCarController.addFavoriteCar )
-// router.get("/" );
-// router.patch("/update" )
+
 
 module.exports = router

@@ -1,16 +1,16 @@
 const mongoose = require("mongoose")
 
-const favoriteCar = new mongoose.Schema({
+const favoriteCarSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
-    boxId: {
+    carId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Box',
+        ref: 'Car',
         required: true
     },
 }, {timestamps : true})
-const FavoriteCar = mongoose.model("favoriteCar" , favoriteCar)
+const FavoriteCar = mongoose.model("favoriteCar" , favoriteCarSchema)
 module.exports = FavoriteCar

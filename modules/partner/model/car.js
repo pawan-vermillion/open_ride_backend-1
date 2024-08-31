@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const CarDetails = new mongoose.Schema({
+const CarDetailsSchema = new mongoose.Schema({
     partnerId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Partner",
@@ -113,5 +113,15 @@ const CarDetails = new mongoose.Schema({
     }
 },{timestamps:true})
 
-const carDetails = mongoose.model("Car",CarDetails);
-module.exports =    carDetails
+
+CarDetailsSchema.statics.calculateAverageRating = async function (carId) {
+    const reviews = await this.model("Review").find({ carId });
+    if (reviews.length === 0) return;
+  
+    const averageRating =
+      reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+  
+      await this.model("Car").findByIdAndUpdate(carId, { rating: averageRating });
+  };
+  const carDetails = mongoose.model("Car", CarDetailsSchema);
+  module.exports = carDetails;
