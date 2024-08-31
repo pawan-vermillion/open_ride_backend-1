@@ -98,6 +98,18 @@ const CarDetails = new mongoose.Schema({
         type:Boolean,
         required:false,
         default:false
+    },
+    bodyStyle:{
+        type:String,
+        required:true
+    },
+    subModel:{
+        type:String,
+        required:true
+    },
+    modelYear:{
+        type:String,
+        required:true
     }
 },{timestamps:true})
 

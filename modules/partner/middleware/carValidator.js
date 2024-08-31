@@ -78,14 +78,14 @@ const CarValidationRules = () => {
             .exists().withMessage("Longitude is required")
             .notEmpty().withMessage("Longitude cannot be empty"),
             
-        body("deleteExteriorImage")
-            .exists().withMessage("deleteExteriorImage is required"),
+        // body("deleteExteriorImage")
+        //     .exists().withMessage("deleteExteriorImage is required"),
 
-        body("deleteInteriorImage")
-            .exists().withMessage("deleteExteriorImage is required"),
+        // body("deleteInteriorImage")
+        //     .exists().withMessage("deleteExteriorImage is required"),
 
-        body("deleteRcPhoto")
-            .exists().withMessage("deleteExteriorImage is required")
+        // body("deleteRcPhoto")
+        //     .exists().withMessage("deleteExteriorImage is required")
 
 
 

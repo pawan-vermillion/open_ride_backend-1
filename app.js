@@ -12,7 +12,7 @@ const userRoute = require("./modules/user/Route/userRoute")
 const passwordRoute = require("./modules/shared/Route/passwordRoute");
 const { upload } = require("./modules/shared/config/multer");
 const bookingRoute = require("./modules/shared/Route/bookingRoute")
-
+const carRoute = require("./modules/shared/Route/carRoute")
 
 
 
@@ -42,6 +42,7 @@ app.use("/api/partner",partnerRoute)
 app.use("/api/user",userRoute)
 app.use("/api/password", passwordRoute);
 app.use("/api/booking",bookingRoute)
+app.use("/api/car",carRoute)
 
 
 

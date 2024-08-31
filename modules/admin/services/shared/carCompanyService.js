@@ -1,5 +1,7 @@
 const CarCompany = require("../../model/carCompany");
 const CarModel = require("../../model/carModel");
+const BodyStyle = require("../../model/bodyStyle");
+const SubModel = require("../../model/subModel")
 
 class CarCompanyService {
     async createCarCompany(adminData){
@@ -40,6 +42,33 @@ class CarCompanyService {
           return result  
         } catch (error) {
            throw error 
+        }
+    }
+
+    async createCarBodyStyle({ carData }) {
+        try {
+           
+            if (!carData.bodyStyle) {
+                throw new Error("bodyStyle is required");
+            }
+    
+            const create = await BodyStyle.create(carData);
+            return {
+                message: "Car Body Style Added Successfully"
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async createSubModel({ subModel, modelId }) {
+        try {
+            const create = await SubModel.create({ subModel, modelId });
+            return {
+                message: "SubModel Added Successfully"
+            };
+        } catch (error) {
+            throw new Error(`Error occurred while adding SubModel: ${error.message}`);
         }
     }
 }

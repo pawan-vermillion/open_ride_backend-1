@@ -12,7 +12,7 @@ class CarController {
 
     req.body.type = "Partner";
    
-
+   
 
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(422).json({ message: "At least one image file is required" });
@@ -25,9 +25,10 @@ class CarController {
       const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
 
       // Collect URLs from the uploaded files
-      const exteriorImageUrls = exteriorImages.map(file => file.path);
-      const interiorImageUrls = interiorImages.map(file => file.path);
-      const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';
+      const exteriorImageUrls = exteriorImages.map(file => file.path); 
+        const interiorImageUrls = interiorImages.map(file => file.path); 
+        const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';
+
       const carData = {
         partnerId: req.user.id,
         ownerFullName: req.body.ownerFullName,
@@ -44,19 +45,25 @@ class CarController {
         rate: req.body.rate,
         unit: req.body.unit,
         description: req.body.description,
-        exteriorImage: exteriorImageUrls.join(','),
-        interiorImage: interiorImageUrls.join(','),
+        exteriorImage: exteriorImageUrls,
+        interiorImage: interiorImageUrls,
         rcPhoto: rcPhotoUrl,
         address: req.body.address,
         latitude: req.body.latitude,
         longitude: req.body.longitude,
         rating: req.body.rating || 0,
-        isCarVarified: req.body.isCarVarified || false
+        isCarVarified: req.body.isCarVarified || false,
+        bodyStyle:req.body.bodyStyle,
+        subModel:req.body.subModel,
+        modelYear:req.body.modelYear
       };
 
       const result = await CarService.createCarService(carData);
+     
       return res.status(201).json(result);
+     
     } catch (error) {
+      console.error("Error creating car:", error); 
       res.status(500).json({ message: error.message });
       
     }
@@ -69,7 +76,7 @@ class CarController {
       const partnerId = req.user.id;
 
       const { limit, page } = req.query;
-      const cars = await CarService.getAllCarsService({ partnerId, page, limit });
+      const cars = await AdminCarService.getAllCarsService({ partnerId, page, limit });
       return res.status(200).json(cars);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -98,7 +105,7 @@ class CarController {
     
    
     try {
-      const existingCar = await CarService.getCarByIdService(carId);
+      const existingCar = await CarService.updateCarService(carId);
   
       // Handle deletion of old images
       const deleteOldImages = async (urls) => {
