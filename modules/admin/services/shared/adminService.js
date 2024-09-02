@@ -48,6 +48,7 @@ class AdminService {
             }
             return admin;
         } catch (error) {
+           
             throw error;
         }
     }

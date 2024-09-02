@@ -9,7 +9,7 @@ const {partnerAuthenication} = require('../middleware/partnerAuthenication');
 const BankDetailsController = require("../controller/bankDetailsController")
 
 router.use(partnerAuthenication);
-router.patch("/bankAccount" ,bankDetailsValidationRules(),validate,BankDetailsController.updateBankDetails)
 router.get("/",BankDetailsController.getBankDetails)
+router.patch("/bankAccount" ,bankDetailsValidationRules(),validate,BankDetailsController.updateBankDetails)
 
 module.exports = router;

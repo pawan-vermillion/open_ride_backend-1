@@ -1,5 +1,5 @@
 const Partner = require("../../../partner/model/partner")
-
+const BankDetails = require("../../../partner/model/bankDetails")
 class PartnerService {
 
 
@@ -42,7 +42,15 @@ class PartnerService {
                 throw error;
             }
 
-            return partner;
+
+            const bankDetails = await BankDetails.findOne({partnerId:PartnerId});
+            console.log(bankDetails);
+            
+            return {
+                partnerDetails: partner,  
+                bankDetails: bankDetails || {}
+            };
+
         } catch (error) {
             throw error;
         }

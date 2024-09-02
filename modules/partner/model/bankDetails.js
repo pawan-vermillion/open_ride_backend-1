@@ -1,7 +1,7 @@
 const mongoose = require ("mongoose");
 
 const bankDetailsSchema = new mongoose.Schema({
-    partnerId: {
+  partnerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Partner',
         required: true,

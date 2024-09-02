@@ -24,9 +24,9 @@ class BankDetailsService {
             throw error;
         }
     }
-    async getBankDetails(partnerId){
+    async getBankDetails({partnerId}){
         try {
-            const  bankDetails = await BankDetails.findOne({partnerId}).select('-__v');
+            const  bankDetails = await BankDetails.findOne({partnerId:partnerId}).select('-__v');
             return bankDetails;
 
         } catch (error) {

@@ -5,7 +5,9 @@ const {uploadToCloudinary} = require('../../../shared/config/multer')
 class AdminController {
     getAdmin = async (req, res) => {
         try {
-            const adminId = req.user.adminId;
+            const adminId = req.user.id;
+            
+            
             const result = await AdminService.getAdminById({ adminId });
             return res.status(200).json(result);
         } catch (error) {

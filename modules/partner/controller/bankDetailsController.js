@@ -12,8 +12,10 @@ class BankDetailsController {
     }
     async getBankDetails(req, res) {
         try {
+           
             const partnerId = req.user.id; 
-            const bankDetails = await BankDetailsService.getBankDetails(partnerId);
+            
+            const bankDetails = await BankDetailsService.getBankDetails({partnerId});
     
             if (!bankDetails) {
                 return res.status(404).json({ message: "Bank details not found" });
