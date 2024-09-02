@@ -16,12 +16,34 @@ class CarCompanyService {
         }
     }
 
-    async getCarComapny({adminId}){
+    async getCarComapny({ adminId }) {
         try {
-            const result = await CarCompany.find(adminId).select('-__v');
-            return {Comapny :  result}
+            const result = await CarCompany.aggregate([
+                {
+                    $match: { adminId: adminId } // Filter by adminId
+                },
+                {
+                    $lookup: {
+                        from: "carmodels", // Name of the CarModel collection
+                        localField: "_id",
+                        foreignField: "companyId",
+                        as: "models"
+                    }
+                },
+                {
+                    $addFields: {
+                        modelCount: { $size: "$models" } // Add modelCount field with the size of the models array
+                    }
+                },
+                {
+                    $project: {
+                        __v: 0, // Exclude __v field if not needed
+                        models: 0 // Exclude models array if not needed
+                    }
+                }
+            ]).exec();
 
-            
+            return { Comapny: result };
         } catch (error) {
             throw error;
         }
