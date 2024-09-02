@@ -19,7 +19,8 @@ class CarCompanyService {
     async getCarComapny({adminId}){
         try {
             const result = await CarCompany.find(adminId).select('-__v');
-            return result
+            return {Comapny :  result}
+
             
         } catch (error) {
             throw error;

@@ -44,7 +44,7 @@ class PartnerService {
 
 
             const bankDetails = await BankDetails.findOne({partnerId:PartnerId});
-            console.log(bankDetails);
+            
             
             return {
                 partnerDetails: partner,  
