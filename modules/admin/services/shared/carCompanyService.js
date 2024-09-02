@@ -20,11 +20,11 @@ class CarCompanyService {
         try {
             const result = await CarCompany.aggregate([
                 {
-                    $match: { adminId: adminId } // Filter by adminId
+                    $match: { adminId: adminId } 
                 },
                 {
                     $lookup: {
-                        from: "carmodels", // Name of the CarModel collection
+                        from: "carmodels", 
                         localField: "_id",
                         foreignField: "companyId",
                         as: "models"
@@ -32,13 +32,13 @@ class CarCompanyService {
                 },
                 {
                     $addFields: {
-                        modelCount: { $size: "$models" } // Add modelCount field with the size of the models array
+                        modelCount: { $size: "$models" } 
                     }
                 },
                 {
                     $project: {
-                        __v: 0, // Exclude __v field if not needed
-                        models: 0 // Exclude models array if not needed
+                        __v: 0, 
+                        models: 0 
                     }
                 }
             ]).exec();
