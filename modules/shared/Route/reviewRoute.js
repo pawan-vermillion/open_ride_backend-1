@@ -8,10 +8,10 @@ const PartnerReviewController = require("../../partner/controller/partnerReviewC
 const UserReviewController = require("../../user/controller/updateReviewController")
 const {reviewValidationRules , validateReview} = require("../../user/middleware/reviewValidation")
 
-router.patch("/user/:carId",userAuthenticate ,reviewValidationRules(),validateReview, PartnerReviewController.upadteReview);
-router.patch("/partner/:userId",partnerAuthenication ,reviewValidationRules(),validateReview, UserReviewController.addOrUpdateReview);
-router.get("car/:carId",sharedAuthentication ,GetReviewController.getReviewsByCarId)
-router.get("user/:userId",sharedAuthentication,GetReviewController.getReviewsByUserId)
+router.patch("/user/:carId",userAuthenticate ,reviewValidationRules(),validateReview, UserReviewController.addOrUpdateReview);
+router.patch("/partner/:userId",partnerAuthenication ,reviewValidationRules(),validateReview, PartnerReviewController.upadteReview);
+router.get("/car/:carId",sharedAuthentication ,GetReviewController.getReviewsByCarId)
+router.get("/user/:userId",sharedAuthentication,GetReviewController.getReviewsByUserId)
 
 
 

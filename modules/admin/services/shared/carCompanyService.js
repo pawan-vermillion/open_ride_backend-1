@@ -18,17 +18,37 @@ class CarCompanyService {
         }
     }
 
-    async getCarComapny() {
+    async getCarCompany(adminId) {
         try {
-           
             const result = await CarCompany.aggregate([
-               
+                {
+                    $match: { adminId: new mongoose.Types.ObjectId(adminId) }
+                },
                 {
                     $lookup: {
-                        from: "carmodels",
+                        from: "carmodels",  // Collection name should be in lowercase or match the exact name in your DB
                         localField: "_id",
                         foreignField: "companyId",
                         as: "models"
+                    }
+                },
+                {
+                    $unwind: "$models",
+                    preserveNullAndEmptyArrays: true   // Deconstructs the array for further processing
+                },
+                {
+                    $lookup: {
+                        from: "submodels",  // Collection name should be in lowercase or match the exact name in your DB
+                        localField: "models.subModels",
+                        foreignField: "_id",
+                        as: "models.subModels"
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        companyName: { $first: "$companyName" },
+                        models: { $push: "$models" }
                     }
                 },
                 {
@@ -39,19 +59,17 @@ class CarCompanyService {
                 {
                     $project: {
                         __v: 0,
-                        models: 0
+                        "models.__v": 0
                     }
                 }
             ]).exec();
     
-            console.log("Result:", result); // Log the result to check if it contains any data
-    
-            return { Comapny: result };
+            return { Company: result };
         } catch (error) {
-            console.error("Error:", error); // Log any errors for debugging
             throw error;
         }
     }
+
 
     async createCarModel({ companyId, model }) {
         try {
@@ -92,10 +110,10 @@ class CarCompanyService {
                 {
                     $project: {
                         __v: 0,
-                        subModels: 0
+                       
                     }
                 }
-            ]).exec();
+            ])
     
             return {
                 companyName: company.carCompany,

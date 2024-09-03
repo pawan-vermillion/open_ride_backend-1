@@ -115,13 +115,14 @@ const CarDetailsSchema = new mongoose.Schema({
 
 
 CarDetailsSchema.statics.calculateAverageRating = async function (carId) {
-    const reviews = await this.model("Review").find({ carId });
+    const reviews = await this.model("CarReview").find({ carId });
     if (reviews.length === 0) return;
   
     const averageRating =
       reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
   
-      await this.model("Car").findByIdAndUpdate(carId, { rating: averageRating });
+      
+  await this.findByIdAndUpdate(carId, { rating: averageRating });
   };
   const carDetails = mongoose.model("Car", CarDetailsSchema);
   module.exports = carDetails;

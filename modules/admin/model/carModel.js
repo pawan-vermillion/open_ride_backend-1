@@ -9,7 +9,12 @@ const CarModel = new mongoose.Schema({
    model:{
     type:String,
     required:true
-   }
+   },
+   subModels: [{
+       type: mongoose.Schema.Types.ObjectId,
+       required:true,
+       ref: 'subModel' 
+   }]
 })
 
 const carModel = mongoose.model("CarModel",CarModel);

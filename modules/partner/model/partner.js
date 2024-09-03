@@ -60,13 +60,13 @@ partnerSchema.statics.matchPasswordGenerateToken = async function(phone , passwo
 }
 
 partnerSchema.statics.calculateAverageRating = async function (partnerId) {
-    const reviews = await this.model("Review").find({ partnerId });
+    const reviews = await this.model("UserReviews").find({ partnerId });
     if (reviews.length === 0) return;
   
     const averageRating =
       reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
   
-      await this.model("Partner").findByIdAndUpdate(partnerId, { rating: averageRating });
+      await this.findByIdAndUpdate(partnerId, { rating: averageRating });
   };
 const Partner = mongoose.model("Partner", partnerSchema)
 module.exports = Partner
