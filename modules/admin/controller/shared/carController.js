@@ -5,10 +5,11 @@ class AdminCarController {
  
   getAllCars = async (req, res) => {
     try {
-      const partnerId = req.user.id;
+    
 
       const { limit, page } = req.query;
-      const cars = await AdminCarService.getAllCarsService({ partnerId, page, limit });
+      const cars = await AdminCarService.getAllCarsService({  page, limit });
+      
       return res.status(200).json(cars);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -25,11 +26,6 @@ class AdminCarController {
     
     }
   }
-
- 
-  
-  
-
 }
 
 module.exports = new AdminCarController();

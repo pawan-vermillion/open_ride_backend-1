@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const reviewSchema = new mongoose.Schema({
+const UserReviewSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -24,8 +24,8 @@ const reviewSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-reviewSchema.post('save', async function (doc) {
-  await mongoose.model('Car').calculateAverageRating(doc.carId);
+UserReviewSchema.post('save', async function (doc) {
+  await mongoose.model('User').calculateAverageRating(doc.userId);
 });
 
-module.exports = mongoose.model('Reviews', reviewSchema);
+module.exports = mongoose.model('UserReviews', UserReviewSchema);

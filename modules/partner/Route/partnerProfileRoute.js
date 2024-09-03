@@ -1,6 +1,6 @@
 const {Router} = require("express")
 const router = Router();
-const {getPartner , updatePartner} = require("../controller/partnerController")
+const {getPartners , updatePartner} = require("../controller/partnerController")
 const { partnerAuthenication } = require("../middleware/partnerAuthenication");
 const {upload , 
     uploadToCloudinary
@@ -8,7 +8,7 @@ const {upload ,
 
 
 router.use(partnerAuthenication)
-router.get("/" , getPartner)
+router.get("/" , getPartners)
 router.patch("/update",  upload.single('profileImage') , updatePartner)
 
 module.exports = router

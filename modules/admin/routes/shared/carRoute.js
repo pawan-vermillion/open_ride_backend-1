@@ -1,5 +1,5 @@
 const{Router} = require('express')
-const router = Router()
+const   router = Router()
 const{sharedAuthentication}= require("../../../shared/Middleware/validator/sharedAuthenication")
 const CarCompanyController = require("../../controller/shared/carCompanyController");
 const AdminCarController = require("../../controller/shared/carController")

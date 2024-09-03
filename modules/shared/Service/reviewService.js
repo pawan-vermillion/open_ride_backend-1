@@ -1,5 +1,5 @@
-const Review = require("../../user/model/review")
-const Reviews = require("../../partner/model/review")
+const CarReview = require("../../user/model/review")
+const UserReviews = require("../../partner/model/review")
 
 class GetReviewService {
     getReviewsByCarId = async (carId, page, limit) => {
@@ -7,9 +7,9 @@ class GetReviewService {
             const pageSize = parseInt(limit) || 10
             const currentPage = parseInt(page) || 1
             const skip = (currentPage - 1) * pageSize
-            const total = await Review.countDocuments()
+            const total = await CarReview.countDocuments()
 
-            const review = await Review.find({ carId }).skip(skip).limit(pageSize).exec()
+            const review = await CarReview.find({ carId }).skip(skip).limit(pageSize).exec()
             if (review.length === 0) {
                 return { error: "Review not found", statusCode: 404 };
             }
@@ -28,14 +28,17 @@ class GetReviewService {
         }
     }
 
-    getReviewsByUserId = async (carId, page, limit) => {
+    getReviewsByUserId = async (userId, page, limit) => {
         try {
             const pageSize = parseInt(limit) || 10
             const currentPage = parseInt(page) || 1
             const skip = (currentPage - 1) * pageSize
-            const total = await Reviews.countDocuments()
 
-            const review = await Reviews.find({ carId }).skip(skip).limit(pageSize).exec()
+            
+
+            const total = await UserReviews.countDocuments({ userId })
+
+            const review = await UserReviews.find({ userId }).skip(skip).limit(pageSize).exec()
             if (review.length === 0) {
                 return { error: "Review not found", statusCode: 404 };
             }
@@ -47,6 +50,7 @@ class GetReviewService {
             }
 
         } catch (error) {
+           
             return {
                 error: "An error occurred while fetching reviews.",
                 statusCode: 500,

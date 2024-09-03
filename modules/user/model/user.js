@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
       rating :{
         type: Number,
         required:false,
+        default:0,
       }
 }, {timestamps : true})
 

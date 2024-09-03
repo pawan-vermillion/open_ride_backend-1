@@ -9,8 +9,8 @@ class UserController {
            
 
             const userId = req.user.id;
-
-            const result = await UserService.getUserById({userId});
+            const { limit, page } = req.query;
+            const result = await UserService.getUserById({userId , limit , page});
             return res.status(200).json(result);
         } catch (error) {
             throw error;

@@ -36,16 +36,24 @@ class UserService {
         throw error
     }
  }
- async getUserById({userId}){
+ async getUserById({limit , page}){
     try {
-       
-        const user = await User.findById(userId).select("-__v -password -createdAt -updatedAt");
+        const pageSize = parseInt(limit) || 10;
+        const currentPage = parseInt(page) || 1;
+        const skip = (currentPage - 1) * pageSize;
+        const total = await User.countDocuments()
+        const user = await User.find().select("-__v -password -createdAt -updatedAt").skip(skip).limit(pageSize)
         if(!user){
             const error  = new error("user not found")
             error.statusCode = 404;
             throw error;
         }
-        return user;
+        return {
+            page:currentPage,
+            limit:pageSize,
+            totalUser:total,
+            user
+        };
     } catch (error) {
         throw error;
     }

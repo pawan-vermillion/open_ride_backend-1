@@ -1,13 +1,17 @@
 const {Router} = require("express")
-const{sharedAuthentication} = require("../Middleware/validator/sharedAuthenication")
-
 const router = Router();
+const{sharedAuthentication} = require("../Middleware/validator/sharedAuthenication")
+const {userAuthenticate} = require("../../user/middleware/userAuthenication");
+const GetReviewController = require("../Controller/reviewController");
+const {partnerAuthenication} = require("../../partner/middleware/partnerAuthenication");
+const PartnerReviewController = require("../../partner/controller/partnerReviewController")
+const UserReviewController = require("../../user/controller/updateReviewController")
+const {reviewValidationRules , validateReview} = require("../../user/middleware/reviewValidation")
 
-const GetReviewController = require("../Controller/reviewController")
-
-router.use(sharedAuthentication)
-router.get("/:carId" ,GetReviewController.getReviewsByCarId)
-router.get("/:userId",GetReviewController.getReviewsByUserId)
+router.patch("/user/:carId",userAuthenticate ,reviewValidationRules(),validateReview, PartnerReviewController.upadteReview);
+router.patch("/partner/:userId",partnerAuthenication ,reviewValidationRules(),validateReview, UserReviewController.addOrUpdateReview);
+router.get("car/:carId",sharedAuthentication ,GetReviewController.getReviewsByCarId)
+router.get("user/:userId",sharedAuthentication,GetReviewController.getReviewsByUserId)
 
 
 

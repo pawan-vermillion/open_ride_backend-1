@@ -1,6 +1,6 @@
 const ReviewService = require("../service/UpdateReviewService")
 
-class ReviewController {
+class UserReviewController {
     addOrUpdateReview = async (req, res) => {
         try {
             const {  review, rating } = req.body;
@@ -21,4 +21,4 @@ class ReviewController {
     }
 }
 
-module.exports = new  ReviewController();
+module.exports = new  UserReviewController();

@@ -1,6 +1,6 @@
 const PartnerReviewService = require("../services/shared/partnerReviewService")
 
-class ReviewController {
+class PartnerReviewController {
     upadteReview = async (req, res) => {
         try {
             const {  review, rating } = req.body;
@@ -23,4 +23,4 @@ class ReviewController {
     }
 }
 
-module.exports = new  ReviewController();
+module.exports = new  PartnerReviewController();
