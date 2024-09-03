@@ -21,7 +21,7 @@ class CarCompanyController {
     getCarComapny = async(req,res)=>{
         try {
             const adminId = req.user.adminId
-            const Comapny = await CarCompanyService.getCarComapny({adminId})
+            const Comapny = await CarCompanyService.getCarCompany(adminId)
             res.status(201).json(Comapny)
         } catch (error) {
             res.status(500).json({

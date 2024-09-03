@@ -2,9 +2,18 @@ const { body, validationResult } = require('express-validator');
 
 const reviewValidationRules = () => {
   return [
-    
-    body('review').exists().withMessage('Review content is required').notEmpty().withMessage('Review content cannot be empty'),
-    body('rating').exists().withMessage('Rating is required').notEmpty().withMessage('Rating cannot be empty'),
+    body('review')
+      .exists()
+      .withMessage('Review content is required')
+      .notEmpty()
+      .withMessage('Review content cannot be empty'),
+    body('rating')
+      .exists()
+      .withMessage('Rating is required')
+      .notEmpty()
+      .withMessage('Rating cannot be empty')
+      .isInt({ min: 1, max: 5 }) 
+      .withMessage('Rating must be between 1 and 5'),
   ];
 };
 

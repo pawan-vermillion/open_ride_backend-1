@@ -18,57 +18,38 @@ class CarCompanyService {
         }
     }
 
-    async getCarCompany(adminId) {
+    async getCarCompany() {
         try {
-            const result = await CarCompany.aggregate([
-                {
-                    $match: { adminId: new mongoose.Types.ObjectId(adminId) }
-                },
+            const pipeline = [
                 {
                     $lookup: {
-                        from: "carmodels",  // Collection name should be in lowercase or match the exact name in your DB
+                        from: "carmodels", 
                         localField: "_id",
                         foreignField: "companyId",
                         as: "models"
                     }
                 },
                 {
-                    $unwind: "$models",
-                    preserveNullAndEmptyArrays: true   // Deconstructs the array for further processing
-                },
-                {
-                    $lookup: {
-                        from: "submodels",  // Collection name should be in lowercase or match the exact name in your DB
-                        localField: "models.subModels",
-                        foreignField: "_id",
-                        as: "models.subModels"
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$_id",
-                        companyName: { $first: "$companyName" },
-                        models: { $push: "$models" }
-                    }
-                },
-                {
                     $addFields: {
-                        modelCount: { $size: "$models" }
+                        modelCount: { $size: "$models" } 
                     }
                 },
                 {
                     $project: {
-                        __v: 0,
-                        "models.__v": 0
+                        __v: 0, 
+                        models: 0 
                     }
                 }
-            ]).exec();
+            ];
     
-            return { Company: result };
+            const result = await CarCompany.aggregate(pipeline).exec();
+    
+            return result;
         } catch (error) {
             throw error;
         }
     }
+    
 
 
     async createCarModel({ companyId, model }) {
