@@ -77,5 +77,7 @@ class CarVerificationService {
             throw error;
         }
     }
+
+    
 }
 module.exports = new CarVerificationService();

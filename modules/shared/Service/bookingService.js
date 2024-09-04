@@ -90,7 +90,9 @@ class BookingService {
       throw new Error('Invalid entityType');
     }
 
-
+    if (status !== 'all') {
+      query.status = status;
+  }
 
     try {
 
@@ -102,10 +104,6 @@ class BookingService {
         .populate("userId", 'emailAddress phoneNumber firstName lastName')
         .populate("partnerId", 'emailAddress phoneNumber firstName lastName')
         .exec();
-
-
-
-
       const totalPages = Math.ceil(totalDocuments / limit);
 
       return {

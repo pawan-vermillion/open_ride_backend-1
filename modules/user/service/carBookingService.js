@@ -118,7 +118,7 @@ class CarBookingService {
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 0;
             const totalCommisionTax = (subTotal - discount) * (commisionRate / 100);
             const commisionAmmount = totalCommisionTax;
-            const partnerAmmount = subTotal - discount - commisionAmmount - totalTax;
+            const partnerAmmount = subTotal - commisionAmmount - totalTax;
             const userAmmount = subTotal - discount - commisionAmmount - totalTax;
 
             let orderId;

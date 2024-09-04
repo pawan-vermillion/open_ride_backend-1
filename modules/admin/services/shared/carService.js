@@ -37,7 +37,7 @@ class AdminCarService {
     try {
       
       
-      const car = await CarDetails.findById(carId);
+      const car = await CarDetails.findById(carId).populate('partnerId')
       if (!car) {
         throw new Error("Car not found.");
       }

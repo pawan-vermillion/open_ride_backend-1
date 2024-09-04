@@ -3,7 +3,7 @@ const AdminCarService = require("../../admin/services/shared/carService")
 class CarVerificationController {
     
     getVerifiedCars = async (req, res) => {
-        const { search, page, limit } = req.query;  // Extract query parameters
+        const { search, page, limit } = req.query;  
     
         try {
             const verified = await CarVerificationService.getVerifiedCar({

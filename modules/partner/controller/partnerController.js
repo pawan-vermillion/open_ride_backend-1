@@ -4,9 +4,9 @@ const PartnerService = require("../services/shared/partnerService");
 class PartnerController {
   getPartners = async (req, res, next) => {
     try {
-      const PartnerId = req.user.id;
-      const { limit, page } = req.query;
-      const result = await PartnerService.getPartners({ PartnerId , limit ,page  });
+      const partnerId = req.user.id;
+     
+      const result = await PartnerService.getPartners({ partnerId });
      
       
       return res.status(200).json(result);

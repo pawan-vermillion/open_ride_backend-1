@@ -43,34 +43,25 @@ class PartnerService {
         }
     }
 
-    async getPartners({ limit, page }) {
+    async getPartners({ partnerId}) {
         try {
-            const pageSize = parseInt(limit) || 10;
-            const currentPage = parseInt(page) || 1;
-            const skip = (currentPage - 1) * pageSize;
-            const total = await Partner.countDocuments()
-            const partners = await Partner.find().select("-__v -password -updatedAt").skip(skip)
-                .limit(pageSize);
-
-
-
+           
+            const partners = await Partner.findById(partnerId).select("-__v -password -updatedAt")
             if (!partners) {
                 const error = new Error("Partner not found");
                 error.statusCode = 404;
                 throw error;
             }
 
-            return {
-
-                page:currentPage,
-                limit:pageSize,
-                totalPartner:total,
-                partners,
-            };
+            return {partners}
+            
         } catch (error) {
             throw error;
         }
     }
+                
+
+
     
 
     async updatePartner(partnerData , PartnerId , amount){

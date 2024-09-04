@@ -19,7 +19,7 @@ class AdminCarController {
   getCarById = async (req, res) => {
     const carId = req.params.id;
     try {
-      const car = await AdminCarService.getCarByIdService({carId});
+      const car = (await AdminCarService.getCarByIdService({carId}))
       return res.status(200).json(car);
     } catch (error) {
       res.status(500).json({ message: error.message });

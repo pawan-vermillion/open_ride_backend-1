@@ -45,6 +45,8 @@ class CarVarificationController {
               .json({ message: "An error occurred while fetching the Car" });
         }
     }
+
+  
 }
 
 module.exports = new  CarVarificationController();
