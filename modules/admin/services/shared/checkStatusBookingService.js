@@ -9,7 +9,7 @@ class CheckStatusBookingService {
 
             
             const query = { partnerId };
-            if (status) {
+            if (status && status !== 'all') {
                 query.status = status;
             }
        
@@ -38,7 +38,7 @@ class CheckStatusBookingService {
 
             
             const query = { userId };
-            if (status) {
+            if (status && status !== 'all') {
                 query.status = status;
             }
        

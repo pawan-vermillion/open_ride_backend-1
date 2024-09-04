@@ -37,10 +37,15 @@ class AdminCarService {
     try {
       
       
-      const car = await CarDetails.findById(carId).populate('partnerId')
+      const car = await CarDetails.findById(carId) .populate("partnerId", 'emailAddress phoneNumber firstName lastName profileImage')
       if (!car) {
         throw new Error("Car not found.");
       }
+      
+    
+
+  
+    
       return car;
     } catch (error) {
      
