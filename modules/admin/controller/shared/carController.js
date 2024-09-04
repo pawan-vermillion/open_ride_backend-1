@@ -7,8 +7,8 @@ class AdminCarController {
     try {
     
 
-      const { limit, page } = req.query;
-      const cars = await AdminCarService.getAllCarsService({  page, limit });
+      const {search , limit, page } = req.query;
+      const cars = await AdminCarService.getAllCarsService({search ,   page, limit });
       
       return res.status(200).json(cars);
     } catch (error) {

@@ -3,19 +3,21 @@ const carDetails = require("../../partner/model/car")
 class CarFilterService {
     async addCarFilter(carFilterData) {
         try {
-            // Save the car filter data
-            const carFilter = new CarFilter(carFilterData); 
-            await carFilter.save();
+            const { minimumPrice, maximumPrice } = carFilterData;
 
-            // Filter cars based on the provided price range
-            return await Car.find({
-                price: { $gte: carFilterData.minimumPrice, $lte: carFilterData.maximumPrice }
+            
+            if (minimumPrice > maximumPrice) {
+                throw new Error("Invalid price range");
+            }
+
+           
+            return await carDetails.find({
+                rate: { $gte: minimumPrice, $lte: maximumPrice }
             });
         } catch (error) {
             throw error;
         }
     }
-    
 }
 
 module.exports = new CarFilterService()
