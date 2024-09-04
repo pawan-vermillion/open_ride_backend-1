@@ -75,11 +75,6 @@ class BookingService {
     }
   };
 
-
-
-
-
-
   getBooking = async ({ entityType, entityId, status, page, limit }) => {
     let query = {};
     if (entityType === 'User') {
@@ -121,5 +116,20 @@ class BookingService {
       };
     }
   }
+  getBookingByBookingId = async({bookingId}) => {
+    try {
+      
+      const booking = await CarBooking.findById(bookingId);
+
+      
+      if (!booking) {
+          throw new Error("Booking not found");
+      }
+
+      return booking;
+  } catch (error) {
+      throw error;
+  }
+}
 }
 module.exports = new BookingService();

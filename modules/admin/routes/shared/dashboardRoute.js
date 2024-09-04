@@ -3,14 +3,14 @@ const router = Router();
 
 
 
-const {getUser , getUserById} = require("../../controller/shared/userController")
+const DahboardController = require("../../controller/shared/dashboardController")
 const {adminAuthenticate} = require("../../middleware/adminAuthenication")
 
 router.use(adminAuthenticate);
 
 
-router.get("/" ,getUser )
-router.get("/:id" , getUserById)
+router.get("/allDetails",DahboardController.getDashboardCountController  )
+
 
 
 module.exports = router

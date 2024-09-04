@@ -4,7 +4,7 @@ const{sharedAuthentication}= require("../../../shared/Middleware/validator/share
 const CarCompanyController = require("../../controller/shared/carCompanyController");
 const AdminCarController = require("../../controller/shared/carController")
 const CarVarificationController = require("../../controller/shared/carVerificationController")
-
+const CarGetByPartnerIdController = require("../../controller/shared/carByPartnerIdController")
 
 router.use(sharedAuthentication);
 router.get("/",AdminCarController.getAllCars );
@@ -17,6 +17,7 @@ router.post("/model/:companyId",CarCompanyController.createCarModel);
 router.get("/model/:companyId",CarCompanyController.getCarModel);
 router.get("/verification/unverified" ,CarVarificationController.getUnverifiedAllCar );
 router.patch("/verification/:carId", CarVarificationController.changeCarVerificationStatus );
+router.get("/partner/:partnerId",CarGetByPartnerIdController.getCarsByPartnerId)
 
 
 module.exports = router;
