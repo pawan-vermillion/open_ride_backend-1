@@ -28,13 +28,8 @@ class EarningService {
           $gte: lastMonth.toDate(),
           $lte: moment().endOf("day").toDate(),
         };
-      } else if (filter === "lastYear") {
-        const lastYear = moment().subtract(1, "year").startOf("day");
-        query.createdAt = {
-          $gte: lastYear.toDate(),
-          $lte: moment().endOf("day").toDate(),
-        };
-      } else if (filter === "custom") {
+      } 
+       else if (filter === "custom") {
         if (!startDate || !endDate) {
           throw new Error(
             "Start date and end date are required for custom date filter"

@@ -101,26 +101,23 @@ class CarBookingService {
             const bookedDates = this.generateDateRange(pickUpMoment.format('YYYY-MM-DD'), returnMoment.format('YYYY-MM-DD'));
             const totalHour = returnMoment.diff(pickUpMoment, 'hours');
 
-
-            const sgstRate = parseFloat(process.env.SGST_RATE) || 0;
-            const cgstRate = parseFloat(process.env.CGST_RATE) || 0;
-            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 0;
+            const sgstRate = parseFloat(process.env.SGST_RATE) || 9; 
+            const cgstRate = parseFloat(process.env.CGST_RATE) || 9; 
+            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
             let subTotal = car.rate * totalHour;
+            const discount = 0; // Assume no discount for now
 
-
-
-
-
-
-            const discount = 0;
+            // Calculate SGST and CGST
             const sgst = parseFloat(((subTotal - discount) * (sgstRate / 100)).toFixed(2));
             const cgst = parseFloat(((subTotal - discount) * (cgstRate / 100)).toFixed(2));
-            const totalTax = parseFloat((sgst + cgst));
-            const totalCommisionTax = parseFloat(((subTotal - discount) * (commisionRate / 100)));
-            const commisionAmmount = subTotal*commisionRate/100;
-            const partnerAmmount = parseFloat((subTotal - commisionAmmount - totalTax));
-            const userAmmount = parseFloat((subTotal - discount - commisionAmmount - totalTax));
+            const totalTax = parseFloat((sgst + cgst).toFixed(2));
 
+            // Calculate commission and partner's earnings
+            const commisionAmmount = parseFloat((subTotal * commisionRate / 100).toFixed(2));
+            const userAmmount = parseFloat((subTotal - discount).toFixed(2));
+            const partnerAmmount = parseFloat((userAmmount - commisionAmmount - totalTax).toFixed(2));
+
+            // Generate a unique order ID
             let orderId;
             do {
                 orderId = crypto.randomBytes(16).toString("hex");
