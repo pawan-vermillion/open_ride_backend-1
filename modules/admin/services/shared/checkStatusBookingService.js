@@ -45,7 +45,7 @@ class CheckStatusBookingService {
             const total = await CarBooking.countDocuments(query);
            
 
-            const booking = await CarBooking.find(query).populate("userId", 'emailAddress phoneNumber firstName lastName')
+            const booking = await CarBooking.find(query).populate("partnerId", 'emailAddress phoneNumber firstName lastName').populate("userId", 'emailAddress phoneNumber firstName lastName').populate("carId", 'carNumber companyName modelName subModel')
                 .skip(skip)
                 .limit(pageSize);
 
