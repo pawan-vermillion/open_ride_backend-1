@@ -145,11 +145,7 @@ const carBooking = new mongoose.Schema({
         type: Date,
         required: true
       }],
-      
-      isCancel: {
-        type: Boolean,
-        default: false,
-      },
+     
       cancelReason: {
         type: String,
         required: false,
@@ -167,7 +163,11 @@ const carBooking = new mongoose.Schema({
         enum: ["pending", "confirmed", "completed", "cancelled"],
         required: true,
         default: "pending",
-      }
+      },
+      isCancel: {
+        type: Boolean,
+        default: false,
+      },
     
 
 }, { timestamps: true })

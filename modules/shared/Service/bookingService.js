@@ -12,18 +12,19 @@ class BookingService {
       if (!booking) {
         return { error: "Booking not found", statusCode: 404 };
       }
+      
 
       if (booking.isCancel) {
         return { error: "Booking has already been cancelled", statusCode: 400 };
       }
 
       // Set booking cancellation details
-      booking.status = "cancelled";
+      booking.status = "cancelled"
       booking.cancelBy = userType;
       booking.cancelReason = cancelReason;
       booking.isCancel = true;
-
-
+    
+      const savedBooking = await booking.save();
       const user = await User.findById(booking.userId);
 
       if (!user) {
@@ -32,9 +33,9 @@ class BookingService {
       }
 
       // Update wallet balance with the refund amount
-      user.walletBalance += booking.summary.subTotal;
-
+      user.walletBalance += booking.summary.userAmmount;
       await user.save();
+
 
 
   
@@ -45,13 +46,12 @@ class BookingService {
           userId: booking.userId,
           partnerId : booking.partnerId,
           transactionType,
-          amount: booking.summary.subTotal, 
+          amount: booking.summary.userAmmount, 
           bookingId: booking._id,
         });
         
         await walletHistoryEntry.save();
       } catch (walletHistoryError) {
-       
         return { error: "Failed to save wallet history", statusCode: 500 };
       }
 
@@ -62,10 +62,11 @@ class BookingService {
       if (!partner) {
         return { error: "Partner not found", statusCode: 404 };
       }
-      partner.walletBalance -= booking.summary.subTotal
+      
+      partner.walletBalance -= booking.summary.partnerAmmount
 
       await partner.save()
-      await booking.save();
+    
 
 
       return { message: "Booking cancelled successfully" };
@@ -88,6 +89,7 @@ class BookingService {
     if (status !== 'all') {
       query.status = status;
   }
+ 
 
     try {
 

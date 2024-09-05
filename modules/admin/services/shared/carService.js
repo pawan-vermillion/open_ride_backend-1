@@ -28,7 +28,7 @@ class AdminCarService {
         cars:cars
       }
     } catch (error) {
-      console.error('Error fetching cars:', error);
+      
       throw new Error("Error occurred while fetching car data.");
     }
   }
@@ -41,11 +41,6 @@ class AdminCarService {
       if (!car) {
         throw new Error("Car not found.");
       }
-      
-    
-
-  
-    
       return car;
     } catch (error) {
      

@@ -63,7 +63,7 @@ class CarController {
       return res.status(201).json(result);
      
     } catch (error) {
-      console.error("Error creating car:", error); 
+     
       res.status(500).json({ message: error.message });
       
     }

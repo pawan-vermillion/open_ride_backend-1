@@ -104,6 +104,7 @@ class CarBookingService {
 
             const sgstRate = parseFloat(process.env.SGST_RATE) || 0;
             const cgstRate = parseFloat(process.env.CGST_RATE) || 0;
+            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 0;
             let subTotal = car.rate * totalHour;
 
 
@@ -112,14 +113,13 @@ class CarBookingService {
 
 
             const discount = 0;
-            const sgst = (subTotal - discount) * (sgstRate / 100);
-            const cgst = (subTotal - discount) * (cgstRate / 100);
-            const totalTax = sgst + cgst;
-            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 0;
-            const totalCommisionTax = (subTotal - discount) * (commisionRate / 100);
-            const commisionAmmount = totalCommisionTax;
-            const partnerAmmount = subTotal - commisionAmmount - totalTax;
-            const userAmmount = subTotal - discount - commisionAmmount - totalTax;
+            const sgst = parseFloat(((subTotal - discount) * (sgstRate / 100)).toFixed(2));
+            const cgst = parseFloat(((subTotal - discount) * (cgstRate / 100)).toFixed(2));
+            const totalTax = parseFloat((sgst + cgst));
+            const totalCommisionTax = parseFloat(((subTotal - discount) * (commisionRate / 100)));
+            const commisionAmmount = subTotal*commisionRate/100;
+            const partnerAmmount = parseFloat((subTotal - commisionAmmount - totalTax));
+            const userAmmount = parseFloat((subTotal - discount - commisionAmmount - totalTax));
 
             let orderId;
             do {
@@ -137,7 +137,7 @@ class CarBookingService {
                     unit: 'Hour',
                     rate: car.rate,
                     totalHour,
-                    subTotal,
+                    subTotal:parseFloat(subTotal).toFixed(2),
                     discount,
                     taxRate: sgstRate + cgstRate,
                     commisionRate,
@@ -147,7 +147,7 @@ class CarBookingService {
                     partnerAmmount,
                     userAmmount,
                     orderId,
-                    totalCommisionTax,
+                    totalCommisionTax : commisionAmmount,
                     totalTax,
                 },
                 bookedDates,
@@ -157,6 +157,15 @@ class CarBookingService {
 
             const booking = new CarBooking(bookingData);
             await booking.save();
+
+            const partner = await Partner.findById(car.partnerId);
+    if (!partner) {
+      throw new Error("Partner not found");
+    }
+
+    partner.walletBalance -= booking.summary.partnerAmmount;
+    await partner.save();
+
             return booking;
         } catch (error) {
             throw new Error(`Error generating booking summary: ${error.message}`);
