@@ -10,6 +10,16 @@ class BankDetailsController {
             res.status(500).json({ message: error.message });
         }
     }
-   
+   async  getBankDetails (req,res) {
+    try {
+        const {partnerId} = req.params
+        const getBankDetails = await BankDetailsService.getBankDetails(partnerId)
+        res.status(200).json(getBankDetails)
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        
+    }
+   }
+
 }
 module.exports = new BankDetailsController()

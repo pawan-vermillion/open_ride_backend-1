@@ -24,6 +24,19 @@ class BankDetailsService {
             throw error;
         }
     }
+    async  getBankDetails(partnerId) {
+        try {
+            let getBankDetails = await BankDetails.find({partnerId})
+            if(!getBankDetails){
+                throw new Error(" Bank Details is not found")
+            }
+            return  getBankDetails
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
   
 }
 

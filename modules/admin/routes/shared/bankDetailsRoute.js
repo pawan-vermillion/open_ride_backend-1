@@ -13,7 +13,7 @@ router.use(adminAuthenticate);
 
 
 router.patch("/partner/:partnerId"  ,bankDetailsValidationRules(),validate, BankDetailsController.updateBankDetails)
-
+router.get("/:partnerId" , BankDetailsController.getBankDetails)
 
 
 module.exports = router

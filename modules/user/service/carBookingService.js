@@ -86,7 +86,6 @@ class CarBookingService {
 
 
 
-            // Check availability for the date range
             const availability = await this.checkAvailabilityForRange({
                 carId,
                 startDate: pickUpMoment.format('YYYY-MM-DD'),
@@ -100,24 +99,26 @@ class CarBookingService {
 
             const bookedDates = this.generateDateRange(pickUpMoment.format('YYYY-MM-DD'), returnMoment.format('YYYY-MM-DD'));
             const totalHour = returnMoment.diff(pickUpMoment, 'hours');
-
+            let subTotal = car.rate * totalHour;
+            const discount = 0; 
+            
+           
+            const userAmmount = parseFloat((subTotal - discount));
+            
+        // 1015   
+            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
+            const commisionAmmount = parseFloat((userAmmount * commisionRate / 100));
+            
+          
             const sgstRate = parseFloat(process.env.SGST_RATE) || 9; 
             const cgstRate = parseFloat(process.env.CGST_RATE) || 9; 
-            const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
-            let subTotal = car.rate * totalHour;
-            const discount = 0; // Assume no discount for now
-
-            // Calculate SGST and CGST
-            const sgst = parseFloat(((subTotal - discount) * (sgstRate / 100)).toFixed(2));
-            const cgst = parseFloat(((subTotal - discount) * (cgstRate / 100)).toFixed(2));
-            const totalTax = parseFloat((sgst + cgst).toFixed(2));
-
-            // Calculate commission and partner's earnings
-            const commisionAmmount = parseFloat((subTotal * commisionRate / 100).toFixed(2));
-            const userAmmount = parseFloat((subTotal - discount).toFixed(2));
+            const sgst = parseFloat(((userAmmount * sgstRate) / 100).toFixed(2));
+            const cgst = parseFloat(((userAmmount * cgstRate) / 100).toFixed(2)); 
+            const totalTax = parseFloat((sgst + cgst).toFixed(2)); 
+            
+        //    1827
             const partnerAmmount = parseFloat((userAmmount - commisionAmmount - totalTax).toFixed(2));
-
-            // Generate a unique order ID
+            
             let orderId;
             do {
                 orderId = crypto.randomBytes(16).toString("hex");
@@ -134,7 +135,7 @@ class CarBookingService {
                     unit: 'Hour',
                     rate: car.rate,
                     totalHour,
-                    subTotal:parseFloat(subTotal).toFixed(2),
+                    subTotal:parseFloat(subTotal),
                     discount,
                     taxRate: sgstRate + cgstRate,
                     commisionRate,
