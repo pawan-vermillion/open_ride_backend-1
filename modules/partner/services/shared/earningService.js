@@ -4,74 +4,45 @@ const moment = require("moment");
 class EarningService {
   earning = async ({ partnerId, filter, startDate, endDate }) => {
     try {
-      // Initialize earnings
-      let totalEarning = 0;
-      let lastWeekEarning = 0;
-      let lastMonthEarning = 0;
-      let lastYearEarning = 0;
-      let todayEarning = 0;
-      let customEarning = 0;
+      const getEarningsForPeriod = async (start, end) => {
+        
+        
+        const bookings = await CarBooking.find({
+          "partnerId": partnerId,
+          status: { $in: ["confirmed", "completed"] }
+        });
 
-      // Helper function to calculate earnings for any given period
-      const calculateEarningForPeriod = async (start, end) => {
-        console.log(`Calculating earnings from ${start} to ${end} for partnerId ${partnerId}`);
-      
-        // Validate the date range
-        if (!start || !end || start > end) {
-          console.error('Invalid date range provided.');
-          return 0;
-        }
-      
-        const earningsResult = await CarBooking.aggregate([
-          { $match: {
-              createdAt: { $gte: start, $lte: end },
-              "summary.partnerId": partnerId,
-              status: { $in: ["confirmed", "completed"] }
-          }},
-          { $project: {
-              createdAt: 1,
-              "summary.partnerId": 1,
-              "summary.partnerAmmount": 1,
-              status: 1
-          }},
-          { $group: {
-              _id: null,
-              totalEarnings: { $sum: "$summary.partnerAmmount" }
-          }},
-          { $project: {
-              _id: 0,
-              totalEarnings: 1
-          }}
-        ]);
-      
-        console.log(`Earnings result: ${JSON.stringify(earningsResult)}`);
-      
-        return earningsResult.length > 0 ? earningsResult[0].totalEarnings : 0;
+       
+        
+        return bookings.reduce((sum, booking) => sum + booking.summary.partnerAmmount, 0);
       };
-      
-      
-      
-      
 
-      // Calculate earnings for different periods
-      const today = moment().startOf("day");
-      todayEarning = await calculateEarningForPeriod(today.toDate(), moment(today).endOf("day").toDate());
-      totalEarning = await calculateEarningForPeriod(new Date(0), new Date());
+      const today = moment().startOf("day").toDate();
+      const endOfToday = moment(today).endOf("day").toDate();
+
+      const totalEarning = await getEarningsForPeriod(new Date(0), new Date());
+      const todayEarning = await getEarningsForPeriod(today, endOfToday);
+      
       const lastWeekStart = moment().subtract(1, "week").startOf("day").toDate();
-      lastWeekEarning = await calculateEarningForPeriod(lastWeekStart, moment().endOf("day").toDate());
-      const lastMonthStart = moment().subtract(1, "month").startOf("day").toDate();
-      lastMonthEarning = await calculateEarningForPeriod(lastMonthStart, moment().endOf("day").toDate());
-      const lastYearStart = moment().subtract(1, "year").startOf("day").toDate();
-      lastYearEarning = await calculateEarningForPeriod(lastYearStart, moment().endOf("day").toDate());
+      const lastWeekEnd = moment().endOf("day").toDate();
+      const lastWeekEarning = await getEarningsForPeriod(lastWeekStart, lastWeekEnd);
 
+      const lastMonthStart = moment().subtract(1, "month").startOf("day").toDate();
+      const lastMonthEnd = moment().endOf("day").toDate();
+      const lastMonthEarning = await getEarningsForPeriod(lastMonthStart, lastMonthEnd);
+
+      const lastYearStart = moment().subtract(1, "year").startOf("day").toDate();
+      const lastYearEnd = moment().endOf("day").toDate();
+      const lastYearEarning = await getEarningsForPeriod(lastYearStart, lastYearEnd);
+
+      let customEarning = 0;
       if (filter === "custom" && startDate && endDate) {
         if (!moment(startDate, "YYYY-MM-DD", true).isValid() || !moment(endDate, "YYYY-MM-DD", true).isValid()) {
           throw new Error("Invalid date format. Please provide valid dates in yyyy-MM-dd format.");
         }
-        customEarning = await calculateEarningForPeriod(
-          moment(startDate, "YYYY-MM-DD").startOf("day").toDate(),
-          moment(endDate, "YYYY-MM-DD").endOf("day").toDate()
-        );
+        const customStart = moment(startDate, "YYYY-MM-DD").startOf("day").toDate();
+        const customEnd = moment(endDate, "YYYY-MM-DD").endOf("day").toDate();
+        customEarning = await getEarningsForPeriod(customStart, customEnd);
       }
 
       return {
@@ -80,10 +51,10 @@ class EarningService {
         lastMonthEarning,
         lastYearEarning,
         todayEarning,
-        customEarning,
+        customEarning: filter === "custom" && startDate && endDate ? customEarning : 0
       };
     } catch (error) {
-      console.error("Error in earning calculation:", error.message);
+      
       throw error;
     }
   };
