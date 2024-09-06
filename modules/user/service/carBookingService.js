@@ -107,13 +107,13 @@ class CarBookingService {
             
         // 1015   
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
-            const commisionAmmount = parseFloat((userAmmount * commisionRate / 100));
+            const commisionAmmount = parseFloat(userAmmount * commisionRate);
             
           
-            const sgstRate = parseFloat(process.env.SGST_RATE) || 9; 
-            const cgstRate = parseFloat(process.env.CGST_RATE) || 9; 
-            const sgst = parseFloat(((userAmmount * sgstRate) / 100).toFixed(2));
-            const cgst = parseFloat(((userAmmount * cgstRate) / 100).toFixed(2)); 
+            const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09; 
+            const cgstRate = parseFloat(process.env.CGST_RATE) || 0.09; 
+            const sgst = parseFloat((commisionAmmount * sgstRate).toFixed(2));
+            const cgst = parseFloat((commisionAmmount * cgstRate).toFixed(2)); 
             const totalTax = parseFloat((sgst + cgst).toFixed(2)); 
             
         //    1827

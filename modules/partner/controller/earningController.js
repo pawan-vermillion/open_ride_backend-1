@@ -5,8 +5,13 @@ class EarningController {
     earningFilter = async (req, res) => {
         try {
             const { filter, startDate, endDate } = req.query;
+            const partnerId = req.user.id;  
 
-           
+
+            if (!partnerId) {
+                return res.status(400).json({ message: "Partner ID is required" });
+            }
+
             if (filter === "custom") {
                 const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateFormatRegex.test(startDate) || !dateFormatRegex.test(endDate)) {
@@ -21,7 +26,7 @@ class EarningController {
             }
 
             
-            const earnings = await EarningService.earning({ filter, startDate, endDate });
+            const earnings = await EarningService.earning({partnerId, filter, startDate, endDate });
 
             
             res.status(200).json({ earnings });
