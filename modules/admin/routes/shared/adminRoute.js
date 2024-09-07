@@ -9,6 +9,7 @@ const userRoute = require("./userRoute")
 const bankDetailsRoute = require("./bankDetailsRoute")
 const bookingRoute = require("./bookingRoute")
 const dashboardRoute = require("./dashboardRoute")
+const walletHistoryRoute = require("./walletHistoryRoute")
 
 router.use("/auth",authRoute)
 router.use("/profile",adminProfileRoute)
@@ -18,6 +19,7 @@ router.use("/user" , userRoute)
 router.use("/bankDetails",bankDetailsRoute)
 router.use("/booking",bookingRoute)
 router.use("/dashboard",dashboardRoute)
+router.use("/walletHistory",walletHistoryRoute)
 
 
 module.exports = router;

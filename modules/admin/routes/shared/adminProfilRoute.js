@@ -17,3 +17,4 @@ router.get("/" , getAdmin );
 router.patch("/update" , upload.single('profileImage'),updateAdmin)
 
 module.exports = router
+
