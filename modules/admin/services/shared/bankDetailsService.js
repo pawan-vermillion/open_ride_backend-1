@@ -3,7 +3,7 @@ const BankDetails = require("../../../partner/model/bankDetails")
 class BankDetailsService {
     async updateBankDetails(partnerId, bankDetailsData) {
         try {
-          // Find and update or create new bank details
+        
           let bankDetails = await BankDetails.findOneAndUpdate(
             { partnerId },
             {
@@ -15,7 +15,7 @@ class BankDetailsService {
                 ifscCode: bankDetailsData.ifscCode
               }
             },
-            { new: true, upsert: true } // Create the document if it doesn't exist
+            { new: true, upsert: true }
           );
     
           if (!bankDetails) {

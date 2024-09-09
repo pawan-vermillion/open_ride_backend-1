@@ -152,6 +152,7 @@ const carBooking = new mongoose.Schema({
       },
       cancelAt: {
         type: Date,
+        default:Date.now(),
         required: false,
       },
       cancelBy: {

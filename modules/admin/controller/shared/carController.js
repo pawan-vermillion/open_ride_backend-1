@@ -1,8 +1,73 @@
 const AdminCarService = require("../../services/shared/carService");
-
-
+const CarService = require("../../../partner/services/shared/carService")
+const { validationResult } = require('express-validator');
 class AdminCarController {
- 
+  createCar = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ message: errors.array()[0].msg });
+    }
+
+    req.body.type = "Partner";
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(422).json({ message: "At least one image file is required" });
+  }
+  if (!req.files) {
+    console.log("No files received");
+} else {
+    console.log(Object.keys(req.files)); // Logs the file field names
+}  
+
+    try {
+        const exteriorImages = req.files['exteriorImage'] ? (Array.isArray(req.files['exteriorImage']) ? req.files['exteriorImage'] : [req.files['exteriorImage']]) : [];
+        const interiorImages = req.files['interiorImage'] ? (Array.isArray(req.files['interiorImage']) ? req.files['interiorImage'] : [req.files['interiorImage']]) : [];
+        const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
+
+        // Collect URLs from the uploaded files
+        const exteriorImageUrls = exteriorImages.map(file => file.path); 
+        const interiorImageUrls = interiorImages.map(file => file.path); 
+        const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';
+
+        // Fetch partnerId from URL params
+        const carData = {
+            partnerId: req.params.partnerId,  // Fetching partnerId from URL params
+            ownerFullName: req.body.ownerFullName,
+            numberOfSeat: req.body.numberOfSeat,
+            numberOfDoors: req.body.numberOfDoors,
+            fuelType: req.body.fuelType,
+            transmission: req.body.transmission,
+            ac: req.body.ac,
+            sunRoof: req.body.sunRoof,
+            carNumber: req.body.carNumber,
+            companyName: req.body.companyName,
+            modelName: req.body.modelName,
+            rcNumber: req.body.rcNumber,
+            rate: req.body.rate,
+            unit: req.body.unit,
+            description: req.body.description,
+            exteriorImage: exteriorImageUrls,
+            interiorImage: interiorImageUrls,
+            rcPhoto: rcPhotoUrl,
+            address: req.body.address,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            rating: req.body.rating || 0,
+            isCarVarified: req.body.isCarVarified || false,
+            bodyStyle: req.body.bodyStyle,
+            subModel: req.body.subModel,
+            modelYear: req.body.modelYear
+        };
+
+        const result = await CarService.createCarService(carData);
+
+        return res.status(201).json(result);
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
   getAllCars = async (req, res) => {
     try {
     

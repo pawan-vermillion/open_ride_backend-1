@@ -13,10 +13,10 @@ class WalletBalanceService {
                 .limit(pageSize);
             
             return {
-                pageSize,
-                currentPage,
+                page:currentPage,
+                limit:pageSize,
                 total,
-                walletHistoryData
+                walletHistoryData,
             };
         } catch (error) {
             throw error;

@@ -7,6 +7,7 @@ const CarVarificationController = require("../../controller/shared/carVerificati
 const CarGetByPartnerIdController = require("../../controller/shared/carByPartnerIdController")
 
 router.use(sharedAuthentication);
+router.post("/addCar/:partnerId",AdminCarController.createCar)
 router.get("/",AdminCarController.getAllCars );
 router.post("/company", CarCompanyController.createCarCompnay);
 router.get("/company",CarCompanyController.getCarComapny);
