@@ -1,6 +1,6 @@
 const WalletBalanceService = require("../../services/shared/walletHistoryService");
-const User = require("../../../user/model/user"); // Assuming you have a User model
-const Partner = require("../../../partner/model/partner"); // Assuming you have a Partner model
+const User = require("../../../user/model/user");
+const Partner = require("../../../partner/model/partner"); 
 
 class WalletBalanceController {
     async getWalletHistory(req, res, next) {

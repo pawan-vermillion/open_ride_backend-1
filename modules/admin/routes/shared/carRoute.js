@@ -5,9 +5,13 @@ const CarCompanyController = require("../../controller/shared/carCompanyControll
 const AdminCarController = require("../../controller/shared/carController")
 const CarVarificationController = require("../../controller/shared/carVerificationController")
 const CarGetByPartnerIdController = require("../../controller/shared/carByPartnerIdController")
+const { uploadMultiple } = require("../../../shared/config/multer");
+const {CarValidationRules , carValidation}=require("../../../partner/middleware/carValidator");
 
 router.use(sharedAuthentication);
-router.post("/addCar/:partnerId",AdminCarController.createCar)
+router.post("/addCar/:partnerId",uploadMultiple,
+    CarValidationRules(),       
+    carValidation,   AdminCarController.createCar)
 router.get("/",AdminCarController.getAllCars );
 router.post("/company", CarCompanyController.createCarCompnay);
 router.get("/company",CarCompanyController.getCarComapny);

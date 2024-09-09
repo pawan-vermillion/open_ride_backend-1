@@ -30,7 +30,7 @@ class AdminCarController {
         const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';
 
       const carData = {
-        partnerId: req.params.id,
+        partnerId: req.params.partnerId,
         ownerFullName: req.body.ownerFullName,
         numberOfSeat: req.body.numberOfSeat,
         numberOfDoors: req.body.numberOfDoors,
