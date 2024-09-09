@@ -10,7 +10,10 @@ class WalletBalanceService {
             const total = await WalletHistory.countDocuments(query);
             const walletHistoryData = await WalletHistory.find(query)
                 .skip(skip)
-                .limit(pageSize);
+                .limit(pageSize) .populate({
+                    path: 'userId',
+                    select: 'firstName lastName phoneNumber' 
+                  });
             
             return {
                 page:currentPage,
