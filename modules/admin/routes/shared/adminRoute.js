@@ -11,6 +11,7 @@ const bookingRoute = require("./bookingRoute")
 const dashboardRoute = require("./dashboardRoute")
 const walletHistoryRoute = require("./walletHistoryRoute")
 
+
 router.use("/auth",authRoute)
 router.use("/profile",adminProfileRoute)
 router.use("/car" , carRoutes)
@@ -20,6 +21,7 @@ router.use("/bankDetails",bankDetailsRoute)
 router.use("/booking",bookingRoute)
 router.use("/dashboard",dashboardRoute)
 router.use("/walletHistory",walletHistoryRoute)
+
 
 
 module.exports = router;

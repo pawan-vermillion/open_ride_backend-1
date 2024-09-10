@@ -1,4 +1,4 @@
-const WalletHistory = require("../../../partner/model/walletBalance");
+const WalletHistory = require("../../../partner/model/walletHistory");
 
 class WalletBalanceService {
     async getWalletHistory(id, limit, page, type) {

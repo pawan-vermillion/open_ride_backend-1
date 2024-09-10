@@ -3,7 +3,7 @@ const Car = require("../../partner/model/car");
 const moment = require("moment")
 const crypto = require("crypto")
 const Partner = require("../../partner/model/partner")
-const walletHistory = require("../../partner/model/walletBalance")
+const walletHistory = require("../../partner/model/walletHistory")
 
 
 class CarBookingService {

@@ -14,9 +14,9 @@ class AdminCarController {
    
    
 
-    // if (!req.files || Object.keys(req.files).length === 0) {
-    //   return res.status(422).json({ message: "At least one image file is required" });
-    // }
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(422).json({ message: "At least one image file is required" });
+    }
 
     try {
       const exteriorImages = req.files['exteriorImage'] ? (Array.isArray(req.files['exteriorImage']) ? req.files['exteriorImage'] : [req.files['exteriorImage']]) : [];
