@@ -1,5 +1,6 @@
 const OfflineBooking = require("../../model/offlineBooking")
 const CarDetails = require("../../model/car")
+const CarBookingService = require("../../../user/service/carBookingService")
 
 class OfflineBookingService {
     async createOfflineBooking(bookingData) {
@@ -20,7 +21,15 @@ class OfflineBookingService {
             if (!car) {
                 throw new Error("Car not found.");
             }
+            const availability = await CarBookingService.checkAvailabilityForRange({
+                carId,
+                startDate: pickUpDate,
+                endDate: returnDate
+            });
 
+            if (availability.some(date => !date.isAvailable)) {
+                throw new Error("Car is not available for the selected offline booking dates.");
+            }
             const newBooking = new OfflineBooking({
                 username,
                 phoneNumber,

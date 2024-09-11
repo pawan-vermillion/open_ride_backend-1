@@ -4,6 +4,7 @@ const moment = require("moment")
 const crypto = require("crypto")
 const Partner = require("../../partner/model/partner")
 const walletHistory = require("../../partner/model/walletHistory")
+const OfflineBooking = require("../../partner/model/offlineBooking")
 
 
 class CarBookingService {
@@ -29,13 +30,17 @@ class CarBookingService {
             endDate.setDate(endDate.getDate() + 14);
 
             const bookings = await CarBooking.find({ carId }).select('bookedDates  isCancel');
+            const offlineBookings = await OfflineBooking.find({ carId });//for offline  booking
+
 
 
             const bookedDates = bookings.flatMap(booking =>
                 !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
             );
-    
-
+            //for offline  booking
+            const offlineDates = offlineBookings.flatMap(booking =>
+                this.generateDateRange(booking.pickUpDate, booking.returnDate)
+            );
             const checkDates = [];
             for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
                 checkDates.push(date.toISOString().split('T')[0]);
@@ -44,7 +49,7 @@ class CarBookingService {
 
             return checkDates.map(date => ({
                 date: date,
-                isAvailable: !bookedDates.includes(date)
+                isAvailable: !bookedDates.includes(date) && !offlineDates.includes(date)
             }));
 
         } catch (error) {
@@ -55,15 +60,22 @@ class CarBookingService {
     checkAvailabilityForRange = async ({ carId, startDate, endDate }) => {
         try {
             const bookings = await CarBooking.find({ carId }).select('bookedDates isCancel');
+            const offlineBookings = await OfflineBooking.find({ carId });//for offline   booking
+
 
             const bookedDates = bookings.flatMap(booking =>
                 !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
             );
+            //for offline   booking
+            const offlineDates = offlineBookings.flatMap(booking =>
+                this.generateDateRange(booking.pickUpDate, booking.returnDate)
+            );
+
             const checkDates = this.generateDateRange(startDate, endDate);
 
             return checkDates.map(date => ({
                 date: date,
-                isAvailable: !bookedDates.includes(date)
+                isAvailable: !bookedDates.includes(date) && !offlineDates.includes(date)
             }));
         } catch (error) {
             throw new Error(`Error checking car availability for range: ${error.message}`);
@@ -93,32 +105,32 @@ class CarBookingService {
             });
 
             if (availability.some(date => !date.isAvailable)) {
-               
+
                 throw new Error("Car is not available for the selected dates");
             }
 
             const bookedDates = this.generateDateRange(pickUpMoment.format('YYYY-MM-DD'), returnMoment.format('YYYY-MM-DD'));
             const totalHour = returnMoment.diff(pickUpMoment, 'hours');
             let subTotal = car.rate * totalHour;
-            const discount = 0; 
-            
-           
+            const discount = 0;
+
+
             const userAmmount = parseFloat((subTotal - discount));
-            
-        // 1015   
+
+
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
             const commisionAmmount = parseFloat(userAmmount * commisionRate);
-            
-          
-            const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09; 
-            const cgstRate = parseFloat(process.env.CGST_RATE) || 0.09; 
+
+
+            const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09;
+            const cgstRate = parseFloat(process.env.CGST_RATE) || 0.09;
             const sgst = parseFloat((commisionAmmount * sgstRate).toFixed(2));
-            const cgst = parseFloat((commisionAmmount * cgstRate).toFixed(2)); 
-            const totalTax = parseFloat((sgst + cgst).toFixed(2)); 
-            
-        //    1827
+            const cgst = parseFloat((commisionAmmount * cgstRate).toFixed(2));
+            const totalTax = parseFloat((sgst + cgst).toFixed(2));
+
+
             const partnerAmmount = parseFloat((userAmmount - commisionAmmount - totalTax).toFixed(2));
-            
+
             let orderId;
             do {
                 orderId = crypto.randomBytes(16).toString("hex");
@@ -130,12 +142,12 @@ class CarBookingService {
                 userId,
                 pickUpData,
                 returnData,
-               
+
                 summary: {
                     unit: 'Hour',
                     rate: car.rate,
                     totalHour,
-                    subTotal:parseFloat(subTotal),
+                    subTotal: parseFloat(subTotal),
                     discount,
                     taxRate: sgstRate + cgstRate,
                     commisionRate,
@@ -145,7 +157,7 @@ class CarBookingService {
                     partnerAmmount,
                     userAmmount,
                     orderId,
-                    totalCommisionTax : commisionAmmount,
+                    totalCommisionTax: commisionAmmount,
                     totalTax,
                 },
                 bookedDates,
@@ -157,12 +169,12 @@ class CarBookingService {
             await booking.save();
 
             const partner = await Partner.findById(car.partnerId);
-    if (!partner) {
-      throw new Error("Partner not found");
-    }
+            if (!partner) {
+                throw new Error("Partner not found");
+            }
 
-    partner.walletBalance -= booking.summary.partnerAmmount;
-    await partner.save();
+            partner.walletBalance -= booking.summary.partnerAmmount;
+            await partner.save();
 
             return booking;
         } catch (error) {
@@ -182,7 +194,7 @@ class CarBookingService {
         }
     };
 
-    bookingVerification = async ({  orderId, paymentId, signature, bookingId }) => {
+    bookingVerification = async ({ orderId, paymentId, signature, bookingId }) => {
         try {
             const booking = await CarBooking.findById({ _id: bookingId });
 
@@ -210,33 +222,32 @@ class CarBookingService {
                 throw new Error('Partner not found');
             }
 
-            
+
             const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
-            
-            
+
+
             // add wallet balance in partner account
             partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
 
-            //  user.walletBalance += booking.summary.subTotal;
-            // GENERATE   PARTNER WALLET TRANSACTION
-           
+
+
             const userId = booking.userId;
             const transactionType = 'Credit';
-       
-const walletHistoryEntry = new walletHistory({
-    partnerId : booking.partnerId,
-    userId,
-    transactionType,
-    amount: totalAmount,
-    bookingId: booking._id,
-});
 
-await walletHistoryEntry.save();
+            const walletHistoryEntry = new walletHistory({
+                partnerId: booking.partnerId,
+                userId,
+                transactionType,
+                amount: totalAmount,
+                bookingId: booking._id,
+            });
+
+            await walletHistoryEntry.save();
 
 
 
-        
-        await partner.save().catch(err => console.error('Save Error:', err));
+
+            await partner.save().catch(err => console.error('Save Error:', err));
             return booking;
         } catch (error) {
             throw new Error(error.message);
@@ -252,15 +263,6 @@ await walletHistoryEntry.save();
         return true;
     };
 
-
-
-
-
 }
-
-
-
-
-
 
 module.exports = new CarBookingService();
