@@ -52,8 +52,6 @@ class WalletBalanceService {
     
             const walletBalance = partner.walletBalance;
     
-            console.log("Partner wallet balance:");
-            console.log(walletBalance);
     
             if (walletBalance < amount) {
                 throw new Error("Insufficient balance");
@@ -82,29 +80,32 @@ class WalletBalanceService {
             throw error;
         }
     }
-    
-    async getWithdrawRequestsByPartner({partnerId , page , limit}) {
+    async getWithdrawRequestsByPartner({ partnerId, page = 1, limit = 10 }) {
         try {
-            page = parseInt(page, 10) || 1;
-            limit = parseInt(limit, 10) || 10;
-            const skip = (page - 1) * limit;
+           
+            const pageSize = parseInt(limit) || 10;
+            const currentPage = parseInt(page) || 1;
+            const skip = (currentPage - 1) * pageSize;
+      
+          const total = await WithdrawRequest.countDocuments({ partnerId });
+      
 
-            const total = await WithdrawRequest.countDocuments({ partnerId });
-    
-          const withdrawRequests = await WithdrawRequest.find({ partnerId}).skip(skip)
-          .limit(limit)
-          .exec();
+          const withdrawRequests = await WithdrawRequest.find({ partnerId })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+      
           return {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
+            page:currentPage,
+            limit:pageSize,
+            totalPartner:total,
             withdrawRequests
-        };
+          };
         } catch (error) {
           throw error;
         }
       }
+      
 
 
 

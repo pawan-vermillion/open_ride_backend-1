@@ -8,7 +8,7 @@ class CarService {
 
       return { message: "New Car add successflluy" };
     } catch (error) {
-      console.error('Error creating car:', error);
+      
       throw new Error("Error occurred while creating a new Car.");
     }
   }

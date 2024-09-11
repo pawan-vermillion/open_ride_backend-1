@@ -20,7 +20,7 @@ router.use("/user" , userRoute)
 router.use("/bankDetails",bankDetailsRoute)
 router.use("/booking",bookingRoute)
 router.use("/dashboard",dashboardRoute)
-router.use("/walletHistory",walletHistoryRoute)
+router.use("/wallet",walletHistoryRoute)
 
 
 

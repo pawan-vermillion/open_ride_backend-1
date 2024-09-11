@@ -37,7 +37,7 @@ class WalletBalanceController {
       async getRequestsByPartner(req, res) {
         try {
           const partnerId = req.user.id;
-          const { page = 1, limit = 10 } = req.query;
+          const { page, limit  } = req.query;
           const requests = await WalletBalanceService.getWithdrawRequestsByPartner({partnerId , page ,limit });
           res.status(200).json(requests);
         } catch (error) {

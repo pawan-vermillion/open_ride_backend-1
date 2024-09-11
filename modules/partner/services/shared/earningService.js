@@ -5,7 +5,7 @@ class EarningService {
   earning = async ({ partnerId, filter, startDate, endDate }) => {
     try {
       const getEarningsForPeriod = async (start, end) => {
-        console.log(`Fetching earnings for period: ${start.toISOString()} to ${end.toISOString()}`);
+       
     
         const bookings = await CarBooking.find({
             partnerId,
@@ -13,7 +13,7 @@ class EarningService {
             createdAt: { $gte: start, $lte: end },
         });
     
-        console.log(`Number of bookings found: ${bookings.length}`);
+       
         
         return bookings.reduce((sum, booking) => sum + booking.summary.partnerAmmount, 0);
     };
