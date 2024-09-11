@@ -9,6 +9,7 @@ router.use(partnerAuthenication);
 
 
 router.post("/booking" , OfflineBookingValidationRules() ,OfflineBookingvalidate , OfflineBookingController.createOfflineBooking)
+router.get("/allBookings" ,OfflineBookingController.getAllOfflineBookings )
 
 
 module.exports = router;

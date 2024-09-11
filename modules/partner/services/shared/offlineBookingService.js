@@ -1,6 +1,7 @@
 const OfflineBooking = require("../../model/offlineBooking")
 const CarDetails = require("../../model/car")
 const CarBookingService = require("../../../user/service/carBookingService")
+const Partner = require("../../../partner/model/partner")
 
 class OfflineBookingService {
     async createOfflineBooking(bookingData) {
@@ -21,6 +22,8 @@ class OfflineBookingService {
             if (!car) {
                 throw new Error("Car not found.");
             }
+            
+
             const availability = await CarBookingService.checkAvailabilityForRange({
                 carId,
                 startDate: pickUpDate,
@@ -50,8 +53,30 @@ class OfflineBookingService {
             throw new Error(error.message || "Error occurred while creating a new offline booking.");
         }
     }
+    async getAllOfflineBookings({ limit, page }) {
+        try {
+            const pageSize = parseInt(limit) || 10;
+            const currentPage = parseInt(page) || 1;
+            const skip = (currentPage - 1) * pageSize;
+    
+            const total = await OfflineBooking.countDocuments();
+            const bookings = await OfflineBooking.find()
+                .skip(skip)
+                .limit(pageSize);
+    
+            return {
+                total,
+                limit: pageSize,
+                page: currentPage,
+                bookings
+            };
+        } catch (error) {
+            throw new Error(error.message || "Error occurred while fetching offline bookings.");
+        }
+    }
+    
 }
-             
 
 
-module.exports = new  OfflineBookingService();
+
+module.exports = new OfflineBookingService();

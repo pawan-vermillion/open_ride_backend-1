@@ -19,18 +19,18 @@ class GetCarService {
         }
     }
 
-    async getAllSubModels() {
+    async getAllSubModels(modelId) {
         try {
-            const subModels = await SubModel.find();
+            const subModels = await SubModel.find({ modelId });
             if (!subModels || subModels.length === 0) {
-                throw new Error("No sub-models found");
+                return []; // Return an empty array instead of throwing an error
             }
             return subModels;
         } catch (error) {
-            throw new Error(`Error occurred while fetching sub-models: ${error.message}. Stack trace: ${error.stack}`);
+            throw new Error(`Error occurred while fetching sub-models: ${error.message}`);
         }
     }
-   
+    
 }
 
 module.exports =  new GetCarService()

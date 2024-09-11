@@ -5,6 +5,6 @@ const router = Router();
 
 router.use(sharedAuthentication)
 router.get("/" ,GetCarController.getCarBodyStyles )
-router.get("/allSubModel/" , GetCarController.getSubModels)
+router.get("/allSubModel/:modelId" , GetCarController.getSubModels)
 
 module.exports = router;

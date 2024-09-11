@@ -2,22 +2,22 @@ const {body, validationResult} = require("express-validator")
 
 const favoriteCarValidationRules = () => {
     return[
-        body('carId')
+        body('carId').exists().withMessage("carId is Required")
         .notEmpty()
-        .withMessage("carId is Required")
+        .withMessage("carId cannot be empty")
     ];
 }
 
 
-const validate =(req,res,next) => {
-    const error = validationResult(req);
-    if(error.isEmpty())
-        return next;
-
-    const extractedErrors =[];
-    error.array.map(error => extractedErrors.push(error.msg));
-    return res.status(422).json({message : extractedErrors[0]})
-}
+const validate = (req, res, next) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+      return next();
+    }
+  
+    const extractedErrors = errors.array().map(error => error.msg);
+    return res.status(422).json({ errors: extractedErrors[0] });
+  };
 module.exports ={
     favoriteCarValidationRules,
     validate

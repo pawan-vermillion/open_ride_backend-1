@@ -97,5 +97,6 @@ const uploadMultiple = upload.fields([
 module.exports = {
   upload,
   uploadToCloudinary,
-  uploadMultiple
+  uploadMultiple,
+  cloudinary
 };
