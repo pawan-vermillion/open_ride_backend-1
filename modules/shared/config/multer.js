@@ -76,13 +76,15 @@ const uploadToCloudinary = async (req, filePath ,fieldname ) => {
   
   
 
+    console.log('Uploading to Cloudinary:', { folder, filePath });
+
     const result = await cloudinary.uploader.upload(filePath, {
-      folder, 
+      folder,
       public_id: Date.now().toString(),
       transformation: [{ quality: 'auto' }],
     });
-   
 
+    console.log('Upload result:', result);
     return result.secure_url;
   } catch (error) {
    

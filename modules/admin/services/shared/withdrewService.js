@@ -82,8 +82,8 @@ class WithdrawRequestService {
 
       return {
         totalCount,
-        currentPage,
-        pageSize,
+        page,
+        limit,
         requests,
       };
 

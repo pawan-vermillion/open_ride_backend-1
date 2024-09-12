@@ -99,71 +99,15 @@ class CarController {
     const carId = req.params.id;
     const updateData = req.body;
     const files = req.files || {};
-    const { exteriorImage, interiorImage, rcPhoto } = files;
   
     try {
-      const existingCar = await CarDetails.findById(carId);
-      if (!existingCar) {
-        return res.status(404).json({ message: "Car not found." });
-      }
+      const updatedCar = await CarService.updateCarService(carId, updateData, files);
   
-      let newExteriorImageUrls = [];
-      let newInteriorImageUrls = [];
-      let newRcPhotoUrl = '';
-  
-      const deleteOldImages = async (urls) => {
-        if (!urls) return;
-        const urlsArray = Array.isArray(urls) ? urls : [urls];
-  
-        for (const url of urlsArray) {
-          if (url) {
-            const public_id = url.split('/').pop().split('.')[0];
-            try {
-              await cloudinary.uploader.destroy(public_id);
-            } catch (error) {
-              console.error(`Error deleting old image ${public_id}:`, error);
-            }
-          }
-        }
-      };
-  
-      const uploadImages = async (images, folder) => {
-        if (!images || images.length === 0) return [];
-  
-        const uploadPromises = images.map(file => uploadToCloudinary(req, file.path, folder));
-        return await Promise.all(uploadPromises);
-      };
-  
-      if (exteriorImage && exteriorImage.length > 0) {
-        await deleteOldImages(existingCar.exteriorImage);
-        newExteriorImageUrls = await uploadImages(exteriorImage, 'uploads/partner/car/exterior');
-        updateData.exteriorImage = newExteriorImageUrls;
-      } else {
-        updateData.exteriorImage = existingCar.exteriorImage;
-      }
-  
-      if (interiorImage && interiorImage.length > 0) {
-        await deleteOldImages(existingCar.interiorImage);
-        newInteriorImageUrls = await uploadImages(interiorImage, 'uploads/partner/car/interior');
-        updateData.interiorImage = newInteriorImageUrls;
-      } else {
-        updateData.interiorImage = existingCar.interiorImage;
-      }
-  
-      if (rcPhoto && rcPhoto.length > 0) {
-        await deleteOldImages(existingCar.rcPhoto);
-        newRcPhotoUrl = await uploadToCloudinary(req, rcPhoto[0].path, 'uploads/partner/car/rcBook');
-        updateData.rcPhoto = newRcPhotoUrl;
-      } else {
-        updateData.rcPhoto = existingCar.rcPhoto;
-      }
-  
-      const result = await CarService.updateCarService(carId, updateData);
-  
+      // Cleanup temporary files
       const cleanupFiles = (files) => {
         if (files && Array.isArray(files)) {
           files.forEach(file => {
-            if (file.path && file.path.startsWith("D:")) {
+            if (file.path) {
               fs.unlink(file.path, (err) => {
                 if (err) {
                   console.error(`Error deleting temporary file: ${file.path}`, err);
@@ -174,16 +118,24 @@ class CarController {
         }
       };
   
-      cleanupFiles(exteriorImage);
-      cleanupFiles(interiorImage);
-      cleanupFiles(rcPhoto);
+      cleanupFiles(Object.values(files));
   
-      return res.status(200).json(result);
+      return res.status(200).json({
+        message: "Car updated successfully",
+        car: updatedCar,
+      });
+  
     } catch (error) {
       console.error('Error in updateCar:', error);
       return res.status(500).json({ message: error.message });
     }
   };
+  
+
+  
+  
+  
+  
   
   
 
