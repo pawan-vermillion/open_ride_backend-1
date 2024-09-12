@@ -95,30 +95,31 @@ class CarController {
     
     }
   }
-   updateCar = async (req, res) => {
-    const carId = req.params.Id;
+  updateCar = async (req, res) => {
+    const carId = req.params.id;
     const updateData = req.body;
     const files = req.files || {};
     const { exteriorImage, interiorImage, rcPhoto } = files;
   
     try {
-      // Fetch the existing car data
-      const existingCar = await CarService.updateCarService(carId);
+      const existingCar = await CarDetails.findById(carId);
       if (!existingCar) {
         return res.status(404).json({ message: "Car not found." });
       }
   
-      // Function to delete old images from Cloudinary
+      let newExteriorImageUrls = [];
+      let newInteriorImageUrls = [];
+      let newRcPhotoUrl = '';
+  
       const deleteOldImages = async (urls) => {
         if (!urls) return;
-        const urlsArray = typeof urls === 'string' ? urls.split(',') : urls;
+        const urlsArray = Array.isArray(urls) ? urls : [urls];
   
         for (const url of urlsArray) {
           if (url) {
-            const public_id = url.split('/').pop().split('.')[0]; // Extract public_id from URL
+            const public_id = url.split('/').pop().split('.')[0];
             try {
-              await cloudinary.uploader.destroy(public_id); // Destroy image in Cloudinary
-              console.log(`Successfully deleted image: ${public_id}`);
+              await cloudinary.uploader.destroy(public_id);
             } catch (error) {
               console.error(`Error deleting old image ${public_id}:`, error);
             }
@@ -126,39 +127,43 @@ class CarController {
         }
       };
   
-      // Upload new exterior images, if provided
+      const uploadImages = async (images, folder) => {
+        if (!images || images.length === 0) return [];
+  
+        const uploadPromises = images.map(file => uploadToCloudinary(req, file.path, folder));
+        return await Promise.all(uploadPromises);
+      };
+  
       if (exteriorImage && exteriorImage.length > 0) {
-        await deleteOldImages(existingCar.exteriorImage); // Delete old exterior images
-        const exteriorImageUrls = await Promise.all(
-          exteriorImage.map(file => uploadToCloudinary(req, file.path, 'exteriorImage'))
-        );
-        updateData.exteriorImage = exteriorImageUrls.join(',');
+        await deleteOldImages(existingCar.exteriorImage);
+        newExteriorImageUrls = await uploadImages(exteriorImage, 'uploads/partner/car/exterior');
+        updateData.exteriorImage = newExteriorImageUrls;
+      } else {
+        updateData.exteriorImage = existingCar.exteriorImage;
       }
   
-      // Upload new interior images, if provided
       if (interiorImage && interiorImage.length > 0) {
-        await deleteOldImages(existingCar.interiorImage); // Delete old interior images
-        const interiorImageUrls = await Promise.all(
-          interiorImage.map(file => uploadToCloudinary(req, file.path, 'interiorImage'))
-        );
-        updateData.interiorImage = interiorImageUrls.join(',');
+        await deleteOldImages(existingCar.interiorImage);
+        newInteriorImageUrls = await uploadImages(interiorImage, 'uploads/partner/car/interior');
+        updateData.interiorImage = newInteriorImageUrls;
+      } else {
+        updateData.interiorImage = existingCar.interiorImage;
       }
   
-      // Upload new RC Photo, if provided
       if (rcPhoto && rcPhoto.length > 0) {
-        await deleteOldImages(existingCar.rcPhoto); // Delete old RC Photo
-        const rcPhotoUrl = await uploadToCloudinary(req, rcPhoto[0].path, 'rcPhoto');
-        updateData.rcPhoto = rcPhotoUrl;
+        await deleteOldImages(existingCar.rcPhoto);
+        newRcPhotoUrl = await uploadToCloudinary(req, rcPhoto[0].path, 'uploads/partner/car/rcBook');
+        updateData.rcPhoto = newRcPhotoUrl;
+      } else {
+        updateData.rcPhoto = existingCar.rcPhoto;
       }
   
-      // Update car details
       const result = await CarService.updateCarService(carId, updateData);
   
-      // Clean up temporary files
       const cleanupFiles = (files) => {
         if (files && Array.isArray(files)) {
           files.forEach(file => {
-            if (file.path && file.path.startsWith("D:")) { // Only unlink local paths
+            if (file.path && file.path.startsWith("D:")) {
               fs.unlink(file.path, (err) => {
                 if (err) {
                   console.error(`Error deleting temporary file: ${file.path}`, err);
@@ -169,7 +174,6 @@ class CarController {
         }
       };
   
-      // Clean up temp files for each image type
       cleanupFiles(exteriorImage);
       cleanupFiles(interiorImage);
       cleanupFiles(rcPhoto);
@@ -182,9 +186,15 @@ class CarController {
   };
   
   
+
+
+}
+  
+  
+  
   
   
 
-}
+
 
 module.exports = new CarController();

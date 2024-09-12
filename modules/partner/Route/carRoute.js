@@ -16,8 +16,12 @@ router.post('/addCar',uploadMultiple,
 
   router.get('/allCars', CarController.getAllCars);
   router.get('/carId/:id', CarController.getCarById);
-  router.patch('/updateCar/:Id', uploadMultiple, CarValidationRules(),       
-  carValidation, carController.updateCar )
+  router.patch('/updateCar/:id', 
+    uploadMultiple,          
+    CarValidationRules(),    
+    carValidation,           
+    carController.updateCar  
+  );
  
 
 module.exports = router;

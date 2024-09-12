@@ -38,7 +38,8 @@ const CarDetailsSchema = new mongoose.Schema({
     },
     carNumber:{
         type:String,
-        required:true
+        required:true,
+        unique: true
     },
     companyName:{
         type:String,

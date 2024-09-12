@@ -33,7 +33,6 @@ class CarService {
     }
   }
 
-
   async updateCarService(carId, updateData) {
     try {
       const car = await CarDetails.findByIdAndUpdate(carId, updateData, { new: true });
@@ -42,8 +41,7 @@ class CarService {
       }
       return car;
     } catch (error) {
-  
-      throw new Error("Error occurred while updating car data.");
+      throw new Error(`Error occurred while updating car data: ${error.message}`);
     }
   }
 
