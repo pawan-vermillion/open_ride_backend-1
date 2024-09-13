@@ -4,7 +4,7 @@ const CarController = require("../controller/carController")
 const {partnerAuthenication} = require('../middleware/partnerAuthenication');
 const { uploadMultiple } = require("../../shared/config/multer");
 const {CarValidationRules , carValidation}=require("../middleware/carValidator");
-const carController = require('../controller/carController');
+
 
 
 router.use(partnerAuthenication);
@@ -20,7 +20,7 @@ router.post('/addCar',uploadMultiple,
     uploadMultiple,          
     CarValidationRules(),    
     carValidation,           
-    carController.updateCar  
+    CarController.updateCar
   );
  
 

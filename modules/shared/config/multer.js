@@ -85,7 +85,15 @@ const uploadToCloudinary = async (req, filePath ,fieldname ) => {
     });
 
     console.log('Upload result:', result);
-    return result.secure_url;
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(path, { folder }, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    })
   } catch (error) {
    
     throw new Error('Error uploading to Cloudinary');

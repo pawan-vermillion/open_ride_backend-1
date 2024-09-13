@@ -1,6 +1,7 @@
 const CarDetails = require("../../model/car")
 const { uploadToCloudinary , cloudinary } = require('../../../shared/config/multer');
-const { deleteOldImages } = require('../../../shared/config/cloudinary');
+
+
 
 class CarService {
   async createCarService(CarData) {
@@ -34,81 +35,65 @@ class CarService {
       throw new Error("Error occurred while fetching car data.");
     }
   }
-
- 
-   deleteOldImages = async (urls) => {
-    if (!urls) return;
-    const urlsArray = Array.isArray(urls) ? urls : [urls];
-    for (const url of urlsArray) {
-      const public_id = getPublicIdFromUrl(url);
-      if (public_id) {
-        try {
-          await cloudinary.uploader.destroy(public_id);
-        } catch (error) {
-          console.error(`Error deleting old image ${public_id}:`, error);
-        }
-      }
-    }
-  };
-  
-   uploadImages = async (images, folder) => {
-    if (!images || images.length === 0) return [];
+  async updateCarService(carId, carData) {
     try {
-      const uploadPromises = images.map(file => uploadToCloudinary(file.path, folder));
-      const results = await Promise.all(uploadPromises);
-      return results;
-    } catch (error) {
-      console.error('Cloudinary upload error:', error);
-      throw new Error('Error uploading images to Cloudinary');
-    }
-  };
-  
-   updateCarService = async (carId, updateData, files) => {
-    try {
+      // Fetch the car to get existing image URLs
       const existingCar = await CarDetails.findById(carId);
-      if (!existingCar) {
-        throw new Error("Car not found.");
+      if (!existingCar) throw new Error("Car not found");
+  
+      // Extract existing images from the database
+      const existingExteriorImages = existingCar.exteriorImage || [];
+      const existingInteriorImages = existingCar.interiorImage || [];
+      const existingRcPhoto = existingCar.rcPhoto || '';
+  
+      // Extract new images from the request (user-provided data)
+      const newExteriorImages = carData.exteriorImage || [];
+      const newInteriorImages = carData.interiorImage || [];
+      const newRcPhoto = carData.rcPhoto || '';
+  
+      // Function to delete images that are no longer present in the update request
+      const deleteImages = async (oldImages, newImages) => {
+        const imagesToDelete = oldImages.filter(image => !newImages.includes(image));
+        for (const imageUrl of imagesToDelete) {
+          await cloudinary.uploader.destroy(imageUrl); // Remove from Cloudinary
+        }
+      };
+  
+      // Check and delete any removed exterior and interior images from Cloudinary
+      await deleteImages(existingExteriorImages, newExteriorImages);
+      await deleteImages(existingInteriorImages, newInteriorImages);
+  
+      // If rcPhoto is changed, delete the old one
+      if (existingRcPhoto && existingRcPhoto !== newRcPhoto) {
+        await cloudinary.uploader.destroy(existingRcPhoto);
       }
   
-      const { exteriorImage, interiorImage, rcPhoto } = files;
-  
-      if (exteriorImage && exteriorImage.length > 0) {
-        await deleteOldImages(existingCar.exteriorImage);
-        updateData.exteriorImage = await uploadImages(exteriorImage, 'uploads/partner/car/exterior');
-      } else {
-        updateData.exteriorImage = existingCar.exteriorImage;
-      }
-  
-      if (interiorImage && interiorImage.length > 0) {
-        await deleteOldImages(existingCar.interiorImage);
-        updateData.interiorImage = await uploadImages(interiorImage, 'uploads/partner/car/interior');
-      } else {
-        updateData.interiorImage = existingCar.interiorImage;
-      }
-  
-      if (rcPhoto && rcPhoto.length > 0) {
-        await deleteOldImages(existingCar.rcPhoto);
-        updateData.rcPhoto = await uploadToCloudinary(rcPhoto[0].path, 'uploads/partner/car/rcBook');
-      } else {
-        updateData.rcPhoto = existingCar.rcPhoto;
-      }
-  
-      const updatedCar = await CarDetails.findByIdAndUpdate(carId, updateData, { new: true });
-      if (!updatedCar) {
-        throw new Error("Failed to update car.");
-      }
-  
+      // Update the car details in the database with new image URLs and other data
+      const updatedCar = await CarDetails.findByIdAndUpdate(carId, carData, { new: true });
       return updatedCar;
   
     } catch (error) {
-      console.error(`Error occurred while updating car data: ${error.message}`);
-      throw new Error(`Error occurred while updating car data: ${error.message}`);
+      throw new Error("Error occurred while updating car data: " + error.message);
     }
-  };
+  }
+  
+
+ 
+
+  
+}
+
+  
+
+  
   
   
   
 
-}
+
+  
+  
+
+
 
 module.exports = new CarService()
