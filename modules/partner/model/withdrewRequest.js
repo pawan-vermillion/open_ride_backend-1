@@ -16,6 +16,6 @@ const WithdrawRequestSchema = new mongoose.Schema({
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending'
     }
-});
+} ,{ timestamps: true });
 
 module.exports = mongoose.model('WithdrawRequest', WithdrawRequestSchema);

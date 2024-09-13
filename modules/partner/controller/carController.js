@@ -95,15 +95,16 @@ class CarController {
     
     }
   }
-  updateCar = async (req, res) => {
+   updateCar = async (req, res) => {
     const carId = req.params.id;
     const updateData = req.body;
     const files = req.files || {};
   
     try {
+      // Call the service to update the car and handle file uploads
       const updatedCar = await CarService.updateCarService(carId, updateData, files);
   
-      // Cleanup temporary files
+      // Function to cleanup temporary files
       const cleanupFiles = (files) => {
         if (files && Array.isArray(files)) {
           files.forEach(file => {
@@ -115,9 +116,17 @@ class CarController {
               });
             }
           });
+        } else if (files && files.path) {
+          // Handle single file case
+          fs.unlink(files.path, (err) => {
+            if (err) {
+              console.error(`Error deleting temporary file: ${files.path}`, err);
+            }
+          });
         }
       };
   
+      // Clean up temporary files
       cleanupFiles(Object.values(files));
   
       return res.status(200).json({
@@ -131,20 +140,7 @@ class CarController {
     }
   };
   
-
-  
-  
-  
-  
-  
-  
-
-
 }
-  
-  
-  
-  
   
 
 

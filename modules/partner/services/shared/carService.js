@@ -1,5 +1,6 @@
 const CarDetails = require("../../model/car")
 const { uploadToCloudinary , cloudinary } = require('../../../shared/config/multer');
+const { deleteOldImages } = require('../../../shared/config/cloudinary');
 
 class CarService {
   async createCarService(CarData) {
@@ -34,79 +35,64 @@ class CarService {
     }
   }
 
-  async updateCarService(carId, updateData, files) {
+ 
+   deleteOldImages = async (urls) => {
+    if (!urls) return;
+    const urlsArray = Array.isArray(urls) ? urls : [urls];
+    for (const url of urlsArray) {
+      const public_id = getPublicIdFromUrl(url);
+      if (public_id) {
+        try {
+          await cloudinary.uploader.destroy(public_id);
+        } catch (error) {
+          console.error(`Error deleting old image ${public_id}:`, error);
+        }
+      }
+    }
+  };
+  
+   uploadImages = async (images, folder) => {
+    if (!images || images.length === 0) return [];
     try {
-      // Find existing car details
+      const uploadPromises = images.map(file => uploadToCloudinary(file.path, folder));
+      const results = await Promise.all(uploadPromises);
+      return results;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw new Error('Error uploading images to Cloudinary');
+    }
+  };
+  
+   updateCarService = async (carId, updateData, files) => {
+    try {
       const existingCar = await CarDetails.findById(carId);
       if (!existingCar) {
         throw new Error("Car not found.");
       }
   
-      // Utility function to extract public ID from a Cloudinary URL
-      const getPublicIdFromUrl = (url) => {
-        if (!url) return null;
-        const parts = url.split('/');
-        const fileName = parts.pop();
-        return fileName.split('.')[0];
-      };
-  
-      // Utility function to delete old images from Cloudinary
-      const deleteOldImages = async (urls) => {
-        if (!urls) return;
-        const urlsArray = Array.isArray(urls) ? urls : [urls];
-        for (const url of urlsArray) {
-          const public_id = getPublicIdFromUrl(url);
-          if (public_id) {
-            try {
-              await cloudinary.uploader.destroy(public_id);
-            } catch (error) {
-              console.error(`Error deleting old image ${public_id}:`, error);
-            }
-          }
-        }
-      };
-  
-      // Utility function to upload images to Cloudinary
-      const uploadImages = async (images, folder) => {
-        if (!images || images.length === 0) return [];
-        try {
-          const uploadPromises = images.map(file => uploadToCloudinary(file.path, folder));
-          const results = await Promise.all(uploadPromises);
-          return results;
-        } catch (error) {
-          console.error('Cloudinary upload error:', error); // Add detailed error logging
-          throw new Error('Error uploading images to Cloudinary');
-        }
-      };
-      
-  
       const { exteriorImage, interiorImage, rcPhoto } = files;
   
-      // Handle exterior images
       if (exteriorImage && exteriorImage.length > 0) {
-        await deleteOldImages(existingCar.exteriorImage); // Delete old images
+        await deleteOldImages(existingCar.exteriorImage);
         updateData.exteriorImage = await uploadImages(exteriorImage, 'uploads/partner/car/exterior');
       } else {
         updateData.exteriorImage = existingCar.exteriorImage;
       }
   
-      // Handle interior images
       if (interiorImage && interiorImage.length > 0) {
-        await deleteOldImages(existingCar.interiorImage); // Delete old images
+        await deleteOldImages(existingCar.interiorImage);
         updateData.interiorImage = await uploadImages(interiorImage, 'uploads/partner/car/interior');
       } else {
         updateData.interiorImage = existingCar.interiorImage;
       }
   
-      // Handle RC photo
       if (rcPhoto && rcPhoto.length > 0) {
-        await deleteOldImages(existingCar.rcPhoto); // Delete old image
+        await deleteOldImages(existingCar.rcPhoto);
         updateData.rcPhoto = await uploadToCloudinary(rcPhoto[0].path, 'uploads/partner/car/rcBook');
       } else {
         updateData.rcPhoto = existingCar.rcPhoto;
       }
   
-      // Update car details
       const updatedCar = await CarDetails.findByIdAndUpdate(carId, updateData, { new: true });
       if (!updatedCar) {
         throw new Error("Failed to update car.");
@@ -115,9 +101,12 @@ class CarService {
       return updatedCar;
   
     } catch (error) {
+      console.error(`Error occurred while updating car data: ${error.message}`);
       throw new Error(`Error occurred while updating car data: ${error.message}`);
     }
-  }
+  };
+  
+  
   
 
 }

@@ -15,7 +15,7 @@ router.use(adminAuthenticate);
 
 router.get("/history/:id" ,WalletBalanceController.getWalletHistory)
 router.get("/request",WithdrawRequestController.getAllRequests)
-router.patch("/request/approved/:requestId",WithdrawRequestController.approvedRequest)
-router.patch("/request/reject/:requestId",WithdrawRequestController.rejectRequest)
+
+router.patch("/request/:requestId",WithdrawRequestController.handleRequest)
 
 module.exports = router
