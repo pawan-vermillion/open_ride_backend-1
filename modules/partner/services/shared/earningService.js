@@ -2,70 +2,75 @@ const CarBooking = require("../../../shared/model/booking");
 const moment = require("moment");
 
 class EarningService {
-  earning = async ({ partnerId, filter, startDate, endDate }) => {
+  earning = async ({ partnerId, startDate, endDate }) => {
     try {
-      const getEarningsForPeriod = async (start, end) => {
-       
-    
-        const bookings = await CarBooking.find({
-            partnerId,
-            status: { $in: ["confirmed", "completed"] },
-            createdAt: { $gte: start, $lte: end },
-        });
-    
-       
-        
-        return bookings.reduce((sum, booking) => sum + booking.summary.partnerAmmount, 0);
-    };
-    
+      const now = moment().endOf("day");
+      const today = moment().startOf("day");
+      const lastWeek = moment().subtract(1, "weeks").startOf("week");
+      const lastMonth = moment().subtract(1, "months").startOf("month");
+      const lastYear = moment().subtract(1, "years").startOf("year");
+     
 
-      const today = moment().startOf("day").toDate();
-      const endOfToday = moment().endOf("day").toDate();
+      const start = startDate ? moment(startDate).startOf("day").toDate() : null;
+      const end = endDate ? moment(endDate).endOf("day").toDate() : null;
 
-      // Total earnings (all-time)
-      const totalEarning = await getEarningsForPeriod(new Date(0), new Date());
-      
-      // Earnings for today
-      const todayEarning = await getEarningsForPeriod(today, endOfToday);
-
-      // Earnings for last week
-      const lastWeekStart = moment().subtract(1, "week").startOf("day").toDate();
-      const lastWeekEnd = moment().subtract(1, "day").endOf("day").toDate(); // Up to yesterday
-      const lastWeekEarning = await getEarningsForPeriod(lastWeekStart, lastWeekEnd);
-
-      // Earnings for last month
-      const lastMonthStart = moment().subtract(1, "month").startOf("day").toDate();
-      const lastMonthEnd = moment().subtract(1, "day").endOf("day").toDate();
-      const lastMonthEarning = await getEarningsForPeriod(lastMonthStart, lastMonthEnd);
-
-      // Earnings for last year
-      const lastYearStart = moment().subtract(1, "year").startOf("day").toDate();
-      const lastYearEnd = moment().subtract(1, "day").endOf("day").toDate();
-      const lastYearEarning = await getEarningsForPeriod(lastYearStart, lastYearEnd);
-
-      let customEarning = 0;
-      // Calculate custom earnings only if custom filter is selected
-      if (filter === "custom" && startDate && endDate) {
-        const customStart = moment(startDate, "YYYY-MM-DD").startOf("day").toDate();
-        const customEnd = moment(endDate, "YYYY-MM-DD").endOf("day").toDate();
-
-        // Ensure valid custom date range
-        if (customStart > customEnd) {
-          throw new Error("Start date cannot be later than end date");
-        }
-
-        customEarning = await getEarningsForPeriod(customStart, customEnd);
+      if (start > end) {
+        throw new Error("Start date cannot be later than end date");
       }
 
+      const todayBookings = await CarBooking.find({
+        partnerId,
+        status: { $in: ["confirmed", "completed"] },
+        createdAt: { $gte: today.toDate(), $lte: now.toDate() }
+      });
+
+      const lastWeekBookings = await CarBooking.find({
+        partnerId,
+        status: { $in: ["confirmed", "completed"] },
+        createdAt: { $gte: lastWeek.toDate(), $lte: now.toDate() }
+      });
+
+      const lastMonthBookings = await CarBooking.find({
+        partnerId,
+        status: { $in: ["confirmed", "completed"] },
+        createdAt: { $gte: lastMonth.toDate(), $lte: now.toDate() }
+      });
+
+      const lastYearBookings = await CarBooking.find({
+        partnerId,
+        status: { $in: ["confirmed", "completed"] },
+        createdAt: { $gte: lastYear.toDate(), $lte: now.toDate() }
+      });
+
+      
+     
+      let customBookings = [];
+      if (start && end) {
+        customBookings = await CarBooking.find({
+          partnerId,
+          status: { $in: ["confirmed", "completed"] },
+          createdAt: { $gte: start, $lte: end }
+        });
+      }
+      
+      const calculateEarnings = bookings =>
+        bookings.reduce((sum, booking) => sum + booking.summary.partnerAmmount, 0);
+
+      const todayEarning = calculateEarnings(todayBookings);
+      const lastWeekEarning = calculateEarnings(lastWeekBookings);
+      const lastMonthEarning = calculateEarnings(lastMonthBookings);
+      const lastYearEarning = calculateEarnings(lastYearBookings);
+      const customEarning = start && end ? calculateEarnings(customBookings) : 0;
+
       return {
-        totalEarning,
-        lastWeekEarning,
-        lastMonthEarning,
-        lastYearEarning,
-        todayEarning,
-        customEarning: filter === "custom" && startDate && endDate ? customEarning : 0
+        todayEarning: todayEarning || 0,
+        lastWeekEarning: lastWeekEarning || 0,
+        lastMonthEarning: lastMonthEarning || 0,
+        lastYearEarning: lastYearEarning || 0,
+        customEarning: customEarning || 0
       };
     } catch (error) {
+      console.error('Error calculating earnings:', error);
       throw error;
     }
   };
