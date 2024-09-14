@@ -6,7 +6,7 @@ class CheckStatusBookingController {
             const { status, partnerId } = req.params;
 
             const { limit, page } = req.query;
-            const validStatuses = ['pending', 'confirmed', 'complete', 'cancelled', 'all'];
+            const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'all'];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({ message: `Invalid status: '${status}` });
             }
@@ -27,7 +27,7 @@ class CheckStatusBookingController {
 
             const { limit, page } = req.query;
 
-            const validStatuses = ['pending', 'confirmed', 'complete', 'cancelled', 'all'];
+            const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'all'];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({ message: `Invalid status: '${status}` });
             }
