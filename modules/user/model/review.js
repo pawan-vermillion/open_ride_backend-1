@@ -26,6 +26,5 @@ const CarReviewSchema = new mongoose.Schema({
 CarReviewSchema.post('save', async function (doc) {
   await mongoose.model('Car').calculateAverageRating(doc.carId);
 });
-
 module.exports = mongoose.model('CarReview', CarReviewSchema);
 

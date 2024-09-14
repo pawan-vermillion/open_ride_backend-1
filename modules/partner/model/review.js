@@ -24,7 +24,7 @@ const UserReviewSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 UserReviewSchema.post('save', async function (doc) {
-  await mongoose.model('Partner').calculateAverageRating(doc.partnerId);
+  await mongoose.model('User').calculateAverageRating(doc.userId);
 });
 
 module.exports = mongoose.model('UserReviews', UserReviewSchema);

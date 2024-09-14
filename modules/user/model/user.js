@@ -59,6 +59,17 @@ userSchema.statics.matchPasswordGenerateToken = async function (phone, password)
         throw error;
     }
 };
+userSchema.statics.calculateAverageRating = async function (userId) {
+    const reviews = await this.model("UserReviews").find({ userId });
+
+    if (reviews.length === 0) return;
+
+    // Calculate the average rating
+    const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+
+    // Update the user's rating field with the average
+    await this.findByIdAndUpdate(userId, { rating: averageRating });
+};
 
 
 const User = mongoose.model('User', userSchema);
