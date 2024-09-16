@@ -4,47 +4,47 @@ const carDetails = require("../../../partner/model/car");
 const CarBooking = require("../../../shared/model/booking");
 
 class DashboardService {
-    getDashbaordCountDetails = async () => {
+    getDashboardCountDetails = async () => {
         try {
-            const partnerCount = await Partner.find({}).countDocuments();
-            const userCount = await User.find({}).countDocuments();
-            const carCount = await carDetails.find({}).countDocuments();
+            const partnerCount = await Partner.countDocuments();
+            const userCount = await User.countDocuments();
+            const carCount = await carDetails.countDocuments();
 
-            // Aggregate booking data
+           
             const bookingAggregation = await CarBooking.aggregate([
                 {
                     $group: {
                         _id: null,
                         totalBooking: { $sum: 1 },
-                        totalUserAmount: { $sum: { $ifNull: ["$userAmount", 0] } }, // Handle null or missing
-                        totalPartnerAmount: { $sum: { $ifNull: ["$partnerAmount", 0] } }, // Handle null or missing
-                        totalCommission: { $sum: { $ifNull: ["$commission", 0] } }, // Handle null or missing
-                        totalTax: { $sum: { $ifNull: ["$tax", 0] } }, // Handle null or missing
+                        confirmedBookingCount: { $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] } },
+                        pendingBookingCount: { $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] } },
+                        cancelledBookingCount: { $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] } },
+                        completedBookingCount: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] } },
+                        totalUserAmount: { $sum: { $ifNull: ["$summary.userAmmount", 0] } },
+                        totalPartnerAmount: { $sum: { $ifNull: ["$summary.partnerAmmount", 0] } },
+                        totalCommission: { $sum: { $ifNull: ["$summary.commisionAmmount", 0] } },
+                        totalTax: { $sum: { $ifNull: ["$summary.totalTax", 0] } },
                     },
                 },
             ]);
-            
 
             const bookingData = bookingAggregation[0] || {
                 totalBooking: 0,
+                confirmedBookingCount: 0,
+                pendingBookingCount: 0,
+                cancelledBookingCount: 0,
+                completedBookingCount: 0,
                 totalUserAmount: 0,
                 totalPartnerAmount: 0,
                 totalCommission: 0,
                 totalTax: 0,
             };
 
-            // Get counts of different booking statuses
-            const confirmedBookingCount = await CarBooking.countDocuments({ status: "confirmed" });
-            const pendingBooking = await CarBooking.countDocuments({ status: "pending" });
-            const cancelledBooking = await CarBooking.countDocuments({ status: "cancelled" });
-            const completedBooking = await CarBooking.countDocuments({ status: "completed" });
+            const commissionPercentage = 0.10;
+            const expectedCommission = bookingData.totalUserAmount * commissionPercentage;
+            const partnerAmmout = bookingData.totalUserAmount - expectedCommission;
 
-            // Calculate commission on tax
-            const commissionOnTax = (bookingData.totalCommission * bookingData.totalTax) / 100;
-
-            // Final amount: Commission + Tax + Commission on Tax
-            const totalCommissionAndTax = bookingData.totalCommission + bookingData.totalTax + commissionOnTax;
-
+           
             return {
                 account: {
                     totalPartner: partnerCount,
@@ -53,16 +53,14 @@ class DashboardService {
                 },
                 booking: {
                     totalBooking: bookingData.totalBooking,
-                    confirmBooking: confirmedBookingCount,
-                    pendingBooking: pendingBooking,
-                    cancelledBooking: cancelledBooking,
-                    completedBooking: completedBooking,
-                    userTotalAmount: bookingData.totalUserAmount, // Total money from users
-                    partnerTotalAmount: bookingData.totalPartnerAmount, // Total money for partners
-                    commission: bookingData.totalCommission, // Total commission
-                    tax: bookingData.totalTax, // Total tax
-                    commissionOnTax: commissionOnTax, // Commission on tax
-                    totalCommissionAndTax: totalCommissionAndTax, // Total commission + tax + commission on tax
+                    confirmBooking: bookingData.confirmedBookingCount,
+                    pendingBooking: bookingData.pendingBookingCount,
+                    cancelledBooking: bookingData.cancelledBookingCount,
+                    completedBooking: bookingData.completedBookingCount,
+                    userTotalAmount: bookingData.totalUserAmount,
+                    
+                    commissionOnTotal: bookingData.totalCommission, 
+                    partnerAmmout: partnerAmmout, 
                 },
             };
         } catch (error) {
