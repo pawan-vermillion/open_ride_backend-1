@@ -12,7 +12,7 @@ router.post('/cancle/:bookingId',
 );
 router.get("/:status", BookingController.getBookingController);
 
-router.get("/add/:bookingId", BookingController.getBookingByBookingId)
+router.get("/get/:bookingId", BookingController.getBookingByBookingId)
 
 module.exports = router;
 

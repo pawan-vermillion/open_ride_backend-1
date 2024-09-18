@@ -25,5 +25,7 @@ class PartnerController {
       res.status(404).json({ message: error.message })
     }
   }
+
+
 }
 module.exports = new PartnerController()

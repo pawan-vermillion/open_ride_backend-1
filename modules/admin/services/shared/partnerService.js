@@ -1,5 +1,6 @@
 const Partner = require("../../../partner/model/partner")
 const BankDetails = require("../../../partner/model/bankDetails")
+const WithdrawRequest = require("../../../partner/model/withdrewRequest")
 class PartnerService {
 
 
@@ -56,6 +57,8 @@ class PartnerService {
         }
 
     }
+
+  
 
 
 }
