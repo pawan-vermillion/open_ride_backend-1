@@ -137,7 +137,7 @@ class BookingService {
   getBookingByBookingId = async({bookingId}) => {
     try {
       
-      const booking = await CarBooking.findById(bookingId).populate("carId" , 'modelName  companyName bodyStyle'  ).populate("partnerId" ,'phoneNumber emailAddress  firstName lastName')
+      const booking = await CarBooking.findById(bookingId).populate("carId" , 'modelName  companyName bodyStyle'  ).populate("partnerId" ,'phoneNumber emailAddress  firstName lastName').populate("userId" ,'phoneNumber emailAddress  firstName lastName')
 
       
       if (!booking) {
