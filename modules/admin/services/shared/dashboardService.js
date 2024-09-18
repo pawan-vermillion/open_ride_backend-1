@@ -2,16 +2,59 @@ const Partner = require("../../../partner/model/partner");
 const User = require("../../../user/model/user");
 const carDetails = require("../../../partner/model/car");
 const CarBooking = require("../../../shared/model/booking");
+const moment = require('moment');
 
 class DashboardService {
-    getDashboardCountDetails = async () => {
+    getDashboardCountDetails = async (filterParams) => {
         try {
             const partnerCount = await Partner.countDocuments();
             const userCount = await User.countDocuments();
             const carCount = await carDetails.countDocuments();
+            
+            let match = {};
+            const now = moment();
+            
+            switch(filterParams.filter) {
+                case 'today':
+                    match.createdAt = { $gte: now.startOf('day').toDate(), $lt: now.endOf('day').toDate() };
+                    break;
+                case 'lastWeek':
+                    match.createdAt = { $gte: now.startOf('week').toDate(), $lt: now.endOf('week').toDate() };
+                    break;
+                case 'lastMonth':
+                    match.createdAt = { $gte: now.startOf('month').toDate(), $lt: now.endOf('month').toDate() };
+                    break;
+                case 'lastYear':
+                    match.createdAt = { $gte: now.startOf('year').toDate(), $lt: now.endOf('year').toDate() };
+                    break;
+                case 'custom':
+                    if (!filterParams.startDate || !filterParams.endDate) {
+                        return {
+                            account: {
+                                totalPartner: partnerCount,
+                                totalUser: userCount,
+                                totalCar: carCount,
+                            },
+                            booking: {
+                                totalBooking: 0,
+                                confirmBooking: 0,
+                                pendingBooking: 0,
+                                cancelledBooking: 0,
+                                completedBooking: 0,
+                                userTotalAmount: 0,
+                                commissionOnTotal: 0,
+                                partnerAmmout: 0,
+                            },
+                        };
+                    }
+                    match.createdAt = { $gte: new Date(filterParams.startDate), $lt: new Date(filterParams.endDate) };
+                    break;
+                default:
+                    match = {};
+            }
 
-           
             const bookingAggregation = await CarBooking.aggregate([
+                { $match: match },
                 {
                     $group: {
                         _id: null,
@@ -44,7 +87,6 @@ class DashboardService {
             const expectedCommission = bookingData.totalUserAmount * commissionPercentage;
             const partnerAmmout = bookingData.totalUserAmount - expectedCommission;
 
-           
             return {
                 account: {
                     totalPartner: partnerCount,
@@ -58,9 +100,8 @@ class DashboardService {
                     cancelledBooking: bookingData.cancelledBookingCount,
                     completedBooking: bookingData.completedBookingCount,
                     userTotalAmount: bookingData.totalUserAmount,
-                    
-                    commissionOnTotal: bookingData.totalCommission, 
-                    partnerAmmout: partnerAmmout, 
+                    commissionOnTotal: bookingData.totalCommission,
+                    partnerAmmout: partnerAmmout,
                 },
             };
         } catch (error) {
