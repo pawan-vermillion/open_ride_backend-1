@@ -1,4 +1,4 @@
-
+const CarBooking = require("../model/booking");
 const BookingService = require("../Service/bookingService")
 
 class BookingController {
@@ -10,9 +10,20 @@ class BookingController {
       return res.status(400).json({ error: "bookingId is required" });
     }
 
-
-
     try {
+      // Retrieve the booking details for time validation
+      const booking = await CarBooking.findById(bookingId);
+
+      if (!booking) {
+        return res.status(404).json({ error: "Booking not found" });
+      }
+
+      // Check if cancellation is allowed based on time
+      const canCancel = await BookingService.canCancelBooking(booking);
+      if (!canCancel) {
+        return res.status(400).json({ error: "Cancellation is only allowed within 3 hours of the booking time" });
+      }
+
       const result = await BookingService.cancelBooking({ userType, bookingId, cancelReason });
 
       if (result.error) {
@@ -21,10 +32,9 @@ class BookingController {
 
       return res.json({ message: result.message });
     } catch (error) {
-
       return res.status(500).json({ error: "Internal Server Error" });
     }
-  }
+}
 
   getBookingController = async (req, res) => {
     try {

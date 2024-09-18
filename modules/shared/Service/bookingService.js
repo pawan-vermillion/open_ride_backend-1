@@ -2,7 +2,16 @@ const CarBooking = require("../model/booking");
 const User = require("../../user/model/user")
 const Partner = require("../../partner/model/partner")
 const WalletHistory = require("../../user/model/walletBalance")
+const moment = require('moment'); 
+
 class BookingService {
+    canCancelBooking = async(booking) => {
+      const bookingTime = moment(booking.bookingTime);
+      const cuurentTime = moment();
+      const hoursDiffrerence = cuurentTime.diff(bookingTime , 'hours')
+      return hoursDiffrerence >= 3
+    }
+
   cancelBooking = async ({ userType, bookingId, cancelReason }) => {
     try {
 
