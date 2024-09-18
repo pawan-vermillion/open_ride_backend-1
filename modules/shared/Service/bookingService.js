@@ -33,9 +33,8 @@ class BookingService {
       }
 
       // Update wallet balance with the refund amount
-      user.walletBalance += booking.summary.userAmmount;
+      user.walletBalance += booking.summary.partnerAmmount;
       await user.save();
-
 
 
   
@@ -46,7 +45,7 @@ class BookingService {
           userId: booking.userId,
           partnerId : booking.partnerId,
           transactionType,
-          amount: booking.summary.userAmmount, 
+          amount: booking.summary.partnerAmmount, 
           bookingId: booking._id,
         });
         
@@ -66,7 +65,15 @@ class BookingService {
       partner.walletBalance -= booking.summary.partnerAmmount
 
       await partner.save()
-    
+      const walletHistoryEntryForPartner = new WalletHistory({
+        userId: booking.userId,
+        partnerId: booking.partnerId,
+        transactionType: 'Debit',
+        amount: booking.summary.partnerAmmount,
+        bookingId: booking._id,
+      });
+      
+      await walletHistoryEntryForPartner.save();
 
 
       return { message: "Booking cancelled successfully" };

@@ -119,7 +119,8 @@ class CarBookingService {
 
 
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
-            const commisionAmmount = parseFloat(userAmmount * commisionRate);
+            // const commisionAmmount = parseFloat(userAmmount * commisionRate);
+            const commisionAmmount = parseFloat(userAmmount * commisionRate / 100);
 
 
             const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09;
@@ -168,13 +169,15 @@ class CarBookingService {
             const booking = new CarBooking(bookingData);
             await booking.save();
 
-            const partner = await Partner.findById(car.partnerId);
-            if (!partner) {
-                throw new Error("Partner not found");
-            }
+            // const partner = await Partner.findById(car.partnerId);
+            // if (!partner) {
+            //     throw new Error("Partner not found");
+            // }
+            // const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
 
-            partner.walletBalance -= booking.summary.partnerAmmount;
-            await partner.save();
+            // partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+            
+            // await partner.save();
 
             return booking;
         } catch (error) {
@@ -217,17 +220,14 @@ class CarBookingService {
             await booking.save();
 
             const partner = await Partner.findById(booking.partnerId);
+        if (!partner) {
+            throw new Error('Partner not found');
+        }
 
-            if (!partner) {
-                throw new Error('Partner not found');
-            }
+        const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
 
-
-            const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
-
-
-            // add wallet balance in partner account
-            partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+        // Update partner's wallet balance
+        partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
 
 
 

@@ -1,8 +1,6 @@
-const {model , Schema, default: mongoose} = require("mongoose")
-const bcrypt = require('bcrypt')
-const {generateToken} = require("../../shared/Service/authenication")
+const mongoose = require("mongoose")
 
-const walletHistorySchema = new Schema({
+const walletBalanceSchema = new mongoose.Schema({
    partnerId :{
     type :mongoose.Schema.Types.ObjectId,
     ref:"Partner",
@@ -36,5 +34,5 @@ const walletHistorySchema = new Schema({
     {timestamps : true}
 )
 
-const WalletHistory = mongoose.model("walletBalance", walletHistorySchema)
-module.exports = WalletHistory;
+const WalletBalance = mongoose.model("walletBalance", walletBalanceSchema)
+module.exports = WalletBalance;

@@ -18,8 +18,8 @@ exports.sendOTP = async (emailAddress, phoneNumber) => {
     const mailOption = {
       from: process.env.EMAIL_USER,
       to: emailAddress,
-      subject: "OpenCricket Account Verification",
-      text: `Thank you for choosing OpenCricket! To complete your account creation, please enter the following One-Time Password (OTP):\n\n${otp}\n\nThis OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.\n\nIf you did not request this OTP, you can safely ignore this message.\n\nWelcome to OpenCricket!\n\nSincerely,\nThe OpenCricket Team`,
+      subject: "OpenRide Account Verification",
+      text: `Thank you for choosing OpenRide! To complete your account creation, please enter the following One-Time Password (OTP):\n\n${otp}\n\nThis OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.\n\nIf you did not request this OTP, you can safely ignore this message.\n\nWelcome to OpenRide!\n\nSincerely,\nThe OpenRide Team`,
     };
 
     await transporter.sendMail(mailOption);
