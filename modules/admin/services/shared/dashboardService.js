@@ -43,7 +43,7 @@ class DashboardService {
                                 completedBooking: 0,
                                 userTotalAmount: 0,
                                 commissionOnTotal: 0,
-                                partnerAmmout: 0,
+                                partnerAmount: 0,
                             },
                         };
                     }
@@ -84,8 +84,9 @@ class DashboardService {
             };
 
             const commissionPercentage = 0.10;
-            const expectedCommission = bookingData.totalUserAmount * commissionPercentage;
-            const partnerAmmout = bookingData.totalUserAmount - expectedCommission;
+            const calculatedCommission = bookingData.totalUserAmount * commissionPercentage;  
+            const partnerAmount = bookingData.totalUserAmount - calculatedCommission;
+
 
             return {
                 account: {
@@ -100,8 +101,9 @@ class DashboardService {
                     cancelledBooking: bookingData.cancelledBookingCount,
                     completedBooking: bookingData.completedBookingCount,
                     userTotalAmount: bookingData.totalUserAmount,
-                    commissionOnTotal: bookingData.totalCommission,
-                    partnerAmmout: partnerAmmout,
+                    
+                    commissionOnTotal: calculatedCommission,  
+                    partnerAmmout: partnerAmount,  
                 },
             };
         } catch (error) {
