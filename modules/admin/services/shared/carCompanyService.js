@@ -1,22 +1,23 @@
-const CarCompany = require("../../model/carCompany");
-const CarModel = require("../../model/carModel");
-const BodyStyle = require("../../model/bodyStyle");
-const SubModel = require("../../model/subModel");
-const mongoose = require("mongoose")
+    const CarCompany = require("../../model/carCompany");
+    const CarModel = require("../../model/carModel");
+    const BodyStyle = require("../../model/bodyStyle");
+    const SubModel = require("../../model/subModel");
+    const mongoose = require("mongoose")
 
 
-class CarCompanyService {
-    async createCarCompany(adminData) {
-        try {
+    class CarCompanyService {
+        async createCarCompany(adminData) {
+            try {
 
-            const create = await CarCompany.create(adminData)
-            return {
-                message: "Car Company Add Successfully",
+                const create = await CarCompany.create(adminData)
+                return {
+                    message: "Car Company Add Successfully",
+                    logo:adminData.logo
+                }
+            } catch (error) {
+                throw error;
             }
-        } catch (error) {
-            throw error;
         }
-    }
 
     async getCarCompany() {
         try {

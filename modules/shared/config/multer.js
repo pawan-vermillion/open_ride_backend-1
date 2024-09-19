@@ -21,13 +21,16 @@ const storage = new CloudinaryStorage({
       if (file.fieldname === 'profileImage') {
         folder = 'uploads/user/profile/';
       }
-    } else {
+    } else if (file.fieldname === 'logoImage') {
+      folder = 'uploads/admin/logo'
+    }
+    else {
       folder = 'uploads/other/profile';
     }
 
     return {
       folder: folder,
-      format: path.extname(file.originalname).substring(1), 
+      format: path.extname(file.originalname).substring(1),
       public_id: Date.now().toString(),
       transformation: [{ quality: 'auto' }],
     };
@@ -49,9 +52,38 @@ const upload = multer({
       cb(new Error(errorMessage));
     }
   }
-});
+})
+const uploadLogo = multer({
+  storage: new CloudinaryStorage({
+      cloudinary: cloudinary,
+      params: {
+          folder: 'admin/logo', // Specify the desired folder structure
+          format: (req, file) => {
+              return path.extname(file.originalname).substring(1); // File format
+          },
+          public_id: (req, file) => {
+              return Date.now().toString(); // Unique public ID based on the current timestamp
+          },
+          transformation: [{ quality: 'auto' }], // Any transformations if needed
+      },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: function (req, file, cb) {
+      const filetypes = /jpeg|jpg|png/;
+      const mimetype = filetypes.test(file.mimetype);
+      const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
-const uploadToCloudinary = async (req, filePath ,fieldname ) => {
+      if (mimetype && extname) {
+          return cb(null, true);
+      } else {
+          cb(new Error(`Only images are allowed (jpeg, jpg, png). Invalid file: ${file.originalname}`));
+      }
+  }
+}).single('logoImage'); // Ensure the field name matches
+
+
+
+const uploadToCloudinary = async (req, filePath, fieldname) => {
   try {
 
     let folder;
@@ -73,8 +105,8 @@ const uploadToCloudinary = async (req, filePath ,fieldname ) => {
     } else {
       folder = 'uploads/other/profile';
     }
-  
-  
+
+
 
     console.log('Uploading to Cloudinary:', { folder, filePath });
 
@@ -95,18 +127,20 @@ const uploadToCloudinary = async (req, filePath ,fieldname ) => {
       });
     })
   } catch (error) {
-   
+
     throw new Error('Error uploading to Cloudinary');
   }
 };
 const uploadMultiple = upload.fields([
   { name: 'exteriorImage', maxCount: 5 },
   { name: 'interiorImage', maxCount: 5 },
-  { name: 'rcPhoto', maxCount: 1 }
+  { name: 'rcPhoto', maxCount: 1 },
+  { name: 'logoImage', maxCount: 1 }
 ]);
 module.exports = {
   upload,
   uploadToCloudinary,
   uploadMultiple,
-  cloudinary
+  cloudinary,
+  uploadLogo
 };

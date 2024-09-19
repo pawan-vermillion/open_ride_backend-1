@@ -1,11 +1,23 @@
 const CarCompanyService = require("../../services/shared/carCompanyService")
+const {uploadToCloudinary , uploadLogo} = require("../../../shared/config/multer")
 
 class CarCompanyController {
-    createCarCompnay = async(req,res)=>{
+    
+    createCarCompany = async (req, res) => {
         try {
-            let adminData = req.body
-            const result = await CarCompanyService.createCarCompany(adminData)
-            res.status(201).json(result)
+            uploadLogo(req, res, async (err) => {
+                if (err) {
+                    return res.status(400).json({ message: err.message });
+                }
+    
+                let adminData = req.body;
+                if (req.file) {
+                    adminData.logo = req.file.path; // This should now point to Cloudinary
+                }
+    
+                const result = await CarCompanyService.createCarCompany(adminData);
+                res.status(201).json(result);
+            });
         } catch (error) {
             if (error.code === 11000) {
                 res.status(400).json({
@@ -17,7 +29,8 @@ class CarCompanyController {
                 });
             }
         }
-    }
+    };
+    
     getCarComapny = async(req,res)=>{
         try {
             const adminId = req.user.adminId

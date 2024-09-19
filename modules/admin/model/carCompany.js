@@ -5,7 +5,11 @@ const CarCompany = new mongoose.Schema({
     type:String,
     required:true,
     unique:true
-   } 
+   } ,
+   logoImage: {
+       type: String, 
+       required: false
+   }
 })
 
 const carCompany = mongoose.model("CarCompnay",CarCompany);
