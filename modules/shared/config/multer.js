@@ -7,26 +7,26 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
     let folder;
-    if (req.type === 'Partner') {
-      if (file.fieldname === 'profileImage') {
-        folder = 'uploads/partner/profile/';
-      } else if (file.fieldname === 'exteriorImage') {
-        folder = 'uploads/partner/car/exterior';
-      } else if (file.fieldname === 'interiorImage') {
-        folder = 'uploads/partner/car/interior';
-      } else if (file.fieldname === 'rcPhoto') {
-        folder = 'uploads/partner/car/rcBook';
+      if (req.type === 'Partner') {
+        if (file.fieldname === 'profileImage') {
+          folder = 'uploads/partner/profile/';
+        } else if (file.fieldname === 'exteriorImage') {
+          folder = 'uploads/partner/car/exterior';
+        } else if (file.fieldname === 'interiorImage') {
+          folder = 'uploads/partner/car/interior';
+        } else if (file.fieldname === 'rcPhoto') {
+          folder = 'uploads/partner/car/rcBook';
+        }
+      } else if (req.type === 'User') {
+        if (file.fieldname === 'profileImage') {
+          folder = 'uploads/user/profile/';
+        }
+      } else if (file.fieldname === 'logoImage') {
+        folder = 'uploads/admin/logo'
       }
-    } else if (req.type === 'User') {
-      if (file.fieldname === 'profileImage') {
-        folder = 'uploads/user/profile/';
+      else {
+        folder = 'uploads/other/profile';
       }
-    } else if (file.fieldname === 'logoImage') {
-      folder = 'uploads/admin/logo'
-    }
-    else {
-      folder = 'uploads/other/profile';
-    }
 
     return {
       folder: folder,
@@ -57,29 +57,14 @@ const uploadLogo = multer({
   storage: new CloudinaryStorage({
       cloudinary: cloudinary,
       params: {
-          folder: 'admin/logo', // Specify the desired folder structure
-          format: (req, file) => {
-              return path.extname(file.originalname).substring(1); // File format
-          },
-          public_id: (req, file) => {
-              return Date.now().toString(); // Unique public ID based on the current timestamp
-          },
-          transformation: [{ quality: 'auto' }], // Any transformations if needed
+          folder: 'admin/logo',
+          format: (req, file) => path.extname(file.originalname).substring(1),
+          public_id: (req, file) => Date.now().toString(),
+          transformation: [{ quality: 'auto' }],
       },
   }),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: function (req, file, cb) {
-      const filetypes = /jpeg|jpg|png/;
-      const mimetype = filetypes.test(file.mimetype);
-      const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-      if (mimetype && extname) {
-          return cb(null, true);
-      } else {
-          cb(new Error(`Only images are allowed (jpeg, jpg, png). Invalid file: ${file.originalname}`));
-      }
-  }
-}).single('logoImage'); // Ensure the field name matches
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+}).single('logoImage');
 
 
 

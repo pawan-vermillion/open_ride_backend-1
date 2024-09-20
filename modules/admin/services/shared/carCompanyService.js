@@ -6,50 +6,59 @@
 
 
     class CarCompanyService {
-        async createCarCompany(adminData) {
+        async createCarCompany({ carCompanyData }) {
             try {
-
-                const create = await CarCompany.create(adminData)
+                // Ensure logoImage is assigned correctly
+                const create = await CarCompany.create({
+                    carCompany: carCompanyData.carCompany,
+                    logoImage: carCompanyData.logoImage, // Use the correct field name here
+                });
                 return {
-                    message: "Car Company Add Successfully",
-                    logo:adminData.logo
+                    message: "Car Company Added Successfully",
+                    logo: carCompanyData.logoImage,
+                };
+            } catch (error) {
+                if (error.code === 11000) {
+                    throw new Error("Car Company with the same details already exists");
+                } else {
+                    console.error("Database Error:", error); // Log the error for debugging
+                    throw new Error("Car Company can't be added");
                 }
+            }
+        }
+        
+        async getCarCompany() {
+            try {
+                const pipeline = [
+                    {
+                        $lookup: {
+                            from: "carmodels", 
+                            localField: "_id",
+                            foreignField: "companyId",
+                            as: "models"
+                        }
+                    },
+                    {
+                        $addFields: {
+                            modelCount: { $size: "$models" }
+                        }
+                    },
+                    {
+                        $project: {
+                            carCompany: 1,    
+                            logoImage: 1,     
+                            modelCount: 1    
+                        }
+                    }
+                ];
+        
+                const result = await CarCompany.aggregate(pipeline).exec();
+
+                return result;
             } catch (error) {
                 throw error;
             }
         }
-
-    async getCarCompany() {
-        try {
-            const pipeline = [
-                {
-                    $lookup: {
-                        from: "carmodels", 
-                        localField: "_id",
-                        foreignField: "companyId",
-                        as: "models"
-                    }
-                },
-                {
-                    $addFields: {
-                        modelCount: { $size: "$models" } 
-                    }
-                },
-                {
-                    $project: {
-                        __v: 0, 
-                        models: 0 
-                    }
-                }
-            ];
-    
-            const result = await CarCompany.aggregate(pipeline).exec();
-    
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    }
     
 
 

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const CarCompany = new mongoose.Schema({
+const CarCompanySchema = new mongoose.Schema({
    carCompany :{
     type:String,
     required:true,
@@ -8,9 +8,9 @@ const CarCompany = new mongoose.Schema({
    } ,
    logoImage: {
        type: String, 
-       required: false
+       required: true
    }
 })
 
-const carCompany = mongoose.model("CarCompnay",CarCompany);
+const carCompany = mongoose.model("CarCompnay",CarCompanySchema);
 module.exports = carCompany

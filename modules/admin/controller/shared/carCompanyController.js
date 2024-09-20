@@ -2,40 +2,33 @@ const CarCompanyService = require("../../services/shared/carCompanyService")
 const {uploadToCloudinary , uploadLogo} = require("../../../shared/config/multer")
 
 class CarCompanyController {
-    
-    createCarCompany = async (req, res) => {
-        try {
-            uploadLogo(req, res, async (err) => {
-                if (err) {
-                    return res.status(400).json({ message: err.message });
+  
+        createCarCompany = async (req, res) => {
+            console.log("Request Body:", req.body);
+            console.log("Uploaded File:", req.file);
+            try {
+                if (!req.file) {
+                    return res.status(400).json({ message: "Logo image is required" });
                 }
-    
-                let adminData = req.body;
-                if (req.file) {
-                    adminData.logo = req.file.path; // This should now point to Cloudinary
-                }
-    
-                const result = await CarCompanyService.createCarCompany(adminData);
+        
+                const carCompanyData = req.body;
+                carCompanyData.logoImage = req.file.path;
+        
+                const result = await CarCompanyService.createCarCompany({ carCompanyData });
                 res.status(201).json(result);
-            });
-        } catch (error) {
-            if (error.code === 11000) {
-                res.status(400).json({
-                    message: "Car Company name already exists. Please choose a different name."
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                });
+            } catch (error) {
+                console.error("Error:", error);
+                res.status(500).json({ error: error.message });
             }
-        }
-    };
+        };
+    
+    
     
     getCarComapny = async(req,res)=>{
         try {
             const adminId = req.user.adminId
             const Comapny = await CarCompanyService.getCarCompany(adminId)
-            res.status(201).json(Comapny)
+            res.status(200).json(Comapny)
         } catch (error) {
             res.status(500).json({
                 message:error.message
