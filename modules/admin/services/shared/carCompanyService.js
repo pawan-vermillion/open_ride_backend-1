@@ -19,7 +19,7 @@
                 };
             } catch (error) {
                 if (error.code === 11000) {
-                    throw new Error("Car Company with the same details already exists");
+                    throw new Error("Car Company already exists");
                 } else {
                     console.error("Database Error:", error); // Log the error for debugging
                     throw new Error("Car Company can't be added");
