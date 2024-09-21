@@ -8,8 +8,13 @@ const CarModel = new mongoose.Schema({
    },
    model:{
     type:String,
-    required:true
+    required:true,
+    unique:true
    },
+   logoImage: {
+    type: String, 
+    required: true
+},
    subModels: [{
        type: mongoose.Schema.Types.ObjectId,
        required:true,

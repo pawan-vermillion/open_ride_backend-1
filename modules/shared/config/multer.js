@@ -57,7 +57,7 @@ const uploadLogo = multer({
   storage: new CloudinaryStorage({
       cloudinary: cloudinary,
       params: {
-          folder: 'admin/logo',
+          folder: 'uploads/admin/logo',
           format: (req, file) => path.extname(file.originalname).substring(1),
           public_id: (req, file) => Date.now().toString(),
           transformation: [{ quality: 'auto' }],

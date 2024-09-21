@@ -4,8 +4,7 @@ const {uploadToCloudinary , uploadLogo} = require("../../../shared/config/multer
 class CarCompanyController {
   
         createCarCompany = async (req, res) => {
-            console.log("Request Body:", req.body);
-            console.log("Uploaded File:", req.file);
+            
             try {
                 if (!req.file) {
                     return res.status(400).json({ message: "Logo image is required" });
@@ -36,18 +35,27 @@ class CarCompanyController {
         }
     }
 
-    createCarModel = async(req,res)=>{
+     createCarModel = async (req, res) => {
         try {
+            if (!req.file) {
+                return res.status(400).json({ message: "Logo is required" });
+            }
+    
             const { companyId } = req.params;
-            const {model} = req.body;
-            const result = await CarCompanyService.createCarModel({companyId,model})
-            res.status(201).json(result)
+            const { model } = req.body;
+    
+          
+            const logoImage = req.file.path;
+           
+            const result = await CarCompanyService.createCarModel({ companyId, model, logoImage });
+            res.status(201).json(result);
         } catch (error) {
             res.status(404).json({
-                message:error.message
-            })
+                message: error.message
+            });
         }
-    }
+    };
+    
 
     getCarModel = async(req,res)=>{
         try {
