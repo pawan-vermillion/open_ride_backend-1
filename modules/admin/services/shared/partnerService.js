@@ -4,10 +4,10 @@ const WithdrawRequest = require("../../../partner/model/withdrewRequest")
 class PartnerService {
 
 
-    async getPartner(limit, page) {
+    async getPartner({limit, page}) {
         try {
-            const pageSize = parseInt(limit) || 10;
-            const currentPage = parseInt(page) || 1;
+            const pageSize = parseInt(limit) ||10;
+            const currentPage = parseInt(page) ||1;
             const skip = (currentPage - 1) * pageSize;
             const total = await Partner.countDocuments()
             const partners = await Partner.find().select("-__v -password -updatedAt").skip(skip)

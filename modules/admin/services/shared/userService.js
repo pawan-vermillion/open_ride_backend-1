@@ -3,7 +3,7 @@ const User = require("../../../user/model/user")
 class UserService {
 
 
-    async getUser(limit, page) {
+    async getUser({limit, page}) {
         try {
             const pageSize = parseInt(limit) || 10;
             const currentPage = parseInt(page) || 1;
