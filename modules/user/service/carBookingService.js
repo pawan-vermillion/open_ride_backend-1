@@ -254,14 +254,33 @@ class CarBookingService {
         }
     };
 
-    verifyPayment = async (orderId, paymentId, signature) => {
+    
+    verifyPayment = async ({ orderId, paymentId, signature }) => {
+        const secretKey = process.env.PAYMENT_SECRET_KEY;
+
+        if (!secretKey) {
+            throw new Error('Secret key is not defined. Please set the PAYMENT_SECRET_KEY environment variable.');
+        }
+
+
         const generatedSignature = crypto
-            .createHmac('sha256', 'your_secret_key')
+            .createHmac('sha256', secretKey)
             .update(`${orderId}|${paymentId}`)
             .digest('hex');
 
-        return true;
+
+     
+
+  
+        if (generatedSignature !== signature) {
+            throw new Error('Signature verification failed');
+        }
+
+        return true; 
     };
+
+
+    
 
 }
 

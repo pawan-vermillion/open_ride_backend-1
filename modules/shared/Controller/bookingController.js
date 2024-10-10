@@ -11,7 +11,7 @@ class BookingController {
     }
 
     try {
-      // Retrieve the booking details for time validation
+   
       const booking = await CarBooking.findById(bookingId);
 
       if (!booking) {
