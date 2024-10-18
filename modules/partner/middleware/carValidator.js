@@ -3,105 +3,86 @@ const { body, validationResult } = require("express-validator");
 const CarValidationRules = () => {
     return [
         body("ownerFullName")
-            .exists().withMessage("Owner's full name is required")
-            .notEmpty().withMessage("Owner's full name cannot be empty"),
+            .exists().withMessage("Owner's  full name is required")
+            .isString().withMessage("Owner's full name must be a string"),
 
         body("numberOfSeat")
             .exists().withMessage("Number of seats is required")
-            .notEmpty().withMessage("Number of seats cannot be empty")
             .isNumeric().withMessage("Number of seats must be a numeric value"),
 
         body("numberOfDoors")
             .exists().withMessage("Number of doors is required")
-            .notEmpty().withMessage("Number of doors cannot be empty")
             .isNumeric().withMessage("Number of doors must be a numeric value"),
 
         body("ac")
             .exists().withMessage("AC status is required")
-            .isBoolean().withMessage("AC status must be a boolean value")
-            .notEmpty().withMessage("AC status cannot be empty"),
+            .isBoolean().withMessage("AC status must be a boolean value"),
 
         body("sunRoof")
-            .exists().withMessage("sunRoof status is required")
-            .isBoolean().withMessage("sunRoof status must be a boolean value")
-            .notEmpty().withMessage("sunRoof status cannot be empty"),
+            .exists().withMessage("SunRoof status is required")
+            .isBoolean().withMessage("SunRoof status must be a boolean value"),
 
         body("fuelType")
-            .exists().withMessage("fuelType status is required")
-            .notEmpty().withMessage("fuelType status cannot be empty"),
+            .exists().withMessage("Fuel type is required")
+            .isString().withMessage("Fuel type must be a string"),
 
         body("transmission")
-            .exists().withMessage("transmission status is required")
-
-            .notEmpty().withMessage("transmission status cannot be empty"),
-
-
+            .exists().withMessage("Transmission status is required")
+            .isString().withMessage("Transmission status must be a string"),
 
         body("carNumber")
             .exists().withMessage("Car number is required")
-            .notEmpty().withMessage("Car number cannot be empty"),
+            .isString().withMessage("Car number must be a string"),
 
         body("companyName")
             .exists().withMessage("Company name is required")
-            .notEmpty().withMessage("Company name cannot be empty"),
+            .isString().withMessage("Company name must be a string"),
 
         body("modelName")
             .exists().withMessage("Model name is required")
-            .notEmpty().withMessage("Model name cannot be empty"),
+            .isString().withMessage("Model name must be a string"),
 
         body("rcNumber")
             .exists().withMessage("RC number is required")
-            .notEmpty().withMessage("RC number cannot be empty"),
+            .isString().withMessage("RC number must be a string"),
 
         body("rate")
-            .exists().withMessage("Rate is required")
-            .notEmpty().withMessage("Rate cannot be empty"),
+            .exists().withMessage("Rate is required"),
+            // .isNumeric().withMessage("Rate must be a numeric value"),
 
         body("unit")
-            .exists().withMessage("unit is required")
-            .notEmpty().withMessage("unit cannot be empty"),
+            .exists().withMessage("Unit is required")
+            .isString().withMessage("Unit must be a string"),
 
         body("description")
             .exists().withMessage("Description is required")
-            .notEmpty().withMessage("Description cannot be empty"),
-
+            .isString().withMessage("Description must be a string"),
 
         body("address")
             .exists().withMessage("Address is required")
-            .notEmpty().withMessage("Address cannot be empty"),
+            .isString().withMessage("Address must be a string"),
 
         body("latitude")
             .exists().withMessage("Latitude is required")
-            .notEmpty().withMessage("Latitude cannot be empty"),
+            .isNumeric().withMessage("Latitude must be a numeric value"),
 
         body("longitude")
             .exists().withMessage("Longitude is required")
-            .notEmpty().withMessage("Longitude cannot be empty"),
-            
-        // body("deleteExteriorImage")
-        //     .exists().withMessage("deleteExteriorImage is required"),
-
-        // body("deleteInteriorImage")
-        //     .exists().withMessage("deleteExteriorImage is required"),
-
-        // body("deleteRcPhoto")
-        //     .exists().withMessage("deleteExteriorImage is required")
-
-
-
+            .isNumeric().withMessage("Longitude must be a numeric value"),
     ];
-}
+};
 
 const carValidation = (req, res, next) => {
-    const error = validationResult(req);
+    const errors = validationResult(req);
 
-    if (error.isEmpty())
+    if (errors.isEmpty()) {
         return next();
+    }
 
-    const extractdErrors = [];
-    error.array().map((error) => extractdErrors.push(error.msg));
-    return res.status(422).json({ message: extractdErrors[0] })
+    const extractedErrors = errors.array().map(err => err.msg);
+    req.validationErrors = extractedErrors;
 
+    return res.status(422).json({ errors: extractedErrors[0] });
+};
 
-}
 module.exports = { CarValidationRules, carValidation };
