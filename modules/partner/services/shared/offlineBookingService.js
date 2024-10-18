@@ -22,7 +22,7 @@ class OfflineBookingService {
             if (!car) {
                 throw new Error("Car not found.");
             }
-            
+
 
             const availability = await CarBookingService.checkAvailabilityForRange({
                 carId,
@@ -53,17 +53,19 @@ class OfflineBookingService {
             throw new Error(error.message || "Error occurred while creating a new offline booking.");
         }
     }
-    async getAllOfflineBookings({ limit, page }) {
+
+
+    async getAllOfflineBookings({ partnerId, limit, page }) {
         try {
             const pageSize = parseInt(limit) || 10;
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
-    
-            const total = await OfflineBooking.countDocuments();
-            const bookings = await OfflineBooking.find()
+
+            const total = await OfflineBooking.countDocuments({ partnerId }); 
+            const bookings = await OfflineBooking.find({ partnerId }) 
                 .skip(skip)
                 .limit(pageSize);
-    
+
             return {
                 total,
                 limit: pageSize,
@@ -74,7 +76,9 @@ class OfflineBookingService {
             throw new Error(error.message || "Error occurred while fetching offline bookings.");
         }
     }
-    
+
+
+
 }
 
 

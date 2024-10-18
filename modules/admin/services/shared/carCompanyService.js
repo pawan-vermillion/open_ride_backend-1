@@ -27,7 +27,7 @@ class CarCompanyService {
         }
     }
 
-    async getCarCompany() {
+    async getCarCompany(adminId, search) {
         try {
             const pipeline = [
                 {
@@ -44,6 +44,11 @@ class CarCompanyService {
                     }
                 },
                 {
+                    $match: {
+                        carCompany: { $regex: search, $options: "i" }
+                    }
+                },
+                {
                     $project: {
                         carCompany: 1,
                         logoImage: 1,
@@ -53,27 +58,21 @@ class CarCompanyService {
             ];
 
             const result = await CarCompany.aggregate(pipeline).exec();
-
             return result;
         } catch (error) {
             throw error;
         }
     }
 
-
-
     async createCarModel({ companyId, model }) {
         try {
             const existingModel = await CarModel.findOne({ model });
             if (existingModel) {
-              throw new Error("Car Model already exists");
+                throw new Error("Car Model already exists");
             }
-            
-            const create = await CarModel.create({
-                companyId,
-                model,
-            });
-            
+
+            const create = await CarModel.create({ companyId, model });
+
             return {
                 message: "Car Model Added Successfully",
             };
@@ -86,7 +85,9 @@ class CarCompanyService {
         }
     }
 
-    async getCarModel({ companyId }) {
+
+
+    async getCarModel({ companyId, search }) {
         try {
             const company = await CarCompany.findOne({ _id: companyId });
             if (!company) {
@@ -95,9 +96,16 @@ class CarCompanyService {
                 };
             }
 
+            // Search condition setup
+            let searchCondition = { companyId: new mongoose.Types.ObjectId(companyId) };
+
+            if (search) {
+                searchCondition['model'] = { $regex: search, $options: "i" }; 
+            }
+
             const result = await CarModel.aggregate([
                 {
-                    $match: { companyId: new mongoose.Types.ObjectId(companyId) }
+                    $match: searchCondition
                 },
                 {
                     $lookup: {
@@ -114,11 +122,10 @@ class CarCompanyService {
                 },
                 {
                     $project: {
-                        __v: 0,
-
+                        __v: 0
                     }
                 }
-            ])
+            ]);
 
             return {
                 companyName: company.carCompany,
@@ -128,6 +135,9 @@ class CarCompanyService {
             throw error;
         }
     }
+
+
+
 
     async createCarBodyStyle({ carData }) {
         try {

@@ -12,4 +12,4 @@ router.post("/booking" , OfflineBookingValidationRules() ,OfflineBookingvalidate
 router.get("/allBookings" ,OfflineBookingController.getAllOfflineBookings )
 
 
-module.exports = router;
+module.exports = router;    
