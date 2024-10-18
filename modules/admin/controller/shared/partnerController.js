@@ -2,10 +2,11 @@ const PartnerService = require("../../services/shared/partnerService");
 
 
 class PartnerController {
+
   getPartner = async (req, res, next) => {
     try {
-        const { limit, page } = req.query; 
-        const result = await PartnerService.getPartner({ limit, page });
+        const { limit, page,search } = req.query; 
+        const result = await PartnerService.getPartner({ limit, page,search });
 
         return res.status(200).json(result);
     } catch (error) {

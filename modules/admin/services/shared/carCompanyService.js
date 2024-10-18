@@ -62,7 +62,7 @@ class CarCompanyService {
 
 
 
-    async createCarModel({ companyId, model, logoImage }) {
+    async createCarModel({ companyId, model }) {
         try {
             const existingModel = await CarModel.findOne({ model });
             if (existingModel) {
@@ -72,18 +72,15 @@ class CarCompanyService {
             const create = await CarModel.create({
                 companyId,
                 model,
-                logoImage
             });
             
             return {
                 message: "Car Model Added Successfully",
-                logoImage
             };
         } catch (error) {
             if (error.code === 11000) {
                 throw new Error("Car Model already exists");
             } else {
-
                 throw new Error("Car Model can't be added");
             }
         }

@@ -4,9 +4,9 @@ const { storeOtp } = require("../Service/otpService");
 exports.sendOTP = async (emailAddress, phoneNumber) => {
   try {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-   
+
     await storeOtp(phoneNumber, otp);
-    
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -25,7 +25,7 @@ exports.sendOTP = async (emailAddress, phoneNumber) => {
     await transporter.sendMail(mailOption);
     return { message: "OTP sent successfully" };
   } catch (error) {
-   
+
     throw new Error("Failed to send OTP");
   }
 };

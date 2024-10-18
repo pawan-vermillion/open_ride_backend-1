@@ -8,24 +8,23 @@ class UserService {
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
 
-            // Search condition add kari che
             const searchCondition = search
                 ? {
                     $or: [
-                        { name: { $regex: search, $options: "i" } },  // i means case-insensitive
-                        { email: { $regex: search, $options: "i" } },
-                        { phone: { $regex: search, $options: "i" } }
+                        { firstName: { $regex: search, $options: "i" } },  
+                        { emailAddress: { $regex: search, $options: "i" } },
+                        { phoneNumber: { $regex: search, $options: "i" } }
                     ]
                 }
                 : {};
 
-            // Users ni query ma search condition add kari
+
             const users = await User.find(searchCondition)
                 .select("-__v -password -updatedAt")
                 .skip(skip)
                 .limit(pageSize);
 
-            const total = await User.countDocuments(searchCondition); // total ne pan search pramane count kariyu
+            const total = await User.countDocuments(searchCondition); 
 
             if (!users) {
                 const error = new Error("User not found");
