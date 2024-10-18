@@ -30,6 +30,8 @@ jobs:
     - run: |
         if pm2 describe ride > /dev/null; then
         pm2 restart ride
+        pm2 save
         else
         pm2 start run.sh --name ride
+        pm2 save
         fi
