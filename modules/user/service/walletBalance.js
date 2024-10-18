@@ -8,17 +8,14 @@ class WalletBalanceService {
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
 
-            console.log(`Fetching wallet history for userId: ${userId}, limit: ${limit}, page: ${page}`);
 
             const total = await WalletBalance.countDocuments({ userId: new mongoose.Types.ObjectId(userId) });
 
-            console.log(`Total documents found: ${total}`);
 
             const walletHistoryData = await WalletBalance.find({ userId: new mongoose.Types.ObjectId(userId) })
                 .skip(skip)
                 .limit(pageSize);
 
-            console.log(`Fetched ${walletHistoryData.length} records`);
 
             return {
                 page,

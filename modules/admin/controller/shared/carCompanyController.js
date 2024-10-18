@@ -56,8 +56,8 @@ class CarCompanyController {
     getCarModel = async (req, res) => {
         try {
             const { companyId } = req.params;
-            const { search } = req.query;
-            const result = await CarCompanyService.getCarModel({ companyId, search });
+            const { search } = req.query
+            const result = await CarCompanyService.getCarModel({ companyId , search});
             res.status(200).json(result); 
         } catch (error) {
             res.status(500).json({

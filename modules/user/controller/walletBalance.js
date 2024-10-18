@@ -6,7 +6,6 @@ class WalletBalanceController {
             const userId = req.user.id;
             const { limit, page } = req.query;
 
-            console.log(`Controller: userId: ${userId}, limit: ${limit}, page: ${page}`);
 
             let walletHistoryData = await WalletBalanceService.getWalletHistory(
                 userId,
@@ -14,7 +13,6 @@ class WalletBalanceController {
                 page
             );
 
-            console.log(`Controller: Fetched wallet history data:`, walletHistoryData);
 
             return res.status(201).json(walletHistoryData);
         } catch (error) {

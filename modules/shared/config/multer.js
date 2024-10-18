@@ -5,13 +5,9 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const deleteOldImage = async (publicId) => {
   try {
-    console.log(`Deleting old image with public ID: ${publicId}`);
     const result = await cloudinary.uploader.destroy(publicId);
 
-    // Log the result of the deletion attempt
-    console.log('Cloudinary deletion result:', result);
 
-    // Check if the result indicates that the image was not found
     if (result.result === 'not found') {
       console.warn(`Image with public ID: ${publicId} not found for deletion.`);
     }
@@ -143,7 +139,6 @@ const uploadAndDeleteOld = async (req, oldImageUrl) => {
       console.error('Error uploading file:', error);
       return;
     }
-    console.log('File uploaded successfully');
   });
 };
 const uploadMultiple = (req, res, next) => {

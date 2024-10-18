@@ -91,22 +91,19 @@ class CarCompanyService {
         try {
             const company = await CarCompany.findOne({ _id: companyId });
             if (!company) {
-                return {
-                    message: "Company Not Found"
-                };
+                return { message: "Company Not Found" };
             }
 
             // Search condition setup
             let searchCondition = { companyId: new mongoose.Types.ObjectId(companyId) };
 
             if (search) {
-                searchCondition['model'] = { $regex: search, $options: "i" }; 
+                searchCondition['model'] = { $regex: search, $options: "i" };
             }
 
+
             const result = await CarModel.aggregate([
-                {
-                    $match: searchCondition
-                },
+                { $match: searchCondition },
                 {
                     $lookup: {
                         from: "submodels",
@@ -132,6 +129,7 @@ class CarCompanyService {
                 models: result
             };
         } catch (error) {
+            console.error("Error in getCarModel:", error); // Debugging line
             throw error;
         }
     }
