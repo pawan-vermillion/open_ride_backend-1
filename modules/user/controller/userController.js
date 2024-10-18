@@ -17,27 +17,25 @@ class UserController {
      }
 
 
-    updateUser = async (req, res) => {
+     updateUser = async (req, res) => {
         try {
             const userId = req.user.id;
             const userData = req.body;
-           
-         
+    
             if (req.file) {
-            
                 userData.profileImage = req.file.path;
             }
-
+    
             const result = await UserService.updateUser(userData, userId);
-            return res.status(200).json({
-                message: 'Money added successfully.',
-                walletBalance: result.walletBalance,
-                result,
-              });
+
+            return res.status(201).json({ message: "User Updated Successfully", result });
+
+            
         } catch (error) {
             return res.status(404).json({ message: error.message });
         }
     }
+    
 }
    
 

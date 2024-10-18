@@ -20,9 +20,10 @@ const reviewRoute = require("./modules/shared/Route/reviewRoute")
 
 const app = express();
 app.use(cors());
-app.use(express.json());
-app.use(bodyParser.json());
-app.use(express.urlencoded({extended:true}))
+app.use(express.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); 
+
+
 const PORT = process.env.PORT || 3000;
 //  Connect MongoDB
 

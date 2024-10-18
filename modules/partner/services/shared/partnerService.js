@@ -64,7 +64,7 @@ class PartnerService {
 
     
 
-    async updatePartner(partnerData , PartnerId , amount){
+    async updatePartner(partnerData , PartnerId ){
         try {
        
             const partner = await Partner.findById(PartnerId);

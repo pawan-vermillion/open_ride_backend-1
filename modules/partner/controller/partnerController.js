@@ -1,5 +1,5 @@
 const PartnerService = require("../services/shared/partnerService");
-
+const {uploadToCloudinary} = require('../../shared/config/multer')
 
 class PartnerController {
   getPartners = async (req, res, next) => {

@@ -1,99 +1,98 @@
-const CarDetails = require("../../model/car")
-const { uploadToCloudinary , cloudinary } = require('../../../shared/config/multer');
-
-
+const CarDetails = require("../../model/car");
+const { uploadToCloudinary, deleteOldImage, cloudinary } = require('../../../shared/config/multer');
 
 class CarService {
-  async createCarService(CarData) {
+  async createCarService(CarData, files) {
     try {
+     
       const newCarAdd = new CarDetails(CarData);
-      await newCarAdd.save();
-
-      return { message: "New Car add successflluy" };
+      const savedCar = await newCarAdd.save();
+  
+  
+      
+      if (files) {
+     const uploadedImages = await this.uploadCarImages(savedCar._id, files); // Call the method to upload images
+  
+   
+        savedCar.exteriorImage = uploadedImages.exteriorImage || [];
+        savedCar.interiorImage = uploadedImages.interiorImage || [];
+        savedCar.rcPhoto = uploadedImages.rcPhoto || '';
+  
+    
+        await savedCar.save();
+  
+     
+      }
+  
+      return { message: "New Car added successfully", status: 201 };
     } catch (error) {
       
-      throw new Error("Error occurred while creating a new Car.", error.message);
+      throw new Error("Error occurred while creating a new Car: " + error.message);
     }
   }
+x  
+  
 
- 
   async getAllCarsService({ page, limit }) {
     try {
       const pageSize = parseInt(limit) || 10;
       const currentPage = parseInt(page) || 1;
       const skip = (currentPage - 1) * pageSize;
-      const totalCars = await CarDetails.countDocuments()
-      const cars = await CarDetails.find().skip(skip).limit(pageSize)
+      const totalCars = await CarDetails.countDocuments();
+      const cars = await CarDetails.find().skip(skip).limit(pageSize);
       return {
-        page:currentPage,
-        limit:pageSize,
-        totalCars:totalCars,
-        cars:cars
-      }
+        page: currentPage,
+        limit: pageSize,
+        totalCars: totalCars,
+        cars: cars,
+      };
     } catch (error) {
-   
       throw new Error("Error occurred while fetching car data.");
     }
   }
-  async updateCarService(carId, carData) {
+  async uploadCarImages(carId, files) {
     try {
-      // Fetch the car to get existing image URLs
+
       const existingCar = await CarDetails.findById(carId);
+
       if (!existingCar) throw new Error("Car not found");
-  
-      // Extract existing images from the database
+
       const existingExteriorImages = existingCar.exteriorImage || [];
       const existingInteriorImages = existingCar.interiorImage || [];
       const existingRcPhoto = existingCar.rcPhoto || '';
-  
-      // Extract new images from the request (user-provided data)
+
       const newExteriorImages = carData.exteriorImage || [];
       const newInteriorImages = carData.interiorImage || [];
       const newRcPhoto = carData.rcPhoto || '';
-  
-      // Function to delete images that are no longer present in the update request
+
+
       const deleteImages = async (oldImages, newImages) => {
         const imagesToDelete = oldImages.filter(image => !newImages.includes(image));
         for (const imageUrl of imagesToDelete) {
           await cloudinary.uploader.destroy(imageUrl); // Remove from Cloudinary
         }
       };
-  
-      // Check and delete any removed exterior and interior images from Cloudinary
+
       await deleteImages(existingExteriorImages, newExteriorImages);
       await deleteImages(existingInteriorImages, newInteriorImages);
-  
-      // If rcPhoto is changed, delete the old one
+
       if (existingRcPhoto && existingRcPhoto !== newRcPhoto) {
         await cloudinary.uploader.destroy(existingRcPhoto);
       }
-  
+
       // Update the car details in the database with new image URLs and other data
       const updatedCar = await CarDetails.findByIdAndUpdate(carId, carData, { new: true });
       return updatedCar;
-  
+
     } catch (error) {
-      throw new Error("Error occurred while updating car data: " + error.message);
+      console.error("Error uploading files:", error.message);
+      throw new Error("File upload failed: " + error.message);
     }
   }
-  
 
- 
 
-  
+
+
 }
 
-  
-
-  
-  
-  
-  
-
-
-  
-  
-
-
-
-module.exports = new CarService()
+module.exports = new CarService();
