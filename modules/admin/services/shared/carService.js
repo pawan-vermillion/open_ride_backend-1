@@ -3,7 +3,7 @@ const CarDetails = require("../../../partner/model/car")
 class AdminCarService {
  
 
-  async getAllCarsService({search , partnerId, page, limit }) {
+  async getAllCarsService({search , page, limit }) {
     try {
       const pageSize = parseInt(limit) || 10;
       const currentPage = parseInt(page) || 1;

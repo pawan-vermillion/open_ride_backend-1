@@ -31,6 +31,14 @@ const partnerSchema = new Schema({
     walletBalance: {
         type: Number,
         default: 0
+    },
+    latitude: {
+        type: Number,
+        required: false 
+    },
+    longitude: {
+        type: Number,
+        required: false 
     }
 
 },
