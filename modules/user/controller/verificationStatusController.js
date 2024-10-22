@@ -27,22 +27,7 @@ class CarVerificationController {
 
 
 
-  // getVerifiedCars = async (req, res) => {
-  //     const { search, page, limit } = req.query;  
 
-  //     try {
-  //         const verified = await CarVerificationService.getVerifiedCar({
-  //             limit,
-  //             page,
-  //             search,
-  //         });
-
-  //        res.status(201).json(verified)
-  //     } catch (error) {
-
-  //         res.status(500).json({ message: "An error occurred while fetching cars" });
-  //     }
-  // };
 
 
   getCarById = async (req, res) => {

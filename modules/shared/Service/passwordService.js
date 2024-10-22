@@ -1,11 +1,12 @@
 const Admin = require("../../admin/model/admin")
 const Partner = require("../../partner/model/partner")
 const User = require("../../user/model/user")
-const { verifyOtp, removeOtp } = require("../../shared/Service/otpService")
+const OtpService = require("../../shared/Service/otpService")
 
 const bcrypt = require("bcrypt")
 
 class PasswordService {
+
     async changePassword({ oldPassword, newPassword, entityId, userType }) {
 
         try {
@@ -52,53 +53,111 @@ class PasswordService {
         }
     }
 
-    async forgotPassword(newPassword, userType, phoneNumber, otp) {
-        try {
-            const isOtpValid = await verifyOtp(otp, phoneNumber)
-            if (!isOtpValid) {
-                return { message: "Invalid  OTP" }
-            }
 
+    async forgotPassword(newPassword, userType, emailAddress, otp) {
+        try {
             let user;
             if (userType === "Admin") {
-                user = await Admin.findOne({ phoneNumber })
+                user = Admin;
             } else if (userType === "Partner") {
-                user = await Partner.findOne({ phoneNumber })
+                user = Partner;
             } else if (userType === "User") {
-                user = await User.findOne({ phoneNumber })
+                user = User;
             } else {
-                const error = new Error("Invalid  UserType");
+                const error = new Error("Invalid UserType");
                 error.statusCode = 400;
                 throw error;
             }
 
-            if (!user) {
-                const error = new Error(`${userType} not find`)
+            const entity = await user.findOne({ emailAddress });
+
+            if (!entity) {
+                const error = new Error("Invalid emailAddress");
                 error.statusCode = 404;
                 throw error;
             }
 
-            const isNewCheck = await bcrypt.compare(newPassword, user.password);
+            const isOtpValid = await OtpService.verifyOtp(otp, emailAddress);
+            if (!isOtpValid) {
+                return { message: "Invalid OTP" };
+            }
+
+            const isNewCheck = await bcrypt.compare(newPassword, entity.password);
             if (isNewCheck) {
-                const error = new Error("New Password cannot be the same as old Password")
-         
+                const error = new Error("New Password cannot be the same as old Password");
                 error.statusCode = 400;
                 throw error;
             }
-      
 
             const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-            user.password = hashedNewPassword;
-            await user.save();
-            await removeOtp(phoneNumber);
-            return { message: "Forgotton password changed successfully" };
+            // Update the entity's password
+            entity.password = hashedNewPassword;
+            await entity.save();
+            await OtpService.removeOtp(emailAddress);
 
+            return { message: "Forgotten password changed successfully" };
 
         } catch (error) {
             throw error;
         }
     }
+
+
+
+
+
+    // = = = = = = = = = = =  = =  = = = = = 
+    // async forgotPassword(newPassword, userType, phoneNumber, otp) {
+    //     try {
+    //         const isOtpValid = await verifyOtp(otp, phoneNumber)
+    //         if (!isOtpValid) {
+    //             return { message: "Invalid  OTP" }
+    //         }
+
+    //         let user;
+    //         if (userType === "Admin") {
+    //             user = await Admin.findOne({ phoneNumber })
+    //         } else if (userType === "Partner") {
+    //             user = await Partner.findOne({ phoneNumber })
+    //         } else if (userType === "User") {
+    //             user = await User.findOne({ phoneNumber })
+    //         } else {
+    //             const error = new Error("Invalid  UserType");
+    //             error.statusCode = 400;
+    //             throw error;
+    //         }
+
+    //         if (!user) {
+    //             const error = new Error(`${userType} not find`)
+    //             error.statusCode = 404;
+    //             throw error;
+    //         }
+
+    //         const isNewCheck = await bcrypt.compare(newPassword, user.password);
+    //         if (isNewCheck) {
+    //             const error = new Error("New Password cannot be the same as old Password")
+
+    //             error.statusCode = 400;
+    //             throw error;
+    //         }
+
+
+    //         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    //         user.password = hashedNewPassword;
+    //         await user.save();
+    //         await removeOtp(phoneNumber);
+    //         return { message: "Forgotton password changed successfully" };
+
+
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
+
+
 }
 
 module.exports = new PasswordService()

@@ -1,17 +1,17 @@
 const PartnerService = require("../services/shared/partnerService")
-const{verifyOtp , removeOtp} = require("../../shared/Service/otpService");
+const OtpService= require("../../shared/Service/otpService");
 const Partner = require("../model/partner");
 
 class PartnerController {
 
     handleCreatePartner = async(req,res)=>{
         try {
-            const { phoneNumber, phoneOtp,emailOtp } = req.body
+            const { phoneNumber, phoneOtp,emailOtp ,emailAddress} = req.body
            
             if(phoneOtp != 123456){
               return res.status(404).json({message : "PhoneNumber  Otp is not valid"})
             }
-            const isOtpValid = await verifyOtp(emailOtp, phoneNumber)
+            const isOtpValid = await OtpService.verifyOtp(emailOtp, emailAddress)
             if (!isOtpValid) {
                 return res.status(400).json({ message: "Invalid OTP" })
             }
@@ -20,7 +20,7 @@ class PartnerController {
     
             const result = await PartnerService.createPartner({partnerData})
     
-            await removeOtp(phoneNumber)
+            await OtpService.removeOtp(phoneNumber)
             return res.status(201).json(result)
     
         } catch (error) {

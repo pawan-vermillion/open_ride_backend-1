@@ -14,13 +14,13 @@ class PasswordController {
     }
 
     forgotPassword = async(req,res)=>{
-        const {newPassword , userType , phoneNumber , otp} = req.body
+        const {newPassword , userType , emailAddress , otp} = req.body
 
         try {
             const result = await PasswordService.forgotPassword(
                 newPassword , 
                 userType,
-                phoneNumber ,
+                emailAddress ,
                 otp
              )
             res.status(200).json(result)

@@ -12,7 +12,7 @@ class CarVerificationService {
 
             const userLat = parseFloat(userlatitude);
             const userLong = parseFloat(userlongitude);
-            const maxDistance = 15; // 15 km ni distance
+            const maxDistance = 15; 
 
             if (isNaN(userLat) || isNaN(userLong)) {
                 throw new Error("Invalid user coordinates");
@@ -38,7 +38,6 @@ class CarVerificationService {
                 .limit(pageSize)
                 .exec();
 
-            // Najik na car fetch karo (15 km ni radius)
             let nearbyCars = allCar.filter(car => {
                 const carLat = parseFloat(car.latitude);
                 const carLong = parseFloat(car.longitude);
@@ -52,7 +51,6 @@ class CarVerificationService {
                 return distance <= maxDistance;
             });
 
-            // Pela najik na cars moklo, baki cars pachhi fetch karo
             if (nearbyCars.length < pageSize) {
                 const remainingCars = allCar.filter(car => !nearbyCars.includes(car));
                 nearbyCars = [...nearbyCars, ...remainingCars].slice(0, pageSize);
@@ -78,46 +76,7 @@ class CarVerificationService {
 
 
 
-    // getVerifiedCar = async ({ limit, page, search }) => {
-    //     try {
-    //         const pageSize = parseInt(limit) || 10;
-    //         const currentPage = parseInt(page) || 1;
-    //         const skip = (currentPage - 1) * pageSize;
-
-    //         const searchQuery = search
-    //             ? {
-    //                   $or: [
-    //                       { city: { $regex: search, $options: "i" } },
-    //                       { companyName: { $regex: search, $options: "i" } },
-    //                       { modelName: { $regex: search, $options: "i" } },
-    //                   ],
-    //               }
-    //             : {};
-
-    //         const query = {
-    //             ...searchQuery,
-    //             isCarVarified: true 
-    //         };
-
-    //         const allCar = await CarDetails.find(query)
-    //             .skip(skip)
-    //             .limit(pageSize)
-    //             .exec();
-
-    //         const total = await CarDetails.countDocuments(query);
-
-    //         return {
-
-    //             page: currentPage,
-    //             limit: pageSize,
-    //             total,
-    //             allCar
-    //         };
-    //     } catch (error) {
-
-    //         throw error;
-    //     }
-    // };
+        
 
 
 }
