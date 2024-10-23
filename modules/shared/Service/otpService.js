@@ -11,7 +11,7 @@ class OtpService {
   }
 
   async storeOtp(key, otp) {
-    this.otpStore[key] = otp;
+    this.otpStore[key] = otp; 
     setTimeout(() => {
       delete this.otpStore[key];
     }, 300000);
@@ -34,7 +34,7 @@ class OtpService {
 
   sendOtp = async ({ emailAddress, userType, isForgot }) => {
     try {
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
       // const key = emailAddress || phoneNumber;
       const key = emailAddress;
       let Model;
@@ -90,7 +90,23 @@ class OtpService {
           from: process.env.EMAIL_USER,
           to: emailAddress,
           subject: "OpenRide Account Verification",
-          text: `Thank you for choosing OpenRide! To complete your account creation, please enter the following One-Time Password (OTP):\n\n${otp}\n\nThis OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.\n\nIf you did not request this OTP, you can safely ignore this message.\n\nWelcome to OpenRide!\n\nSincerely,\nThe OpenRide Team`,
+          // text: `Thank you for choosing OpenRide! To complete your account creation, please enter the following One-Time Password (OTP):\n\n${otp}\n\nThis OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.\n\nIf you did not request this OTP, you can safely ignore this message.\n\nWelcome to OpenRide!\n\nSincerely,\nThe OpenRide Team`,
+          html: `
+          <div style="font-size: 16px;">
+            Thank you for choosing OpenRide! To complete your account creation, please enter the following One-Time Password (OTP):
+            <br><br>
+            <strong style="font-size: 25px;">${otp}</strong>
+            <br><br>
+            This OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.
+            <br><br>
+            If you did not request this OTP, you can safely ignore this message.
+            <br><br>
+            Welcome to OpenRide!
+            <br><br>
+            Sincerely,
+            <br>The OpenRide Team
+          </div>
+        `,
         };
 
         await transporter.sendMail(mailOption);
@@ -137,7 +153,7 @@ module.exports = new OtpService();
 
 
 
-// = = = = = = = = = = =  = =  = = = = = 
+// = = = = = = = = = = =  = =  = = = = =
 // const User = require('../../user/model/user')
 // const Admin = require('../../admin/model/admin')
 // const Partner = require('../../partner/model/partner')

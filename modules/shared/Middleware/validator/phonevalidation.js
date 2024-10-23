@@ -2,15 +2,15 @@ const { body, validationResult } = require("express-validator");
 
 const phoneValidationRules = () => {
   return [
-    body("phoneNumber")
-      .exists()
-      .withMessage("PhoneNumber is required")
-      .notEmpty()
-      .withMessage("PhoneNumber cannot be empty")
-      .isNumeric()
-      .withMessage("PhoneNumber is not type number ")
-      .isLength({ min: 10, max: 10 })
-      .withMessage("Phonenumber must be 10 digit"),
+    // body("phoneNumber")
+    //   .exists()
+    //   .withMessage("PhoneNumber is required")
+    //   .notEmpty()
+    //   .withMessage("PhoneNumber cannot be empty")
+    //   .isNumeric()
+    //   .withMessage("PhoneNumber is not type number ")
+    //   .isLength({ min: 10, max: 10 })
+    //   .withMessage("Phonenumber must be 10 digit"),
 
     body("emailAddress")
       .exists()

@@ -45,8 +45,8 @@ const signupvalidationRule = () => {
     .withMessage("emailOtp cannot be empty")
     .isString()
     .withMessage("emailOtp must be a string")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("emailOtp must be exactly 6 characters"),
+    .isLength({ min: 4, max: 4 })
+    .withMessage("emailOtp must be exactly 4 characters"),
 
     body("phoneOtp")
     .exists()
@@ -55,8 +55,8 @@ const signupvalidationRule = () => {
     .withMessage("phoneOtp cannot be empty")
     .isString()
     .withMessage("phoneOtp must be a string")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("phoneOtp must be exactly 6 characters"),
+    .isLength({ min: 4, max: 4 })
+    .withMessage("phoneOtp must be exactly 4 characters"),
   ];
 };
 
