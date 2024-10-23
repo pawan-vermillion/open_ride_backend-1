@@ -57,8 +57,8 @@ class CarCompanyController {
         try {
             const { companyId } = req.params;
             const { search } = req.query
-            const result = await CarCompanyService.getCarModel({ companyId , search});
-            res.status(200).json(result); 
+            const result = await CarCompanyService.getCarModel({ companyId, search });
+            res.status(200).json(result);
         } catch (error) {
             res.status(500).json({
                 message: error.message
@@ -70,13 +70,17 @@ class CarCompanyController {
         try {
             const carData = req.body;
 
-
             if (!carData.bodyStyle) {
                 return res.status(400).json({ message: "bodyStyle is required" });
             }
 
             const result = await CarCompanyService.createCarBodyStyle({ carData });
-            res.status(201).json(result);
+
+            if (result.statusCode === 400) {
+                return res.status(400).json({ message: result.message });
+            }
+
+            res.status(201).json({ message: result.message });
         } catch (error) {
             res.status(500).json({
                 message: error.message

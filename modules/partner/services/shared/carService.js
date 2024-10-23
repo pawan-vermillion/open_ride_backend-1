@@ -30,8 +30,7 @@ class CarService {
       throw new Error("Error occurred while creating a new Car: " + error.message);
     }
   }
-x  
-  
+    
 
   async getAllCarsService({ page, limit }) {
     try {

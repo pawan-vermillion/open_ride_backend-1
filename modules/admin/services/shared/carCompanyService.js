@@ -139,19 +139,30 @@ class CarCompanyService {
 
     async createCarBodyStyle({ carData }) {
         try {
-
             if (!carData.bodyStyle) {
                 throw new Error("bodyStyle is required");
             }
 
+            const existingBodyStyle = await BodyStyle.findOne({ bodyStyle: carData.bodyStyle });
+
+            if (existingBodyStyle) {
+                return {
+                    statusCode: 400,  
+                    message: "Body Style already exists"
+                };
+            }
+
             const create = await BodyStyle.create(carData);
+
             return {
-                message: "Car Body Style Added Successfully"
+                message: "Car Body Style Added Successfully"  
             };
         } catch (error) {
-            throw error;
+            throw error;  
         }
     }
+
+
 
     async createSubModel({ subModel, modelId }) {
         try {
