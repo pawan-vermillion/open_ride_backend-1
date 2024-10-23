@@ -10,10 +10,11 @@ const adminRoute = require("./modules/admin/routes/shared/adminRoute")
 const partnerRoute = require("./modules/partner/Route/partnerRoute")
 const userRoute = require("./modules/user/Route/userRoute")
 const passwordRoute = require("./modules/shared/Route/passwordRoute");
-const { upload } = require("./modules/shared/config/multer");
+// const { upload } = require("./modules/shared/config/multer"); 
 const bookingRoute = require("./modules/shared/Route/bookingRoute")
 const carRoute = require("./modules/shared/Route/carRoute")
 const reviewRoute = require("./modules/shared/Route/reviewRoute")
+const emailAndPhoneRoute = require("./modules/shared/Route/emailAndPhoneRoute")
 
 
 
@@ -45,7 +46,7 @@ app.use("/api/password", passwordRoute);
 app.use("/api/booking",bookingRoute)
 app.use("/api/car",carRoute)
 app.use("/api/review",reviewRoute)
-// app.use("/api/change",emailAndPhoneRoute)
+app.use("/api/change",emailAndPhoneRoute)
 
 
 

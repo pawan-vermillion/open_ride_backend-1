@@ -16,7 +16,7 @@ const partnerSchema = new Schema({
         require:true
     },
     phoneNumber:{
-        type:String,
+        type:Number,
         require:true,
         unique:true
     },

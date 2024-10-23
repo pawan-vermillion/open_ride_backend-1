@@ -48,10 +48,12 @@ class AuthController {
       }
 
       const token = await Admin.matchPasswordAndGenerateToken(phoneNumber, password);
+      
 
       res.status(200).json({ message: "Signin in SucessFully", token });
 
-    } catch (error) {
+    } 
+    catch (error) {
       if (error.message === "Admin not found") {
         return res
           .status(401)
@@ -63,7 +65,9 @@ class AuthController {
         .status(500)
         .json({ message: "Error logging in admin", error: error.message });
     }
-
   }
+
+
+
 }
 module.exports = new AuthController();
