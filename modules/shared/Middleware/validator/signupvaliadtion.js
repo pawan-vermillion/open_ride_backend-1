@@ -60,6 +60,7 @@ const signupvalidationRule = () => {
   ];
 };
 
+
 const signupvalidation = (req, res, next) => {
 
   const errors = validationResult(req);

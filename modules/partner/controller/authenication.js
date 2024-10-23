@@ -8,7 +8,7 @@ class PartnerController {
         try {
             const { phoneNumber, phoneOtp,emailOtp ,emailAddress} = req.body
            
-            if(phoneOtp != 123456){
+            if(phoneOtp != 1234){
               return res.status(404).json({message : "PhoneNumber  Otp is not valid"})
             }
             const isOtpValid = await OtpService.verifyOtp(emailOtp, emailAddress)
