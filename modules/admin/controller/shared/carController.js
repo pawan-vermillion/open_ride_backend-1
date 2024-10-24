@@ -4,6 +4,8 @@ const { validationResult } = require('express-validator');
 const { uploadToCloudinary } = require('../../../shared/config/multer');
 
 class AdminCarController {
+
+  
   createCar = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -21,7 +23,6 @@ class AdminCarController {
     try {
       const exteriorImages = req.files['exteriorImage'] ? (Array.isArray(req.files['exteriorImage']) ? req.files['exteriorImage'] : [req.files['exteriorImage']]) : [];
       const interiorImages = req.files['interiorImage'] ? (Array.isArray(req.files['interiorImage']) ? req.files['interiorImage'] : [req.files['interiorImage']]) : [];
-     
       const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
 
       // Collect URLs from the uploaded files

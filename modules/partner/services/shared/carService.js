@@ -49,6 +49,8 @@ class CarService {
       throw new Error("Error occurred while fetching car data.");
     }
   }
+
+  
   async uploadCarImages(carId, files) {
     try {
 

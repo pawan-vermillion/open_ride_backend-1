@@ -102,10 +102,6 @@ const uploadToCloudinary = async (req, filePath, fieldname) => {
       folder = 'uploads/other/profile';
     }
 
-
-
-
-
     const result = await cloudinary.uploader.upload(filePath, {
       folder,
       public_id: Date.now().toString(),
@@ -141,6 +137,8 @@ const uploadAndDeleteOld = async (req, oldImageUrl) => {
     }
   });
 };
+
+
 const uploadMultiple = (req, res, next) => {
   upload.fields([
     { name: 'exteriorImage', maxCount: 5 },
@@ -155,6 +153,9 @@ const uploadMultiple = (req, res, next) => {
     next();
   });
 };
+
+
+
 module.exports = {
   deleteOldImage,
   upload,

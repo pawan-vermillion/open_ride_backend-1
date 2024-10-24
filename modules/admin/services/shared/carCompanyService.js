@@ -67,6 +67,7 @@ class CarCompanyService {
     async createCarModel({ companyId, model }) {
         try {
             const existingModel = await CarModel.findOne({ model });
+            
             if (existingModel) {
                 throw new Error("Car Model already exists");
             }
