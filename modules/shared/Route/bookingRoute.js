@@ -7,9 +7,8 @@ const { sharedAuthentication } = require("../Middleware/validator/sharedAuthenic
 
 
 router.use(sharedAuthentication)
-router.post('/cancle/:bookingId',
-  cancelBookingValidator(), bookingValidate, BookingController.cancelBooking
-);
+router.post('/cancle/:bookingId',cancelBookingValidator(), bookingValidate, BookingController.cancelBooking);
+
 router.get("/:status", BookingController.getBookingController);
 
 router.get("/get/:bookingId", BookingController.getBookingByBookingId)

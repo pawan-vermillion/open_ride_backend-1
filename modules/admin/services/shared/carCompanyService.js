@@ -67,7 +67,7 @@ class CarCompanyService {
     async createCarModel({ companyId, model }) {
         try {
             const existingModel = await CarModel.findOne({ model });
-            
+
             if (existingModel) {
                 throw new Error("Car Model already exists");
             }
@@ -148,7 +148,7 @@ class CarCompanyService {
 
             if (existingBodyStyle) {
                 return {
-                    statusCode: 400,  
+                    statusCode: 400,
                     message: "Body Style already exists"
                 };
             }
@@ -156,10 +156,10 @@ class CarCompanyService {
             const create = await BodyStyle.create(carData);
 
             return {
-                message: "Car Body Style Added Successfully"  
+                message: "Car Body Style Added Successfully"
             };
         } catch (error) {
-            throw error;  
+            throw error;
         }
     }
 
@@ -167,6 +167,15 @@ class CarCompanyService {
 
     async createSubModel({ subModel, modelId }) {
         try {
+            const existingSubModel = await SubModel.findOne({ subModel, modelId });
+
+            if (existingSubModel) {
+                return {
+                    status: 409, 
+                    message: "SubModel already exists"
+                };
+            }
+
             const create = await SubModel.create({ subModel, modelId });
             return {
                 message: "SubModel Added Successfully"
@@ -175,6 +184,9 @@ class CarCompanyService {
             throw new Error(`Error occurred while adding SubModel: ${error.message}`);
         }
     }
+
+
+
 }
 
 module.exports = new CarCompanyService()

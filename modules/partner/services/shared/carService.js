@@ -24,7 +24,7 @@ class CarService {
      
       }
   
-      return { message: "New Car added successfully", status: 201 };
+      return { status: 201, message: "New Car added successfully" };
     } catch (error) {
       
       throw new Error("Error occurred while creating a new Car: " + error.message);
@@ -97,3 +97,6 @@ class CarService {
 }
 
 module.exports = new CarService();
+
+
+

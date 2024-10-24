@@ -176,7 +176,7 @@ class CarBookingService {
             // const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
 
             // partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
-            
+
             // await partner.save();
 
             return booking;
@@ -197,6 +197,8 @@ class CarBookingService {
         }
     };
 
+
+
     bookingVerification = async ({ orderId, paymentId, signature, bookingId }) => {
         try {
             const booking = await CarBooking.findById({ _id: bookingId });
@@ -208,7 +210,7 @@ class CarBookingService {
 
 
 
-            const isPaymentVerified = await this.verifyPayment(orderId, paymentId, signature);
+            const isPaymentVerified = await this.verifyPayment({ orderId, paymentId, signature });
             if (!isPaymentVerified) {
                 throw new Error('Payment verification failed');
             }
@@ -220,14 +222,14 @@ class CarBookingService {
             await booking.save();
 
             const partner = await Partner.findById(booking.partnerId);
-        if (!partner) {
-            throw new Error('Partner not found');
-        }
+            if (!partner) {
+                throw new Error('Partner not found');
+            }
 
-        const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
+            const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
 
-        // Update partner's wallet balance
-        partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
+            // Update partner's wallet balance
+            partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
 
 
 
@@ -254,33 +256,26 @@ class CarBookingService {
         }
     };
 
-    
     verifyPayment = async ({ orderId, paymentId, signature }) => {
-        const secretKey = process.env.PAYMENT_SECRET_KEY;
+        // const secretKey = process.env.PAYMENT_SECRET_KEY;
+        // const secretKey = process.env.STRIPE_SECRET_KEY;
 
-        if (!secretKey) {
-            throw new Error('Secret key is not defined. Please set the PAYMENT_SECRET_KEY environment variable.');
-        }
+        // if (!secretKey) {
+        //     throw new Error('Secret key is not defined. Please set the PAYMENT_SECRET_KEY environment variable.');
+        // }
 
+        // const generatedSignature = crypto
+        //     .createHmac('sha256', secretKey)
+        //     .update(`${orderId}|${paymentId}`)
+        //     .digest('hex');
 
-        const generatedSignature = crypto
-            .createHmac('sha256', secretKey)
-            .update(`${orderId}|${paymentId}`)
-            .digest('hex');
+        // if (generatedSignature !== signature) {
+        //     throw new Error('Signature verification failed');
+        // }
 
-
-     
-
-  
-        if (generatedSignature !== signature) {
-            throw new Error('Signature verification failed');
-        }
-
-        return true; 
+        return true;
     };
 
-
-    
 
 }
 

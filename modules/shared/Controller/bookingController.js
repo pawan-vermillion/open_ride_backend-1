@@ -20,6 +20,7 @@ class BookingController {
 
       // Check if cancellation is allowed based on time
       const canCancel = await BookingService.canCancelBooking(booking);
+      
       if (!canCancel) {
         return res.status(400).json({ error: "Cancellation is only allowed within 3 hours of the booking time" });
       }
@@ -59,6 +60,9 @@ class BookingController {
       res.status(500).json({ message: 'Error retrieving bookings', error: error.message });
     }
   }
+
+
+  
   getBookingByBookingId = async (req, res) => {
     try {
       const { bookingId } = req.params;

@@ -2,15 +2,17 @@ const CarBooking = require("../model/booking");
 const User = require("../../user/model/user")
 const Partner = require("../../partner/model/partner")
 const WalletHistory = require("../../user/model/walletBalance")
-const moment = require('moment'); 
+const moment = require('moment');
 
 class BookingService {
-    canCancelBooking = async(booking) => {
-      const bookingTime = moment(booking.bookingTime);
-      const cuurentTime = moment();
-      const hoursDiffrerence = cuurentTime.diff(bookingTime , 'hours')
-      return hoursDiffrerence >= 3
-    }
+  canCancelBooking = async (booking) => {
+    const bookingTime = moment(booking.bookingTime);
+    const currentTime = moment();
+    const hoursDifference = currentTime.diff(bookingTime, 'hours');
+
+    // Allow cancellation within 3 hours
+    return hoursDifference <= 3;
+  }
 
   cancelBooking = async ({ userType, bookingId, cancelReason }) => {
     try {
@@ -21,7 +23,7 @@ class BookingService {
       if (!booking) {
         return { error: "Booking not found", statusCode: 404 };
       }
-      
+
 
       if (booking.isCancel) {
         return { error: "Booking has already been cancelled", statusCode: 400 };
@@ -32,7 +34,7 @@ class BookingService {
       booking.cancelBy = userType;
       booking.cancelReason = cancelReason;
       booking.isCancel = true;
-    
+
       const savedBooking = await booking.save();
       const user = await User.findById(booking.userId);
 
@@ -46,18 +48,18 @@ class BookingService {
       await user.save();
 
 
-  
+
       const transactionType = 'Credit';
-    
+
       try {
         const walletHistoryEntry = new WalletHistory({
           userId: booking.userId,
-          partnerId : booking.partnerId,
+          partnerId: booking.partnerId,
           transactionType,
-          amount: booking.summary.partnerAmmount, 
+          amount: booking.summary.partnerAmmount,
           bookingId: booking._id,
         });
-        
+
         await walletHistoryEntry.save();
       } catch (walletHistoryError) {
         return { error: "Failed to save wallet history", statusCode: 500 };
@@ -70,7 +72,7 @@ class BookingService {
       if (!partner) {
         return { error: "Partner not found", statusCode: 404 };
       }
-      
+
       partner.walletBalance -= booking.summary.partnerAmmount
 
       await partner.save()
@@ -81,13 +83,13 @@ class BookingService {
         amount: booking.summary.partnerAmmount,
         bookingId: booking._id,
       });
-      
+
       await walletHistoryEntryForPartner.save();
 
 
       return { message: "Booking cancelled successfully" };
     } catch (error) {
-   
+
       return { error: "Internal Server Error", statusCode: 500 };
     }
   };
@@ -104,8 +106,8 @@ class BookingService {
 
     if (status !== 'all') {
       query.status = status;
-  }
- 
+    }
+
 
     try {
 
@@ -127,27 +129,30 @@ class BookingService {
         bookings
       };
     } catch (error) {
-    
+
       return {
         message: "Error retrieving bookings",
         error: error.message,
       };
     }
   }
-  getBookingByBookingId = async({bookingId}) => {
-    try {
-      
-      const booking = await CarBooking.findById(bookingId).populate("carId" , 'modelName  companyName bodyStyle'  ).populate("partnerId" ,'phoneNumber emailAddress  firstName lastName').populate("userId" ,'phoneNumber emailAddress  firstName lastName')
 
-      
+
+
+  getBookingByBookingId = async ({ bookingId }) => {
+    try {
+
+      const booking = await CarBooking.findById(bookingId).populate("carId", 'modelName  companyName bodyStyle').populate("partnerId", 'phoneNumber emailAddress  firstName lastName').populate("userId", 'phoneNumber emailAddress  firstName lastName')
+
+
       if (!booking) {
-          throw new Error("Booking not found");
+        throw new Error("Booking not found");
       }
 
       return booking;
-  } catch (error) {
+    } catch (error) {
       throw error;
+    }
   }
-}
 }
 module.exports = new BookingService();

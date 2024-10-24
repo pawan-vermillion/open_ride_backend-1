@@ -22,7 +22,7 @@ class EmailAndPhoneController {
                 return res.status(400).json({ message: `Invalid ${userType}` });
             }
 
-            if (otp !== "123456") {
+            if (otp !== "1234") {
                 return res.status(400).json({
                     message: 'Invalid OTP.',
                 });

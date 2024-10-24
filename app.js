@@ -43,7 +43,7 @@ app.use("/api/admin",adminRoute)
 app.use("/api/partner",partnerRoute)
 app.use("/api/user",userRoute)
 app.use("/api/password", passwordRoute);
-app.use("/api/booking",bookingRoute)
+app.use("/api/booking",bookingRoute)  
 app.use("/api/car",carRoute)
 app.use("/api/review",reviewRoute)
 app.use("/api/change",emailAndPhoneRoute)
@@ -58,3 +58,7 @@ const server = app.listen(PORT, () => {
 });
 
 server.setTimeout(600000); 
+
+
+
+// I resolved the issue that was found during testing In

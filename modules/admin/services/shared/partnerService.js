@@ -46,6 +46,9 @@ class PartnerService {
         }
 
     }
+
+
+
     async getPartnerById(PartnerId) {
         try {
             const partner = await Partner.findById(PartnerId).select("-__v -password -updatedAt");

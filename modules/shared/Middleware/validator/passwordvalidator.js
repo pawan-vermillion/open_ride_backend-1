@@ -75,7 +75,7 @@ const ForgetPasswordValidationRule = () => {
             .withMessage("OTP cannot be empty")
             .isString()
             .withMessage("OTP must be a string")
-            .isLength({ min: 6, max: 6 })
+            .isLength({ min: 4, max: 4 })
             .withMessage("OTP must be exactly 6 characters")
     ]
 

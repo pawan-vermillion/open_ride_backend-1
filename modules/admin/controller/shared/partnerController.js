@@ -5,21 +5,21 @@ class PartnerController {
 
   getPartner = async (req, res, next) => {
     try {
-        const { limit, page,search } = req.query; 
-        const result = await PartnerService.getPartner({ limit, page,search });
+      const { limit, page, search } = req.query;
+      const result = await PartnerService.getPartner({ limit, page, search });
 
-        return res.status(200).json(result);
+      return res.status(200).json(result);
     } catch (error) {
-        res.status(error.statusCode || 404).json({ message: error.message });
+      res.status(error.statusCode || 404).json({ message: error.message });
     }
-}
+  }
 
   getPartnerById = async (req, res, next) => {
     try {
-      const  PartnerId  = req.params.id;  
+      const PartnerId = req.params.id;
 
-     
-      const result = await PartnerService.getPartnerById( PartnerId );
+
+      const result = await PartnerService.getPartnerById(PartnerId);
       return res.status(200).json(result);
     } catch (error) {
       res.status(404).json({ message: error.message })

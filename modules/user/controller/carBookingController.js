@@ -44,6 +44,7 @@ class CarBookingController {
     try {
         const { orderId, paymentId, signature, bookingId } = req.body;
         
+        
         const result = await CarBookingService.bookingVerification({ orderId, paymentId, signature, bookingId });
 
         res.status(200).json({ message: 'Payment verified successfully', booking: result });
