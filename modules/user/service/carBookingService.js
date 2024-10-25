@@ -96,7 +96,10 @@ class CarBookingService {
             const pickUpMoment = moment(pickUpDateTime, 'YYYY-MM-DD HH:mm');
             const returnMoment = moment(returnDateTime, 'YYYY-MM-DD HH:mm');
 
-
+            // New validation check
+            if (returnMoment.isBefore(pickUpMoment)) {
+                throw new Error("Return date cannot be before the pick-up date");
+            }
 
             const availability = await this.checkAvailabilityForRange({
                 carId,
@@ -105,7 +108,6 @@ class CarBookingService {
             });
 
             if (availability.some(date => !date.isAvailable)) {
-
                 throw new Error("Car is not available for the selected dates");
             }
 
@@ -114,21 +116,15 @@ class CarBookingService {
             let subTotal = car.rate * totalHour;
             const discount = 0;
 
-
             const userAmmount = parseFloat((subTotal - discount));
-
-
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
-            // const commisionAmmount = parseFloat(userAmmount * commisionRate);
             const commisionAmmount = parseFloat(userAmmount * commisionRate / 100);
-
 
             const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09;
             const cgstRate = parseFloat(process.env.CGST_RATE) || 0.09;
             const sgst = parseFloat((commisionAmmount * sgstRate).toFixed(2));
             const cgst = parseFloat((commisionAmmount * cgstRate).toFixed(2));
             const totalTax = parseFloat((sgst + cgst).toFixed(2));
-
 
             const partnerAmmount = parseFloat((userAmmount - commisionAmmount - totalTax).toFixed(2));
 
@@ -143,7 +139,6 @@ class CarBookingService {
                 userId,
                 pickUpData,
                 returnData,
-
                 summary: {
                     unit: 'Hour',
                     rate: car.rate,
@@ -169,21 +164,15 @@ class CarBookingService {
             const booking = new CarBooking(bookingData);
             await booking.save();
 
-            // const partner = await Partner.findById(car.partnerId);
-            // if (!partner) {
-            //     throw new Error("Partner not found");
-            // }
-            // const totalAmount = booking.summary.subTotal - booking.summary.discount - booking.summary.commisionAmmount - booking.summary.totalTax;
-
-            // partner.walletBalance = (parseFloat(partner.walletBalance) || 0) + totalAmount;
-
-            // await partner.save();
-
             return booking;
         } catch (error) {
-            throw new Error(`Error generating booking summary: ${error.message}`);
+            throw new Error(`${error.message}`);
         }
     };
+
+
+
+
 
     removeExpiredBookings = async () => {
         try {

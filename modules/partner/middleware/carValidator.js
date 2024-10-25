@@ -3,8 +3,8 @@ const { body, validationResult } = require("express-validator");
 const CarValidationRules = () => {
     return [
         body("ownerFullName")
-            .exists().withMessage("Owner's  full name is required")
-            .isString().withMessage("Owner's full name must be a string"),
+            .exists().withMessage("Owner full name is required")
+            .isString().withMessage("Owner full name must be a string"),
 
         body("numberOfSeat")
             .exists().withMessage("Number of seats is required")

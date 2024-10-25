@@ -4,33 +4,33 @@ const { uploadToCloudinary, deleteOldImage, cloudinary } = require('../../../sha
 class CarService {
   async createCarService(CarData, files) {
     try {
-     
+
       const newCarAdd = new CarDetails(CarData);
       const savedCar = await newCarAdd.save();
-  
-  
-      
+
+
+
       if (files) {
-     const uploadedImages = await this.uploadCarImages(savedCar._id, files); // Call the method to upload images
-  
-   
+        const uploadedImages = await this.uploadCarImages(savedCar._id, files); // Call the method to upload images
+
+
         savedCar.exteriorImage = uploadedImages.exteriorImage || [];
         savedCar.interiorImage = uploadedImages.interiorImage || [];
         savedCar.rcPhoto = uploadedImages.rcPhoto || '';
-  
-    
+
+
         await savedCar.save();
-  
-     
+
+
       }
-  
+
       return { status: 201, message: "New Car added successfully" };
     } catch (error) {
-      
+
       throw new Error("Error occurred while creating a new Car: " + error.message);
     }
   }
-    
+
 
   async getAllCarsService({ page, limit }) {
     try {
@@ -50,12 +50,10 @@ class CarService {
     }
   }
 
-  
-  async uploadCarImages(carId, files) {
+
+  async uploadCarImages(carId, carData ,files) { 
     try {
-
       const existingCar = await CarDetails.findById(carId);
-
       if (!existingCar) throw new Error("Car not found");
 
       const existingExteriorImages = existingCar.exteriorImage || [];
@@ -66,11 +64,10 @@ class CarService {
       const newInteriorImages = carData.interiorImage || [];
       const newRcPhoto = carData.rcPhoto || '';
 
-
       const deleteImages = async (oldImages, newImages) => {
         const imagesToDelete = oldImages.filter(image => !newImages.includes(image));
         for (const imageUrl of imagesToDelete) {
-          await cloudinary.uploader.destroy(imageUrl); // Remove from Cloudinary
+          await cloudinary.uploader.destroy(imageUrl); 
         }
       };
 
@@ -81,7 +78,6 @@ class CarService {
         await cloudinary.uploader.destroy(existingRcPhoto);
       }
 
-      // Update the car details in the database with new image URLs and other data
       const updatedCar = await CarDetails.findByIdAndUpdate(carId, carData, { new: true });
       return updatedCar;
 

@@ -212,21 +212,16 @@ class CarController {
         bodyStyle: req.body.bodyStyle,
         subModel: req.body.subModel,
         modelYear: req.body.modelYear
-      };
+      };  
 
       // Call the service to update the car
       const updatedCar = await CarService.uploadCarImages(carId, carData);
 
-      return res.status(200).json(result);
+      return res.status(200).json(updatedCar);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   };
-
-
-
-
-
 
 }
 module.exports = new CarController();
