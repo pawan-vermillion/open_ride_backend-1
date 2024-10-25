@@ -6,8 +6,6 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const deleteOldImage = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-
-
     if (result.result === 'not found') {
       console.warn(`Image with public ID: ${publicId} not found for deletion.`);
     }
