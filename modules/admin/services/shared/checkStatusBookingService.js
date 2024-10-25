@@ -47,7 +47,7 @@ class CheckStatusBookingService {
 
             const booking = await CarBooking.find(query).populate("partnerId", 'emailAddress phoneNumber firstName lastName ').populate("userId", 'emailAddress phoneNumber firstName lastName profileImage').populate("carId", 'carNumber companyName modelName subModel')
                 .skip(skip)
-                .limit(pageSize);
+                .limit(pageSize);  
 
             return {
                 page: currentPage,

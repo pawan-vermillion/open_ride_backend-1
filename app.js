@@ -54,7 +54,7 @@ app.use("/api/change",emailAndPhoneRoute)
 
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}/`);
+  console.log(`Server running on port http://localhost:${PORT}/`);  
 });
 
 server.setTimeout(600000); 

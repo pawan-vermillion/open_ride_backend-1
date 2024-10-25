@@ -10,32 +10,41 @@ class PartnerService {
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
 
-            const searchCondition = search
-                ? {
-                    $or: [
-                        { firstName: { $regex: search, $options: "i" } },
-                        { emailAddress: { $regex: search, $options: "i" } },
-                        { phoneNumber: { $regex: search, $options: "i" } }
-                    ]
+            const query = {};
+            if (search) {
+                const searchTerm = search;
+                query.$or = [
+                    { firstName: { $regex: searchTerm, $options: "i" } },
+                    { lastName: { $regex: searchTerm, $options: "i" } },
+                    { emailAddress: { $regex: searchTerm, $options: "i" } },
+                ];
+
+                if (!isNaN(Number(searchTerm))) {
+                    const regex = new RegExp(searchTerm, "i");
+                    query.$or.push({
+                        $expr: {
+                            $regexMatch: {
+                                input: { $toString: "$phoneNumber" },
+                                regex: regex,
+                            },
+                        },
+                    });
                 }
-                : {};
+            }
 
-
-
-            const total = await Partner.countDocuments()
-            const partners = await Partner.find(searchCondition).select("-__v -password -updatedAt").skip(skip)
+            const total = await Partner.countDocuments(query);
+            const partners = await Partner.find(query)
+                .select("-__v -password -updatedAt")
+                .skip(skip)
                 .limit(pageSize);
 
-
-
-            if (!partners) {
+            if (!partners || partners.length === 0) {
                 const error = new Error("Partner not found");
                 error.statusCode = 404;
                 throw error;
             }
 
             return {
-
                 page: currentPage,
                 limit: pageSize,
                 totalPartner: total,
@@ -44,8 +53,8 @@ class PartnerService {
         } catch (error) {
             throw error;
         }
-
     }
+
 
 
 
