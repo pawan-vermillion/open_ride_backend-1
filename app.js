@@ -26,7 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 const PORT = process.env.PORT || 3001;
-
 //  Connect MongoDB
 
 connectMongoDb(process.env.DB_URL)
