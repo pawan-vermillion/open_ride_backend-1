@@ -25,7 +25,7 @@ app.use(express.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 //  Connect MongoDB
 
 connectMongoDb(process.env.DB_URL)
