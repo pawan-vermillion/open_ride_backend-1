@@ -40,7 +40,7 @@ jobs:
         run: |
           # Define ECS variables
           ecs_cluster_name="ride-cluster"
-          ecs_service_name="ride-service"
+          ecs_service_name="ride-service2"
           ecs_task_definition="ride-task"
 
           # Register a new ECS task definition
@@ -65,7 +65,7 @@ jobs:
             --force-new-deployment
 
           existing_rule=$(aws ec2 describe-security-groups \
-            --group-ids sg-072e1f1b08d34ce36 \
+            --group-ids sg-0b1343d4bd89f3349 \
             --query "SecurityGroups[0].IpPermissions[?FromPort==\`3000\`].FromPort" \
             --output text)
   
