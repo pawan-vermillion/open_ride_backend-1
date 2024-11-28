@@ -49,6 +49,9 @@ app.use("/api/review",reviewRoute)
 app.use("/api/change",emailAndPhoneRoute)
 
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP', timestamp: new Date() });
+});
 
 
 

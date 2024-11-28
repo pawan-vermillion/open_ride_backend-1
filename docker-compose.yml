@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Map container port 3000 to host port 3000
+    env_file: # Load environment variables from the .env file
+      - .env
+    volumes:
+      - .:/usr/src/app # Mount the project directory for development
+      - /usr/src/app/node_modules # Exclude node_modules to avoid overwrites
+    restart: unless-stopped # Restart the app if it crashes
