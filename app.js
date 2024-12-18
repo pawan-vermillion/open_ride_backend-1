@@ -21,8 +21,8 @@ const emailAndPhoneRoute = require("./modules/shared/Route/emailAndPhoneRoute")
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true })); 
 
 
 const PORT = process.env.PORT || 3000;

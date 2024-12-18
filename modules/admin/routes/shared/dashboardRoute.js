@@ -9,7 +9,7 @@ const {adminAuthenticate} = require("../../middleware/adminAuthenication")
 router.use(adminAuthenticate);
 
 
-router.get("/Details",DahboardController.getDashboardCountController  )
+router.get("/details",DahboardController.getDashboardCountController  )
 
 
 

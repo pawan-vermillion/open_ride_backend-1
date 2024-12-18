@@ -95,7 +95,13 @@ class CarBookingService {
             const returnDateTime = ` ${returnData.returnDate} ${returnData.returnTime}`;
             const pickUpMoment = moment(pickUpDateTime, 'YYYY-MM-DD HH:mm');
             const returnMoment = moment(returnDateTime, 'YYYY-MM-DD HH:mm');
-
+            if (pickUpMoment.isBefore(moment(), 'minute')) {
+                throw new Error("Pickup date and time cannot be in the past");
+            }
+    
+            if (returnMoment.isBefore(moment(), 'minute')) {
+                throw new Error("Return date and time cannot be in the past");
+            }
             // New validation check
             if (returnMoment.isBefore(pickUpMoment)) {
                 throw new Error("Return date cannot be before the pick-up date");

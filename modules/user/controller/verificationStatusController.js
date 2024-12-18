@@ -16,18 +16,10 @@ class CarVerificationController {
 
       res.status(201).json(verified)
     } catch (error) {
-
+      console.log(error.message)
       res.status(500).json({ message: "An error occurred while fetching cars" });
     }
   };
-
-
-
-
-
-
-
-
 
 
   getCarById = async (req, res) => {

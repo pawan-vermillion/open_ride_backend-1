@@ -15,6 +15,12 @@ const WithdrawRequestSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending'
+    },
+    type:{
+        type:String,
+        enum:['withdrew'],
+        default:'withdrew',
+        
     }
 } ,{ timestamps: true });
 

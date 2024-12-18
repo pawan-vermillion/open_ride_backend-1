@@ -33,7 +33,7 @@ class CarBookingController {
 
       res.status(201).json({ message: "success", bookingSummary });
     } catch (error) {
-
+console.log(error)
       res.status(500).json({ message: error.message });
     }
   }
