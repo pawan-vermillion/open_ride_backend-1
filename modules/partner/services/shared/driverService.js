@@ -28,12 +28,7 @@ class DriverService {
             const skip = (currentPage - 1) * pageSize;
             const total = await Driver.countDocuments()
             const drivers = await Driver.find({ partnerId }).skip(skip).limit(pageSize)
-            return {
-                page:currentPage,
-                limit:pageSize,
-                totalPartner:total,
-                drivers
-            };
+            return drivers;
         } catch (error) {
             throw error;
         }

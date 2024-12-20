@@ -5,80 +5,17 @@ class CarService {
 
 
 
-  async createCarService(CarData, files) {
+   createCarService = async (carData) => {
     try {
-      const newCarAdd = new CarDetails(CarData);
-      const savedCar = await newCarAdd.save();
-
-      if (files) {
-        const uploadedImages = await this.uploadCarImages(savedCar._id, files);
-
-        savedCar.exteriorImage = uploadedImages.exteriorImage || [];
-        savedCar.interiorImage = uploadedImages.interiorImage || [];
-        savedCar.rcPhoto = uploadedImages.rcPhoto || '';
-
-        await savedCar.save();
-      }
-
-      return { status: 201, message: "New Car added successfully" };
+      // Save car data in the database
+      const newCar = await CarDetails.create(carData);
+      return newCar;
     } catch (error) {
+      console.log(error)
       throw new Error("Error occurred while creating a new Car: " + error.message);
     }
-  }
-
-
-
-
-
-
-
-  // async createCarService(CarData, files) {
-  //   try {
-
-  //     const newCarAdd = new CarDetails(CarData);
-  //     const savedCar = await newCarAdd.save();
-
-  //     if (files) {
-  //       const uploadedImages = await this.uploadCarImages(savedCar._id, files); // Call the method to upload images
-
-  //       savedCar.exteriorImage = uploadedImages.exteriorImage || [];
-  //       savedCar.interiorImage = uploadedImages.interiorImage || [];
-  //       savedCar.rcPhoto = uploadedImages.rcPhoto || '';
-
-  //       await savedCar.save();
-
-  //     }
-
-  //     return { status: 201, message: "New Car added successfully" };
-  //   } catch (error) {
-
-  //     throw new Error("Error occurred while creating a new Car: " + error.message);
-  //   }
-  // }
-
-
-
-  async getAllCarsService({ page, limit }) {
-    try {
-      const pageSize = parseInt(limit) || 10;
-      const currentPage = parseInt(page) || 1;
-      const skip = (currentPage - 1) * pageSize;
-      const totalCars = await CarDetails.countDocuments();
-      const cars = await CarDetails.find().skip(skip).limit(pageSize);
-      return {
-        page: currentPage,
-        limit: pageSize,
-        totalCars: totalCars,
-        cars: cars,
-      };
-    } catch (error) {
-      throw new Error("Error occurred while fetching car data.");
-    }
-  }
-
-
-
-
+  };
+  
 
   async uploadCarImages(carId, carData) {
     try {
@@ -126,6 +63,55 @@ class CarService {
       throw new Error("Failed to update car images: " + error.message);
     }
   }
+
+
+
+
+
+  // async createCarService(CarData, files) {
+  //   try {
+
+  //     const newCarAdd = new CarDetails(CarData);
+  //     const savedCar = await newCarAdd.save();
+
+  //     if (files) {
+  //       const uploadedImages = await this.uploadCarImages(savedCar._id, files); // Call the method to upload images
+
+  //       savedCar.exteriorImage = uploadedImages.exteriorImage || [];
+  //       savedCar.interiorImage = uploadedImages.interiorImage || [];
+  //       savedCar.rcPhoto = uploadedImages.rcPhoto || '';
+
+  //       await savedCar.save();
+
+  //     }
+
+  //     return { status: 201, message: "New Car added successfully" };
+  //   } catch (error) {
+
+  //     throw new Error("Error occurred while creating a new Car: " + error.message);
+  //   }
+  // }
+
+
+
+  async getAllCarsService({ page, limit }) {
+    try {
+      const pageSize = parseInt(limit) || 10;
+      const currentPage = parseInt(page) || 1;
+      const skip = (currentPage - 1) * pageSize;
+      const totalCars = await CarDetails.countDocuments();
+      const cars = await CarDetails.find().skip(skip).limit(pageSize);
+      return cars ;
+    } catch (error) {
+      throw new Error("Error occurred while fetching car data.");
+    }
+  }
+
+
+
+
+
+
 
 
 

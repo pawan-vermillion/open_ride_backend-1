@@ -21,12 +21,8 @@ class AdminCarService {
       const totalCars = await CarDetails.countDocuments()
       const cars = await CarDetails.find(query).skip(skip).limit(pageSize)
       
-      return {
-        page:currentPage,
-        limit:pageSize,
-        totalCars:totalCars,
-        cars:cars
-      }
+      return cars;
+    
     } catch (error) {
       
       throw new Error("Error occurred while fetching car data.");

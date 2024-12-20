@@ -2,6 +2,7 @@ const multer = require("multer");
 const cloudinary = require("./cloudinary");
 const path = require("path");
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { log } = require("console");
 
 const deleteOldImage = async (publicId) => {
   try {
@@ -79,6 +80,10 @@ const uploadLogo = multer({
 
 const uploadToCloudinary = async (req, filePath, fieldname) => {
   try {
+    // Validate filePath
+    if (!filePath) {
+      throw new Error('Invalid file path: filePath is undefined or empty');
+    }
 
     let folder;
 
@@ -86,41 +91,47 @@ const uploadToCloudinary = async (req, filePath, fieldname) => {
       if (fieldname === 'profileImage') {
         folder = 'uploads/partner/profile/';
       } else if (fieldname === 'exteriorImage') {
-        folder = 'uploads/partner/car/exterior';
+        folder = 'uploads/partner/car/exterior/';
       } else if (fieldname === 'interiorImage') {
-        folder = 'uploads/partner/car/interior';
+        folder = 'uploads/partner/car/interior/';
       } else if (fieldname === 'rcPhoto') {
-        folder = 'uploads/partner/car/rcBook';
+        folder = 'uploads/partner/car/rcBook/';
+      } else {
+        throw new Error('Invalid fieldname for Partner');
       }
     } else if (req.type === 'User') {
       if (fieldname === 'profileImage') {
         folder = 'uploads/user/profile/';
+      } else {
+        throw new Error('Invalid fieldname for User');
       }
+    } else if (fieldname === 'logoImage') {
+      folder = 'uploads/admin/logo/';
     } else {
-      folder = 'uploads/other/profile';
+      throw new Error('Invalid request type or fieldname');
     }
 
+    const randomFiveDigit = Math.floor(10000 + Math.random() * 90000);
+    const currentTime = Date.now();
+    const uniquePublicId = `${randomFiveDigit}-${currentTime}`;
+
+
+    
     const result = await cloudinary.uploader.upload(filePath, {
-      folder,
-      public_id: Date.now().toString(),
+      folder: folder,
+      public_id: uniquePublicId,
       transformation: [{ quality: 'auto' }],
     });
 
-
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload(path, { folder }, (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    })
+    console.log('Upload successful:', result);
+    return result.secure_url;
   } catch (error) {
-
-    throw new Error('Error uploading to Cloudinary');
+    console.error('Error uploading to Cloudinary:', error.message);
+    throw new Error('Error uploading file to Cloudinary');
   }
 };
+
+
 
 
 const uploadAndDeleteOld = async (req, oldImageUrl) => {
@@ -144,13 +155,21 @@ const uploadMultiple = (req, res, next) => {
     { name: 'rcPhoto', maxCount: 1 },
     { name: 'logoImage', maxCount: 1 }
   ])(req, res, (err) => {
-    if (err) {
-      console.error('File upload error:', err);
+    if (err instanceof multer.MulterError) {
+      console.error('Multer error:', err.message);
       return res.status(500).json({ message: err.message });
+    } else if (err) {
+      console.error('Unknown error:', err);
+      return res.status(500).json({ message: 'Unexpected error during file upload.' });
+    }
+    
+    if (!req.files || !req.files.exteriorImage || !req.files.interiorImage || !req.files.rcPhoto) {
+      return res.status(400).json({ message: 'Missing required files.' });
     }
     next();
   });
 };
+
 
 
 

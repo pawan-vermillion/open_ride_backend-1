@@ -32,8 +32,7 @@ class RepairCarController {
 
             return res.status(200).json({
                 message: "Repair car records fetched successfully",
-                data: result.repairCars,
-                pagination: result.pagination,
+                data: result.repairCars
             });
         } catch (error) {
             console.error("Error in RepairCarController:", error.message);

@@ -66,12 +66,8 @@ class OfflineBookingService {
                 .skip(skip)
                 .limit(pageSize);
 
-            return {
-                total,
-                limit: pageSize,
-                page: currentPage,
-                bookings
-            };
+            return  bookings;
+         
         } catch (error) {
             throw new Error(error.message || "Error occurred while fetching offline bookings.");
         }

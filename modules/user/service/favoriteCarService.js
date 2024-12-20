@@ -33,11 +33,7 @@ class FavoriteCarService {
 
             const favoriteCars = await FavoriteCar.find({ userId }).skip(skip)
             .limit(pageSize);;
-            return {
-                page: currentPage,
-                limit: pageSize,
-                total:total,
-                favoriteCars};
+            return favoriteCars;
         } catch (error) {
             console.error('Error fetching favorite cars:', error); 
             throw error;

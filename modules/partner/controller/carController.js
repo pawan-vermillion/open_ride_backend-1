@@ -1,7 +1,9 @@
 const { validationResult } = require('express-validator');
 const CarService = require("../services/shared/carService");
 const AdminCarService = require("../../admin/services/shared/carService");
-const { uploadToCloudinary } = require('../../shared/config/multer');
+const { uploadToCloudinary 
+
+ } = require('../../shared/config/multer');
 const cloudinary = require("../../shared/config/cloudinary")
 const fs = require('fs');
 const CarDetails = require("../model/car");
@@ -9,29 +11,37 @@ const Partner = require('../model/partner');
 
 class CarController {
 
-
   createCar = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
-
+  
     req.body.type = "Partner";
-
+  
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(422).json({ message: "At least one image file is required" });
     }
-
+  
     try {
-      // Ensure files are processed as arrays
-      const exteriorImages = req.files['exteriorImage'] ? [].concat(req.files['exteriorImage']) : [];
-      const interiorImages = req.files['interiorImage'] ? [].concat(req.files['interiorImage']) : [];
-      const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
+      const exteriorImages = req.files.exteriorImage || [];
+      const interiorImages = req.files.interiorImage || [];
+      const rcPhoto = req.files.rcPhoto ? req.files.rcPhoto[0] : null;
+    
+   
+    
+      const exteriorImageUrls = exteriorImages.length > 0 ? exteriorImages.map(file => file.path) : [];
+      const interiorImageUrls = interiorImages.length > 0 ? interiorImages.map(file => file.path) : [];
+    
 
-      const exteriorImageUrls = exteriorImages.map(file => file.path);
-      const interiorImageUrls = interiorImages.map(file => file.path);
-      const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';
-
+      const rcPhotoUrl = rcPhoto ? rcPhoto.path : null;
+ 
+      if (!rcPhotoUrl) {
+        return res.status(422).json({ message: 'rcPhoto is required.' });
+      }
+    
+    
+      
       const carData = {
         partnerId: req.user.id,
         ownerFullName: req.body.ownerFullName,
@@ -58,17 +68,20 @@ class CarController {
         isCarVarified: req.body.isCarVarified || false,
         bodyStyle: req.body.bodyStyle,
         subModel: req.body.subModel,
-        modelYear: req.body.modelYear
+        modelYear: req.body.modelYear,
       };
-
+    
       const result = await CarService.createCarService(carData);
-
+    
       return res.status(201).json(result);
-
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: error.message });
     }
-  };
+  }    
+
+  
+  
 
 
 
@@ -166,12 +179,11 @@ class CarController {
     }
 
     try {
-      // Handling the image uploads
+   
       const exteriorImages = req.files['exteriorImage'] || [];
       const interiorImages = req.files['interiorImage'] || [];
       const rcPhoto = req.files['rcPhoto'] ? req.files['rcPhoto'][0] : null;
 
-      // Extract paths from uploaded files
       const exteriorImageUrls = exteriorImages.map(file => file.path);
       const interiorImageUrls = interiorImages.map(file => file.path);
       const rcPhotoUrl = rcPhoto ? rcPhoto.path : '';

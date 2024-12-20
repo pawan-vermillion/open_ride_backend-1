@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const CarController = require('../controller/carController');
 const {partnerAuthenication } = require('../middleware/partnerAuthenication');
-const { uploadMultiple } = require('../../shared/config/multer');
+const { uploadMultiple ,uploadToCloudinary} = require('../../shared/config/multer');
 const { CarValidationRules, carValidation } = require('../middleware/carValidator');
 
 router.use(partnerAuthenication);

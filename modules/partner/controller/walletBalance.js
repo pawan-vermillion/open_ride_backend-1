@@ -6,10 +6,10 @@ class WalletBalanceController {
         const partnerId = req.user.id;
         const { limit, page } = req.query;
 
-        // Get wallet history and withdraw request data
+       
         const walletHistoryData = await WalletBalanceService.getWalletHistory(partnerId, limit, page);
 
-        // Return combined data in the response
+      
         return res.status(200).json(walletHistoryData);
     } catch (error) {
         next(error);

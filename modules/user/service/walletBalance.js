@@ -17,12 +17,7 @@ class WalletBalanceService {
                 .limit(pageSize);
 
 
-            return {
-                page,
-                limit,
-                total,
-                walletHistoryData
-            };
+            return  walletHistoryData;
         } catch (error) {
             console.error(`Error fetching wallet history: ${error.message}`);
             throw error;

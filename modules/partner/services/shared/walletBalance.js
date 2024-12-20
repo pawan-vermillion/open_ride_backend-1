@@ -11,32 +11,27 @@ class WalletBalanceService {
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
     
-            // Fetch WalletHistory data and WithdrawRequest data
+          
             const walletHistoryData = await WalletHistory.find({ partnerId })
                 .skip(skip)
                 .limit(pageSize)
-                .sort({ createdAt: -1 }); // Sort by createdAt descending
+                .sort({ createdAt: -1 }); 
     
             const withdrawRequestData = await WithdrawRequest.find({ partnerId })
                 .skip(skip)
                 .limit(pageSize)
-                .sort({ createdAt: -1 }); // Sort by createdAt descending
+                .sort({ createdAt: -1 });
     
-            // Combine both results into a single array
             const combinedData = [...walletHistoryData, ...withdrawRequestData];
     
-            // Sort the combined array by createdAt field in descending order
+
             combinedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
-            // Total combined records
+    
             const total = await WalletHistory.countDocuments({ partnerId }) + await WithdrawRequest.countDocuments({ partnerId });
     
-            return {
-                pageSize,
-                currentPage,
-                total,
-                combinedData, // Return the merged data
-            };
+            return   combinedData; // Return the merged data
+           
         } catch (error) {
             throw error;
         }
