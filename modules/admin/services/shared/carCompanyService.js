@@ -66,6 +66,10 @@ class CarCompanyService {
 
     async createCarModel({ companyId, model }) {
         try {
+            const carCompany = await CarCompany.findById(companyId);
+        if (!carCompany) {
+            throw new Error("Company Not Found");
+        }
             const existingModel = await CarModel.findOne({ model });
 
             if (existingModel) {
@@ -78,11 +82,8 @@ class CarCompanyService {
                 message: "Car Model Added Successfully",
             };
         } catch (error) {
-            if (error.code === 11000) {
-                throw new Error("Car Model already exists");
-            } else {
-                throw new Error("Car Model can't be added");
-            }
+            console.log(error)
+            throw error;
         }
     }
 
@@ -130,7 +131,8 @@ class CarCompanyService {
                 models: result
             };
         } catch (error) {
-            console.error("Error in getCarModel:", error); // Debugging line
+            console.error("Error in getCarModel:", error);
+            
             throw error;
         }
     }
@@ -167,24 +169,39 @@ class CarCompanyService {
 
     async createSubModel({ subModel, modelId }) {
         try {
+       
+            const submodel = await CarModel.findById(modelId);
+            if (!submodel) {
+                return {
+                   
+                    message: "Model Not Found"
+                };
+            }
+    
+        
             const existingSubModel = await SubModel.findOne({ subModel, modelId });
-
             if (existingSubModel) {
                 return {
-                    status: 409, 
+               
                     message: "SubModel already exists"
                 };
             }
-
-            const create = await SubModel.create({ subModel, modelId });
+    
+         
+            await SubModel.create({ subModel, modelId });
             return {
+                
                 message: "SubModel Added Successfully"
             };
         } catch (error) {
-            throw new Error(`Error occurred while adding SubModel: ${error.message}`);
+            
+            return {
+                status: 500,
+                message: `Unexpected Error: ${error.message}`
+            };
         }
     }
-
+    
 
 
 }

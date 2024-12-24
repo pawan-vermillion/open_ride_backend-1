@@ -7,7 +7,7 @@ class CarCompanyController {
 
         try {
             if (!req.file) {
-                return res.status(400).json({ message: "Logo image is required" });
+                return res.status(400).json({ message: "Logo image is required"});
             }
 
             const carCompanyData = req.body;
@@ -38,10 +38,10 @@ class CarCompanyController {
 
     createCarModel = async (req, res) => {
         try {
-
+            console.log(req.body)
             const { companyId } = req.params;
             const { model } = req.body;
-
+console.log(companyId)
             const result = await CarCompanyService.createCarModel({ companyId, model });
 
             res.status(201).json(result);

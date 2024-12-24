@@ -18,9 +18,10 @@ router.get("/company",CarCompanyController.getCarComapny);
 router.post("/addCarBody" ,CarCompanyController.createCarBodyStyle );
 router.post("/subModel/:modelId" , CarCompanyController.createSubModel);
 router.get("/:id", AdminCarController.getCarById );
-router.post("/model/:companyId",CarCompanyController.createCarModel);
-// router.post("/model/:companyId",uploadLogo,CarCompanyController.createCarModel);
 router.get("/model/:companyId",CarCompanyController.getCarModel);
+router.post("/model/:companyId",CarCompanyController.createCarModel);
+
+// router.post("/model/:companyId",uploadLogo,CarCompanyController.createCarModel);
 router.get("/verification/unverified" ,CarVarificationController.getUnverifiedAllCar );
 router.patch("/verification/:carId", CarVarificationController.changeCarVerificationStatus );
 router.get("/partner/:partnerId",CarGetByPartnerIdController.getCarsByPartnerId)
