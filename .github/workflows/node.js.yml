@@ -24,10 +24,10 @@ jobs:
         npm install --prefer-offline
         npm run build --if-present
     - run: |
-        if pm2 describe cricket > /dev/null; then
-        pm2 restart cricket
+        if pm2 describe ride > /dev/null; then
+        pm2 restart ride
         pm2 save --force
         else
-        pm2 start run.sh --name cricket
+        pm2 start run.sh --name ride
         pm2 save --force
         fi
