@@ -1,76 +1,33 @@
-name: Deploy to ECS 
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main  # Trigger the workflow only when pushing to the 'main' branch
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # Use an Ubuntu runner
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.x]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2  # Check out your code from the repository
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # Set the correct AWS region
-
-      - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 601159029499.dkr.ecr.ap-south-1.amazonaws.com
-
-      - name: Build Docker image
-        run: |
-          docker build -t ride .
-
-      - name: Tag Docker image
-        run: |
-          docker tag ride:latest 601159029499.dkr.ecr.ap-south-1.amazonaws.com/ride:latest
-
-      - name: Push Docker image to ECR
-        run: |
-          docker push 601159029499.dkr.ecr.ap-south-1.amazonaws.com/ride:latest
-
-      - name: Deploy to ECS
-        run: |
-          # Define ECS variables
-          ecs_cluster_name="ride-cluster"
-          ecs_service_name="ride-service2"
-          ecs_task_definition="ride-task"
-
-          # Register a new ECS task definition
-          aws ecs register-task-definition \
-            --family $ecs_task_definition \
-            --container-definitions "[{
-              \"name\":\"ride-app\", 
-              \"image\":\"601159029499.dkr.ecr.ap-south-1.amazonaws.com/ride:latest\", 
-              \"essential\":true,
-              \"memory\":1024, 
-              \"portMappings\": [{
-                \"containerPort\":3000,
-                \"hostPort\":3000,
-                \"protocol\":\"tcp\"
-              }]
-            }]"
-          
-          # Update ECS service to use the new task definition
-          aws ecs update-service \
-            --cluster $ecs_cluster_name \
-            --service $ecs_service_name \
-            --force-new-deployment
-
-          existing_rule=$(aws ec2 describe-security-groups \
-            --group-ids sg-0b1343d4bd89f3349 \
-            --query "SecurityGroups[0].IpPermissions[?FromPort==\`3000\`].FromPort" \
-            --output text)
-  
-
-      - name: Copy .env file to Docker image
-        run: |
-          # Add the .env file to the Docker image during build
-          echo "COPY .env .env" >> Dockerfile
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: |
+        npm install --prefer-offline
+        npm run build --if-present
+    - run: |
+        if pm2 describe cricket > /dev/null; then
+        pm2 restart cricket
+        pm2 save --force
+        else
+        pm2 start run.sh --name cricket
+        pm2 save --force
+        fi
