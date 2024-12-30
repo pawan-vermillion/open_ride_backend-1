@@ -53,7 +53,7 @@ class PartnerService {
                 throw error;
             }
 
-            return {partners}
+            return partners
             
         } catch (error) {
             throw error;
