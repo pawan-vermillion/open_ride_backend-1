@@ -122,11 +122,13 @@ class CarCompanyService {
                 },
                 {
                     $addFields: {
+                        carModelId: "$_id",
                         subModelCount: { $size: "$subModels" }
                     }
                 },
                 {
                     $project: {
+                        _id: 0,
                         __v: 0
                     }
                 }

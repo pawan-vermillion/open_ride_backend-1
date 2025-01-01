@@ -13,7 +13,12 @@ class GetCarService {
             if (!bodyStyles || bodyStyles.length === 0) {
                 throw new Error("No body styles found");
             }
-            return bodyStyles;
+
+            const transformedBodystyle = bodyStyles.map(bodyStyle => ({
+                bodyStyleId: bodyStyle._id,
+                bodyStyle: bodyStyle.bodyStyle
+            }))
+            return transformedBodystyle;
         } catch (error) {
             throw new Error(`Error occurred while fetching body styles: ${error.message}. Stack trace: ${error.stack}`);
         }
@@ -21,15 +26,24 @@ class GetCarService {
 
     async getAllSubModels(modelId) {
         try {
-            const subModels = await SubModel.find({ modelId });
+            const subModels = await SubModel.find({ modelId }).lean(); 
             if (!subModels || subModels.length === 0) {
-                return []; // Return an empty array instead of throwing an error
+                return []; 
             }
-            return subModels;
+    
+            // Transform the response
+            const transformedSubModels = subModels.map(subModel => ({
+                subModelId: subModel._id,
+                modelId: subModel.modelId,
+                subModel: subModel.subModel
+            }));
+    
+            return transformedSubModels;
         } catch (error) {
             throw new Error(`Error occurred while fetching sub-models: ${error.message}`);
         }
     }
+    
     
 }
 

@@ -42,11 +42,13 @@ const CarDetailsSchema = new mongoose.Schema({
         unique: true
     },
     companyName:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CarCompnay",
         required:true
     },
     modelName:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CarModel",
         required:true
     },
     rcNumber:{
@@ -101,11 +103,13 @@ const CarDetailsSchema = new mongoose.Schema({
         default:false
     },
     bodyStyle:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BodyStyle",
         required:true
     },
     subModel:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubModel",
         required:true
     },
     modelYear:{
