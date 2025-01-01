@@ -26,43 +26,48 @@ class CarCompanyService {
             }
         }
     }
-
     async getCarCompany(adminId, search) {
         try {
-            const pipeline = [
-                {
-                    $lookup: {
-                        from: "carmodels",
-                        localField: "_id",
-                        foreignField: "companyId",
-                        as: "models"
-                    }
-                },
-                {
-                    $addFields: {
-                        modelCount: { $size: "$models" }
-                    }
-                },
-                {
+          const pipeline = [
+            {
+              $lookup: {
+                from: "carmodels",
+                localField: "_id",
+                foreignField: "companyId",
+                as: "models"
+              }
+            },
+            {
+              $addFields: {
+                modelCount: { $size: "$models" }
+              }
+            },
+           
+            ...(search
+              ? [
+                  {
                     $match: {
-                        carCompany: { $regex: search, $options: "i" }
+                      carCompany: { $regex: search, $options: "i" }
                     }
-                },
-                {
-                    $project: {
-                        carCompany: 1,
-                        logoImage: 1,
-                        modelCount: 1
-                    }
-                }
-            ];
-
-            const result = await CarCompany.aggregate(pipeline).exec();
-            return result;
+                  }
+                ]
+              : []),
+            {
+              $project: {
+                carCompany: 1,
+                logoImage: 1,
+                modelCount: 1
+              }
+            }
+          ];
+      
+          const result = await CarCompany.aggregate(pipeline).exec();
+          return result;
         } catch (error) {
-            throw error;
+          throw error;
         }
-    }
+      }
+      
 
     async createCarModel({ companyId, model }) {
         try {
