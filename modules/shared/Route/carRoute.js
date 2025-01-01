@@ -4,7 +4,7 @@ const GetCarController = require("../Controller/carController")
 const router = Router();
 
 router.use(sharedAuthentication)
-router.get("/allSubModel" ,GetCarController.getCarBodyStyles )
+router.get("/allBodyStyle" ,GetCarController.getCarBodyStyles )
 router.get("/allSubModel/:modelId" , GetCarController.getSubModels)
 
 module.exports = router;

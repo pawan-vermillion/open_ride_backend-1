@@ -9,7 +9,6 @@ class AdminCarService {
       const currentPage = parseInt(page) || 1;
       const skip = (currentPage - 1) * pageSize;
   
-      // Define the search query
       const searchQuery = search
         ? {
             $or: [
@@ -20,11 +19,15 @@ class AdminCarService {
           }
         : {};
   
-      // Query cars with selected fields
+    
       const cars = await CarDetails.find(searchQuery)
         .select(
           "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission"
         )
+        .populate("companyName", "carCompany -_id") 
+        .populate("modelName", "model -_id") 
+        .populate("subModel", "subModel -_id") 
+        .populate("bodyStyle", "bodyStyle -_id")
         .skip(skip)
         .limit(pageSize);
   
@@ -45,7 +48,9 @@ class AdminCarService {
       }));
   
       return formattedCars;
+  
     } catch (error) {
+      console.log(error)
       throw new Error("Error occurred while fetching car data.");
     }
   }

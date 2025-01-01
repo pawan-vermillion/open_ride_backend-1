@@ -104,12 +104,12 @@ const CarDetailsSchema = new mongoose.Schema({
     },
     bodyStyle:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "BodyStyle",
+        ref: "bodyStyle",
         required:true
     },
     subModel:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "SubModel",
+        ref: "subModel",
         required:true
     },
     modelYear:{

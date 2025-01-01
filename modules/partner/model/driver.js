@@ -22,6 +22,10 @@ const driverSchema = new mongoose.Schema({
     age:{
         type: Number,
         required: true
+    },
+    driverImage:{
+        type:String,
+        required:false
     }
 }, { timestamps: true });
 

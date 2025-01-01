@@ -96,7 +96,9 @@ const uploadToCloudinary = async (req, filePath, fieldname) => {
         folder = 'uploads/partner/car/interior/';
       } else if (fieldname === 'rcPhoto') {
         folder = 'uploads/partner/car/rcBook/';
-      } else {
+      }else if (file.fieldname === 'driverImage') {  
+        folder = 'uploads/partner/driverimage/';
+      }else {
         throw new Error('Invalid fieldname for Partner');
       }
     } else if (req.type === 'User') {

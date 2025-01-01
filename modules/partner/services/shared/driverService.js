@@ -2,44 +2,72 @@
 const Driver = require('../../model/driver');
 
 class DriverService {
-    addDriver = async ({ partnerId, firstName, lastName, phoneNumber,age }) => {
+    addDriver = async ({ partnerId, firstName, lastName, phoneNumber, age, driverImage }) => {
         try {
-           
             const newDriver = await Driver.create({
                 partnerId,
                 firstName,
                 lastName,
                 phoneNumber,
-                age
+                age,
+               driverImage 
             });
+    
+            const formattedDriver = {
+                ...newDriver.toObject(),
+                driverId: newDriver._id,
+            };
+            delete formattedDriver._id;
+    
+            return formattedDriver;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
+    
+    
+
+    getDriversByPartnerId = async ({ partnerId, limit, page }) => {
+        try {
+            const pageSize = parseInt(limit) || 10;
+            const currentPage = parseInt(page) || 1;
+            const skip = (currentPage - 1) * pageSize;
+    
+            const total = await Driver.countDocuments({ partnerId }); 
+            const drivers = await Driver.find({ partnerId })
+                .skip(skip)
+                .limit(pageSize);
+    
+            
+            const formattedDrivers = drivers.map((driver) => {
+                const driverObj = driver.toObject();
+                const { _id,createdAt , updatedAt , __v, ...rest } = driverObj; 
+                return {
+                    ...rest, 
+                    driverId: _id,  
+                };
+            });
+    
             return {
-                message: "Driver added successfully",
-                driver: newDriver
+                total,
+                page: currentPage,
+                limit: pageSize,
+                drivers: formattedDrivers,
             };
         } catch (error) {
             throw error;
         }
     };
-
-    getDriversByPartnerId = async ({partnerId , limit , page}) => {
-        try {
-            const pageSize = parseInt(limit) || 10;
-            const currentPage = parseInt(page) || 1;
-            const skip = (currentPage - 1) * pageSize;
-            const total = await Driver.countDocuments()
-            const drivers = await Driver.find({ partnerId }).skip(skip).limit(pageSize)
-            return drivers;
-        } catch (error) {
-            throw error;
-        }
-    };
+    
+    
 
     updateDriver = async ({ driverId, partnerId, updateData }) => {
         try {
             const updatedDriver = await Driver.findOneAndUpdate(
                 { _id: driverId, partnerId }, 
                 updateData,                 
-                { new: true } // Ensure validation runs
+                { new: true } 
             );
             return updatedDriver;
         } catch (error) {
