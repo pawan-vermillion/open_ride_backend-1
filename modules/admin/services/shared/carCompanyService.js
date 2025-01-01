@@ -42,7 +42,6 @@ class CarCompanyService {
                 modelCount: { $size: "$models" }
               }
             },
-           
             ...(search
               ? [
                   {
@@ -54,6 +53,8 @@ class CarCompanyService {
               : []),
             {
               $project: {
+                carCompanyId: "$_id", 
+                _id: 0,
                 carCompany: 1,
                 logoImage: 1,
                 modelCount: 1
