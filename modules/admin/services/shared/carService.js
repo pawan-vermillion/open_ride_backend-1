@@ -3,34 +3,54 @@ const CarDetails = require("../../../partner/model/car")
 class AdminCarService {
  
 
-  async getAllCarsService({search , page, limit }) {
+  async getAllCarsService({ search, page, limit }) {
     try {
       const pageSize = parseInt(limit) || 10;
       const currentPage = parseInt(page) || 1;
       const skip = (currentPage - 1) * pageSize;
+  
+      // Define the search query
       const searchQuery = search
-      ? {
-          $or: [
-            { carNumber: { $regex: search, $options: "i" } },
-            { companyName: { $regex: search, $options: "i" } },
-            { modelName: { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
-      const query = {...searchQuery}
-      const totalCars = await CarDetails.countDocuments()
-      const cars = await CarDetails.find(query).skip(skip).limit(pageSize)
-      
-      return cars;
-    
+        ? {
+            $or: [
+              { carNumber: { $regex: search, $options: "i" } },
+              { companyName: { $regex: search, $options: "i" } },
+              { modelName: { $regex: search, $options: "i" } },
+            ],
+          }
+        : {};
+  
+      // Query cars with selected fields
+      const cars = await CarDetails.find(searchQuery)
+        .select(
+          "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission"
+        )
+        .skip(skip)
+        .limit(pageSize);
+  
+      // Map the results to the desired structure
+      const formattedCars = cars.map(car => ({
+        carId: car._id,
+        carCompany: car.companyName,
+        carModel: car.modelName,
+        carSubModel: car.subModel,
+        modelYear: car.modelYear,
+        bodyStyle: car.bodyStyle,
+        isCarVerified: car.isCarVarified,
+        rating: car.rating,
+        noOfSeat: car.numberOfSeat,
+        fuelType: car.fuelType,
+        exteriorImage: car.exteriorImage?.[0] || "",
+        transmission : car.transmission
+      }));
+  
+      return formattedCars;
     } catch (error) {
-      
       throw new Error("Error occurred while fetching car data.");
     }
   }
-
   
-
+  
   async getCarByIdService({carId}) {
     try {
       

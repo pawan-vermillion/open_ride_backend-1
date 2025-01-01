@@ -28,38 +28,47 @@ class PartnerController {
         }
     }
 
-    handleSignIn = async (req,res) => {
-        try {
-            const { phoneNumber, password } = req.body;
-            if (!phoneNumber || !password) {
-              return res
-                .status(400)
-                .json({ message: "Both phoneNumber and password are required" });
-            }
-            if (isNaN(phoneNumber)) {
-              return res.status(400).json({ message: "PhoneNumber must be number" });
-            }
-        
-            if (phoneNumber.toString().length !== 10) {
-              return res.status(400).json({ message: "PhoneNumber must be 10 digit" });
-            }
-        
-            const token = await Partner.matchPasswordGenerateToken(phoneNumber, password);
-        
-            res.status(200).json({ message: "Signin in SucessFully", token});
-          } catch (error) {
-            if (error.message === "Partner not found") {
-              return res
-                .status(401)
-                .json({ message: "Please sign up before accessing your account" });
-            } else if (error.message === "Incorrect Password") {
-              return res.status(401).json({ message: "Incorrect Password" });
-            }
-            return res
-              .status(500)
-              .json({ message: "Error logging in User", error: error.message });
-          }
-      
-}
+    handleSignIn = async (req, res) => {
+      try {
+        const { phoneNumber, password } = req.body;
+    
+        if (!phoneNumber || !password) {
+          return res
+            .status(400)
+            .json({ message: "Both phoneNumber and password are required" });
+        }
+    
+        if (isNaN(phoneNumber)) {
+          return res.status(400).json({ message: "PhoneNumber must be a number" });
+        }
+    
+        if (phoneNumber.toString().length !== 10) {
+          return res.status(400).json({ message: "PhoneNumber must be 10 digits" });
+        }
+    
+        const token = await Partner.matchPasswordGenerateToken(phoneNumber, password);
+    
+        res.status(200).json({ message: "Signed in Successfully", token });
+      } catch (error) {
+        if (
+          error.message === "Partner not found" ||
+          error.message === "Incorrect Password" ||
+          error.message ===
+            "Invalid Access, Please check your password and PhoneNumber"
+        ) {
+          return res.status(200).json({
+            error: true,
+            message: "Invalid Access, please check your password and phoneNumber",
+          });
+        }
+    
+        return res.status(500).json({
+          message: "Error logging in User",
+          error: error.message,
+        });
+      }
+    };
+    
+    
 }
 module.exports = new PartnerController()

@@ -82,12 +82,7 @@ class PasswordService {
                 return { message: "Invalid OTP" };
             }
 
-            const isNewCheck = await bcrypt.compare(newPassword, entity.password);
-            if (isNewCheck) {
-                const error = new Error("New Password cannot be the same as old Password");
-                error.statusCode = 400;
-                throw error;
-            }
+           
 
             const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
