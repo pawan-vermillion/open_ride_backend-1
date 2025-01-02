@@ -1,11 +1,19 @@
 const driverService = require('../services/shared/driverService');
-const {uploadToCloudinary} = require("../../shared/config/multer")
+const {uploadToCloudinary} = require("../../shared/config/multer");
+const Driver = require('../model/driver');
 class DriverController {
     addDriver = async (req, res) => {
         try {
             const partnerId = req.user.id;
             const { firstName, lastName, phoneNumber, age } = req.body;
+
+            const checkPhone = await Driver.findOne({partnerId:partnerId , phoneNumber:phoneNumber})
+            if (checkPhone) {
+                throw new Error("This phone number is already registered with the same partner. A partner cannot add the same phone number for a driver more than once.");
+              }
             const driverImage = req.file ? await uploadToCloudinary(req, req.file.path, 'driverImage') : null;
+
+
             
             const driver = await driverService.addDriver({ partnerId, firstName, lastName, phoneNumber, age, driverImage });
             
