@@ -1,5 +1,4 @@
 
-
 services:
   app:
     build:
@@ -9,7 +8,6 @@ services:
       - "3002:3002"
     env_file:
       - .env
-
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -48,4 +46,4 @@ services:
 
 networks:
   mynetwork:
-    driver: bridg
+    driver: bridge
