@@ -6,7 +6,7 @@ class ReviewService {
         try {
             let reviewDocument = await CarReview.findOne({ carId, userId });
 
-            if (!reviewDocument) {
+          
                 reviewDocument = new CarReview({
                     userId,
                     carId,
@@ -14,11 +14,7 @@ class ReviewService {
                     rating
                 });
                 await reviewDocument.save();
-            } else {
-                reviewDocument.review = review;
-                reviewDocument.rating = rating;
-                await reviewDocument.save();
-            }
+            
 
             await CarDetails.calculateAverageRating(carId); // Ensure this method updates the car's rating
             return reviewDocument;
