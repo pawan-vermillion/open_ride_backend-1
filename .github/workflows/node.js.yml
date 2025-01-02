@@ -33,8 +33,14 @@ jobs:
       run: |
         # Ensure the docker-compose.yml file is in the root directory and copy it to the EC2 server
         echo "Copying docker-compose.yml to the server..."
+        
+        # Create the target directory on the server if it doesn't exist
+        ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /home/${{ secrets.SERVER_USER }}/app/"
+        
+        # Now, copy docker-compose.yml to the newly created directory
         scp -i ~/.ssh/my_ec2_key ./docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
-
+        
+        # SSH into the server to continue deployment
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           # Ensure PM2 is installed
           if ! command -v pm2 &> /dev/null
@@ -75,4 +81,5 @@ jobs:
           echo "Container details:"
           docker inspect ride
         EOF
+
 
