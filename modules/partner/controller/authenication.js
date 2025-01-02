@@ -56,7 +56,7 @@ class PartnerController {
           error.message ===
             "Invalid Access, Please check your password and PhoneNumber"
         ) {
-          return res.status(200).json({
+          return res.status(404).json({
             error: true,
             message: "Invalid Access, please check your password and phoneNumber",
           });
