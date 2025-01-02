@@ -26,9 +26,18 @@ jobs:
         push: true
         tags: pawan042/openride:latest  # Use the correct tag for your DockerHub repository
 
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/my_ec2_key
+        chmod 600 ~/.ssh/my_ec2_key
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      env:
+        EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+    
     - name: Deploy to Server
       run: |
-        ssh -t -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+        ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           docker pull pawan042/openride:latest
           docker-compose down
           docker-compose up -d
