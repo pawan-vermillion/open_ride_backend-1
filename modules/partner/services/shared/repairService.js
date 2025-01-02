@@ -1,6 +1,8 @@
 const RepairCar = require("../../model/repairCar");
 const CarDetails = require("../../model/car")
-const moment = require("moment")
+const moment = require("moment");
+const Partner = require("../../model/partner");
+const carCompany = require("../../../admin/model/carCompany");
 class RepaircarService {
     async repairCar({ partnerId, repairDetails }) {
         try {
@@ -122,6 +124,44 @@ class RepaircarService {
             throw error;
         }
     }
+
+
+    async getCarList(partnerId) {
+        try {
+          // Check if the partner exists
+          const checkPartner = await Partner.findById(partnerId);
+          if (!checkPartner) {
+            throw new Error("Partner not found");
+          }
+      
+          // Fetch the cars for the partner and populate the related carCompany
+          const fetchCar = await CarDetails.find({ partnerId: partnerId })
+            .populate(
+                {
+                    path: 'companyName',
+                    select: 'carCompany',
+                }
+            ) // Populate carCompany from the referenced companyName
+            .select("carNumber")  // Select only carCompany from the populated companyName and carNumber
+      
+          if (!fetchCar || fetchCar.length === 0) {
+            throw new Error("No cars found for this partner");
+          }
+
+    
+          // Format the response to only include the carCompany and carNumber
+          const formattedResponse = fetchCar.map(car => ({
+            car: `${car.companyName?.carCompany || "N/A"} - ${car.carNumber}`, 
+            carId: car._id,
+          }));
+      
+          return formattedResponse; // Return the formatted list of cars
+        } catch (error) {
+          console.error("Error in getCarList:", error.message);
+          throw error; // Throw the error to be handled by the caller
+        }
+      }
+      
 }
 
 module.exports = new RepaircarService();

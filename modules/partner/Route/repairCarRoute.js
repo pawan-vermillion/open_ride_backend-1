@@ -8,5 +8,6 @@ const RepairCarController= require("../controller/repairCarController")
 router.use(partnerAuthenication)
 router.post("/",RepairCarController.repairCar)
 router.get("/allCars",RepairCarController.getAllRepairCars)
+router.get("/getCarList/:id",RepairCarController.getCarList)
 
 module.exports = router
