@@ -1,4 +1,5 @@
 const express = require("express");
+console.log("this is update")
 const { connectMongoDb } = require("./db/connection");
 require("dotenv").config();
 const bodyParser = require("body-parser");
