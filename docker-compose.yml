@@ -8,7 +8,8 @@ services:
     ports:
       - "3002:3002"
     env_file:
-      - .env
+      - /home/${{ secrets.SERVER_USER }}/app/.env
+
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
