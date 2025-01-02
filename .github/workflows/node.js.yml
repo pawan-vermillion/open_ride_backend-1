@@ -30,74 +30,23 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Deploy to Server
-      run: | 
-        # Free up disk space (optional if needed)
-        echo "Freeing up disk space..."
-        docker system prune -a -f
-        
-        # Ensure the docker-compose.yml file is in the root directory and copy it to the EC2 server
-        echo "Copying docker-compose.yml to the server..."
-        
-        # Create the target directory on the server if it doesn't exist
-        ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /home/${{ secrets.SERVER_USER }}/app/"
-        
-        # Now, copy docker-compose.yml and .env to the newly created directory
-        scp -i ~/.ssh/my_ec2_key ./docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
-        scp -i ~/.ssh/my_ec2_key ./.env ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
-        
-        # SSH into the server to continue deployment
+      run: |
+        # SSH into the server to pull and run the Docker image
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          # Ensure the directory exists and navigate to it
-          echo "Changing to app directory..."
-          cd /home/${{ secrets.SERVER_USER }}/app/
-          
-          # Verify if the docker-compose.yml and .env files are present
-          ls -l docker-compose.yml .env
-
-          # Ensure docker-compose is installed
-          if ! command -v docker-compose &> /dev/null
-          then
-            echo "docker-compose is not installed. Installing..."
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-          fi
-          
-          # Ensure PM2 is installed
-          if ! command -v pm2 &> /dev/null
-          then
-            echo "PM2 is not installed. Installing..."
-            npm install pm2@latest -g
-          fi
-          
-          # Log in to DockerHub on the server
-          echo "Logging in to DockerHub..."
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          
           # Pull the latest Docker image from Docker Hub
           echo "Pulling the latest Docker image..."
           docker pull pawan042/openride:latest
-          
-          # Shut down old containers
-          echo "Shutting down old containers..."
-          docker-compose down
 
-          # Start or reload the container with PM2
-          echo "Checking if PM2 process exists..."
-          if pm2 show ride > /dev/null 2>&1; then
-            # If it exists, reload the container
-            echo "Reloading PM2 container..."
-            pm2 reload ride
-          else
-            # If it doesn't exist, start a new container with PM2
-            echo "Starting new container with PM2..."
-            pm2 start /home/${{ secrets.SERVER_USER }}/app/docker-compose.yml --name ride
-          fi
+          # Check if there are existing containers and remove them
+          echo "Stopping and removing old containers..."
+          docker stop ride || true
+          docker rm ride || true
 
-          # Check if the container is running and display details
+          # Run the new container
+          echo "Running the new container..."
+          docker run -d --name ride -p 3002:3002 pawan042/openride:latest
+
+          # Check if the container is running
           echo "Checking if the container is running..."
           docker ps --filter "name=ride"
-
-          # Display container details
-          echo "Container details:"
-          docker inspect ride
         EOF
