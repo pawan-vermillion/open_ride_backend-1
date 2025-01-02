@@ -9,7 +9,7 @@ const RepairCarSchema = new mongoose.Schema({
     },
     carId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "CarDetails",  // Ensure the reference is correct
+        ref: "Car",  // Ensure the reference is correct
         required: true,
     },
     

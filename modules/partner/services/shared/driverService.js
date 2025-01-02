@@ -42,19 +42,16 @@ class DriverService {
             
             const formattedDrivers = drivers.map((driver) => {
                 const driverObj = driver.toObject();
-                const { _id,createdAt , updatedAt , __v, ...rest } = driverObj; 
+                const { _id,createdAt , updatedAt , __v,driverImage, ...rest } = driverObj; 
                 return {
-                    ...rest, 
+                    ...rest,
+                    driverImage:driverImage || "",
                     driverId: _id,  
                 };
             });
     
-            return {
-                total,
-                page: currentPage,
-                limit: pageSize,
-                drivers: formattedDrivers,
-            };
+            return formattedDrivers
+         
         } catch (error) {
             throw error;
         }

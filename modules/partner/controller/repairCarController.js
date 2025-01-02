@@ -30,10 +30,7 @@ class RepairCarController {
 
             const result = await RepaircarService.getAllRepairCars({ page, limit });
 
-            return res.status(200).json({
-                message: "Repair car records fetched successfully",
-                data: result.repairCars
-            });
+            return res.status(200).json(result);
         } catch (error) {
             console.error("Error in RepairCarController:", error.message);
             res.status(500).json({

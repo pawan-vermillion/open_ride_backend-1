@@ -45,28 +45,56 @@ class RepaircarService {
 
 
             const repairCars = await RepairCar.find()
-                .skip(skip)
-                .limit(pageSize)
-                .sort({ createdAt: -1 });
+            .skip(skip)
+            .select('-__v -_id -createdAt -updatedAt -partnerId ')
+            .limit(pageSize)
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'carId',
+                select: 'companyName modelName subModel bodyStyle modelYear rating -_id exteriorImage',
+                populate: [
+                    {
+                        path: 'companyName',
+                        select: 'carCompany',  // Assuming the company name is stored in a company collection and has a 'name' field
+                    },
+                    {
+                        path: 'modelName',
+                        select: 'model',  // Assuming the model name is stored in a model collection and has a 'name' field
+                    },
+                    {
+                        path: 'subModel',
+                        select: 'subModel',  // Assuming the sub-model name is stored in a sub-model collection and has a 'name' field
+                    },
+                    {
+                        path: 'bodyStyle',
+                        select: 'bodyStyle',  // Assuming the body style is stored in a body style collection and has a 'name' field
+                    }
+                ]
+            });
 
-                const formattedRepairCars = repairCars.map(car => {
-                    return {
-                        ...car.toObject(),
-                        fromtoDate: moment(car.fromtoDate).format('YYYY-MM-DD'),  // Format the date as per your requirement
-                        toDate: moment(car.toDate).format('YYYY-MM-DD'),          // Format the date as per your requirement
-                    };
-                });
-            const totalRecords = await RepairCar.countDocuments();
+        // Format the repair cars and remove the carId object, replacing it with its properties
+        const formattedRepairCars = repairCars.map(car => {
+            const { carId, ...carData } = car.toObject();
+
+          
 
             return {
-                repairCars :formattedRepairCars,
-                pagination: {
-                    totalRecords,
-                    totalPages: Math.ceil(totalRecords / pageSize),
-                    currentPage: pageNumber,
-                    pageSize,
-                },
+                ...carData,
+                companyName: carId.companyName.carCompany ? carId.companyName.carCompany : 'N/A',
+                modelName: carId.modelName.model ? carId.modelName.model : 'N/A',
+                subModel: carId.subModel.subModel ? carId.subModel.subModel : 'N/A',
+                bodyStyle: carId.bodyStyle.bodyStyle ? carId.bodyStyle.bodyStyle : 'N/A',
+                modelYear: carId.modelYear,
+                rating: carId.rating,
+                fromtoDate: moment(car.fromtoDate).format('YYYY-MM-DD'),  // Format the date as per your requirement
+                toDate: moment(car.toDate).format('YYYY-MM-DD'),          // Format the date as per your requirement
+                fromtoTime: car.fromtoTime,
+                toTime: car.toTime,
+                exteriorImage:carId.exteriorImage[0] || ""
             };
+        });
+
+        return formattedRepairCars;
         } catch (error) {
             console.error("Error in RepaircarService:", error.message);
             throw error;

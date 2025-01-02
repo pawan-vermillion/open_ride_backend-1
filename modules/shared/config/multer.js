@@ -98,7 +98,7 @@ const uploadToCloudinary = async (req, filePath, fieldname) => {
         folder = 'uploads/partner/car/interior/';
       } else if (fieldname === 'rcPhoto') {
         folder = 'uploads/partner/car/rcBook/';
-      }else if (file.fieldname === 'driverImage') {  
+      }else if (fieldname === 'driverImage') {  
         folder = 'uploads/partner/driverimage/';
       }else {
         throw new Error('Invalid fieldname for Partner');
@@ -127,10 +127,10 @@ const uploadToCloudinary = async (req, filePath, fieldname) => {
       transformation: [{ quality: 'auto' }],
     });
 
-    console.log('Upload successful:', result);
+
     return result.secure_url;
   } catch (error) {
-    console.error('Error uploading to Cloudinary:', error.message);
+    console.error('Error uploading to Cloudinary:', error);
     throw new Error('Error uploading file to Cloudinary');
   }
 };

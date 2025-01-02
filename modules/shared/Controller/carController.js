@@ -24,7 +24,7 @@ class GetCarController {
             const subModels = await GetCarService.getAllSubModels(modelId);
             
             if (subModels.length === 0) {
-                return res.status(200).json({ message: "No sub-models found for the given model ID" });
+                return res.status(404).json({ message: "No sub-models found for the given model ID" });
             }
             
             res.status(200).json(subModels);

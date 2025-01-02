@@ -19,41 +19,41 @@ class AdminCarService {
           }
         : {};
   
-    
       const cars = await CarDetails.find(searchQuery)
         .select(
           "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission"
         )
         .populate("companyName", "carCompany -_id") 
-        .populate("modelName", "model -_id") 
-        .populate("subModel", "subModel -_id") 
-        .populate("bodyStyle", "bodyStyle -_id")
+        .populate("modelName", "model -_id")        
+        .populate("subModel", "subModel -_id")     
+        .populate("bodyStyle", "bodyStyle -_id") 
         .skip(skip)
         .limit(pageSize);
   
-      // Map the results to the desired structure
+      // Map the results to remove nested objects
       const formattedCars = cars.map(car => ({
         carId: car._id,
-        carCompany: car.companyName,
-        carModel: car.modelName,
-        carSubModel: car.subModel,
+        carCompany: car.companyName?.carCompany || "", 
+        carModel: car.modelName?.model || "",         
+        carSubModel: car.subModel?.subModel || "",    
         modelYear: car.modelYear,
-        bodyStyle: car.bodyStyle,
+        bodyStyle: car.bodyStyle?.bodyStyle || "",    
         isCarVerified: car.isCarVarified,
         rating: car.rating,
         noOfSeat: car.numberOfSeat,
         fuelType: car.fuelType,
         exteriorImage: car.exteriorImage?.[0] || "",
-        transmission : car.transmission
+        transmission: car.transmission
       }));
   
       return formattedCars;
   
     } catch (error) {
-      console.log(error)
+      console.error(error);
       throw new Error("Error occurred while fetching car data.");
     }
   }
+  
   
   
   async getCarByIdService({carId}) {
