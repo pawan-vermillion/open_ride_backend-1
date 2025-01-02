@@ -28,6 +28,8 @@ const storage = new CloudinaryStorage({
         folder = 'uploads/partner/car/interior';
       } else if (file.fieldname === 'rcPhoto') {
         folder = 'uploads/partner/car/rcBook';
+      }else if (file.fieldname === 'driverImage') {  
+        folder = 'uploads/partner/driverimage/';
       }
     } else if (req.type === 'User') {
       if (file.fieldname === 'profileImage') {
@@ -155,7 +157,8 @@ const uploadMultiple = (req, res, next) => {
     { name: 'exteriorImage', maxCount: 5 },
     { name: 'interiorImage', maxCount: 5 },
     { name: 'rcPhoto', maxCount: 1 },
-    { name: 'logoImage', maxCount: 1 }
+    { name: 'logoImage', maxCount: 1 },
+    { name: 'driverImage', maxCount: 1 },
   ])(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       console.error('Multer error:', err.message);

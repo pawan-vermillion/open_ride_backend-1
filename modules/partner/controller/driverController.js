@@ -19,6 +19,7 @@ class DriverController {
     };
 
     getDriversByPartner = async (req, res) => {
+        
         try {
             const partnerId = req.user.id;  
             const { limit, page } = req.query;
