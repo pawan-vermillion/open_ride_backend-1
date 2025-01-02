@@ -61,7 +61,7 @@ const CarDetailsSchema = new mongoose.Schema({
     },
     unit:{
         type:String,
-        enum:[ "Hour"],
+        enum:[ "KM"],
         required:true
     },
     description:{
