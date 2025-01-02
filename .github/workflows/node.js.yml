@@ -42,7 +42,6 @@ jobs:
             echo "PM2 is not installed. Installing..."
             npm install pm2@latest -g
           fi
-<<<<<<< HEAD
 
           # Log in to DockerHub on the server (if not already done)
           echo "Logging in to DockerHub..."
@@ -56,25 +55,6 @@ jobs:
           echo "Shutting down old containers..."
           docker-compose down
 
-=======
-          
-          # Log in to DockerHub on the server (if not already done)
-          echo "Logging in to DockerHub..."
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          
-          # Pull the latest Docker image from Docker Hub
-          echo "Pulling the latest Docker image..."
-          docker pull pawan042/openride:latest
-          
-          # Shut down old containers
-          echo "Shutting down old containers..."
-          docker-compose down
-          
-          # Ensure docker-compose.yml is present on the server
-          echo "Copying docker-compose.yml to the server..."
-          scp -i ~/.ssh/my_ec2_key docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/path/to/destination/
-          
->>>>>>> 7fb664d4946238e1dd570508dff5fe1efb31fbee
           # Start or reload the container with PM2
           echo "Checking if PM2 process exists..."
           if pm2 show ride > /dev/null 2>&1; then
@@ -84,7 +64,6 @@ jobs:
           else
             # If it doesn't exist, start a new container with PM2
             echo "Starting new container with PM2..."
-<<<<<<< HEAD
             pm2 start /home/${{ secrets.SERVER_USER }}/app/docker-compose.yml --name ride
           fi
 
@@ -92,15 +71,6 @@ jobs:
           echo "Checking if the container is running..."
           docker ps --filter "name=ride"
 
-=======
-            pm2 start /path/to/destination/docker-compose.yml --name ride
-          fi
-          
-          # Check if the container is running and display details
-          echo "Checking if the container is running..."
-          docker ps --filter "name=ride"
-          
->>>>>>> 7fb664d4946238e1dd570508dff5fe1efb31fbee
           # Display container details
           echo "Container details:"
           docker inspect ride
