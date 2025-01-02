@@ -87,7 +87,9 @@ class AdminCarService {
         three: ratingCounts[3],
         four: ratingCounts[4],
         five: ratingCounts[5],
-      };
+        totalCount: Object.values(ratingCounts).reduce((acc, count) => acc + count, 0)  // Add the total count
+    };
+    
   
       // Calculate the average rating
       const averageRating = reviews.length > 0
