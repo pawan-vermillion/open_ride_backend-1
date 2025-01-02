@@ -38,12 +38,22 @@ jobs:
     - name: Deploy to Server
       run: |
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          # Pull the latest image
+          # Ensure docker-compose is installed (if not already)
+          if ! command -v docker-compose &> /dev/null
+          then
+            curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+          fi
+
+          # Pull the latest Docker image
+          echo "Pulling the latest Docker image..."
           docker pull pawan042/openride:latest
 
           # Stop and remove old containers
+          echo "Stopping and removing old containers..."
           docker-compose down
 
           # Start the containers with Docker Compose
+          echo "Starting new containers..."
           docker-compose up -d
         EOF
