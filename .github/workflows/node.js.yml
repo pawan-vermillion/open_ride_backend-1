@@ -1,58 +1,33 @@
-name: Docker CI/CD Pipeline
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.x]
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-
-    - name: Set up SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/my_ec2_key
-        chmod 600 ~/.ssh/my_ec2_key
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-      env:
-        EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-
-    - name: Log in to DockerHub
-      uses: docker/login-action@v3
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build Docker image
-      run: |
-        docker build -t pawan042/openride:latest .
-
-    - name: Push Docker image
-      run: |
-        docker push pawan042/openride:latest
-
-    - name: Deploy to Server
-      run: |
-        ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          # Pull the latest Docker image from Docker Hub
-          echo "Pulling the latest Docker image..."
-          docker pull pawan042/openride:latest
-
-          # Stop and remove any existing containers
-          echo "Stopping and removing old containers..."
-          docker stop ride || true
-          docker rm ride || true
-
-          # Run the new container
-          echo "Running the new container..."
-          docker-compose -f /path/to/your/docker-compose.yml up -d
-
-          # Verify if the containers are running
-          echo "Checking if the containers are running..."
-          docker ps --filter "name=ride"
-        EOF
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: |
+        npm install --prefer-offline
+        npm run build --if-present
+    - run: |
+        if pm2 describe ride > /dev/null; then
+        pm2 restart ride
+        pm2 save --force
+        else
+        pm2 start run.sh --name ride
+        pm2 save --force
+        fi

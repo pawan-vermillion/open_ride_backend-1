@@ -41,13 +41,23 @@ connectMongoDb(process.env.DB_URL)
     res.status(200).json("Welcome To The Open Ride Backend 2");
   });
 
+// Check the environment variable
+const environment = process.env.DEV;
+
+if (environment === "production") {
+  // If in production, establish RabbitMQ connection
   connectRabbitMq()
-  .then(() => {
-    console.log("RabbitMQ connection established.");
-  })
-  .catch((error) => {
-    console.error("Failed to connect to RabbitMQ:", error);
-  });
+    .then(() => {
+      console.log("RabbitMQ connection established.");
+    })
+    .catch((error) => {
+      console.error("Failed to connect to RabbitMQ:", error);
+    });
+} else {
+  // Skip RabbitMQ connection if in development
+  console.log("Skipping RabbitMQ connection in development environment.");
+}
+
 
 app.use("/api/otp",OtpRoutes)
 app.use("/api/admin",adminRoute)
