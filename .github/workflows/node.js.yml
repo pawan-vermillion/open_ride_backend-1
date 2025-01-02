@@ -53,6 +53,10 @@ jobs:
           echo "Logging in to DockerHub..."
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
+          # Free up disk space (optional if needed)
+          echo "Freeing up disk space..."
+          docker system prune -a -f
+
           # Pull the latest Docker image from Docker Hub
           echo "Pulling the latest Docker image..."
           docker pull pawan042/openride:latest
@@ -81,5 +85,6 @@ jobs:
           echo "Container details:"
           docker inspect ride
         EOF
+
 
 
