@@ -8,17 +8,38 @@ class RepaircarService {
             if (!carExists) {
                 throw new Error("Car not found. Please provide a valid carId.");
             }
-            const curentDate = new Date();
+    
+            const currentDate = new Date();
             const fromtoDate = new Date(repairDetails.fromtoDate);
+            const fromtoTime = repairDetails.fromtoTime.split(':');
             const toDate = new Date(repairDetails.toDate);
-
-            if (fromtoDate < curentDate || toDate < curentDate) {
+            const toTime = repairDetails.toTime.split(':');
+    
+           
+            fromtoDate.setHours(parseInt(fromtoTime[0]), parseInt(fromtoTime[1]));
+            toDate.setHours(parseInt(toTime[0]), parseInt(toTime[1]));
+    
+            console.log(repairDetails, fromtoTime, toTime);
+    
+           
+            if (fromtoDate < currentDate || toDate < currentDate) {
                 throw new Error("Dates cannot be in the past. Please select valid dates.");
             }
-
+    
+           
+            if (fromtoDate.getDate() === toDate.getDate()) {
+                if (fromtoDate.getHours() === toDate.getHours() && fromtoDate.getMinutes() >= toDate.getMinutes()) {
+                    throw new Error("From time must be earlier than To time on the same date.");
+                } else if (fromtoDate.getHours() > toDate.getHours()) {
+                    throw new Error("From time must be earlier than To time on the same date.");
+                }
+            }
+    
+           
             if (fromtoDate > toDate) {
                 throw new Error("From date cannot be after the to date.");
             }
+    
             const newRepairCar = new RepairCar({
                 partnerId,
                 carId: repairDetails.carId,
@@ -27,15 +48,16 @@ class RepaircarService {
                 toDate: repairDetails.toDate,
                 toTime: repairDetails.toTime,
             });
-
-
+    
             await newRepairCar.save();
             return newRepairCar;
         } catch (error) {
-            console.log('Error in RepaircarService:', error);
+            console.log('Error in RepaircarService:', error.message);
             throw error;
         }
     }
+    
+    
     async getAllRepairCars({ page, limit }) {
         try {
 
