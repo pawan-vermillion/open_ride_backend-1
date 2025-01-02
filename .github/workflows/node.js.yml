@@ -51,6 +51,10 @@ jobs:
           echo "Shutting down old containers..."
           docker-compose down
           
+          # Ensure docker-compose.yml is present on the server
+          echo "Copying docker-compose.yml to the server..."
+          scp -i ~/.ssh/my_ec2_key docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/path/to/destination/
+          
           # Start or reload the container with PM2
           echo "Checking if PM2 process exists..."
           if pm2 show ride > /dev/null 2>&1; then
@@ -60,7 +64,7 @@ jobs:
           else
             # If it doesn't exist, start a new container with PM2
             echo "Starting new container with PM2..."
-            pm2 start /path/to/docker-compose.yml --name ride
+            pm2 start /path/to/destination/docker-compose.yml --name ride
           fi
           
           # Check if the container is running and display details
@@ -71,3 +75,4 @@ jobs:
           echo "Container details:"
           docker inspect ride
         EOF
+
