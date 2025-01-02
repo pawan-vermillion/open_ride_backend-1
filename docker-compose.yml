@@ -6,14 +6,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3002:3002" # Map container port to host port
+      - "3002:3002"
     env_file:
       - .env
     volumes:
-      - .:/usr/src/app # Mount project directory for development
-      - /usr/src/app/node_modules # Exclude node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       - rabbitmq
+    networks:
+      - mynetwork
     deploy:
       resources:
         limits:
@@ -27,16 +29,22 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:management # RabbitMQ with management plugin
+    image: rabbitmq:management
     ports:
-      - "5673:5672" # Communication port
-      - "15673:15672" # Management interface
+      - "5673:5672"
+      - "15673:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - mynetwork
     deploy:
       resources:
         limits:
           cpus: "0.25"
           memory: "256M"
     restart: unless-stopped
+
+networks:
+  mynetwork:
+    driver: bridge
