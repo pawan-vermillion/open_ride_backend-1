@@ -6,10 +6,37 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000" # Map container port 3000 to host port 3000
-    env_file: # Load environment variables from the .env file
+      - "3002:3002" # Map container port to host port
+    env_file:
       - .env
     volumes:
-      - .:/usr/src/app # Mount the project directory for development
-      - /usr/src/app/node_modules # Exclude node_modules to avoid overwrites
-    restart: unless-stopped # Restart the app if it crashes
+      - .:/usr/src/app # Mount project directory for development
+      - /usr/src/app/node_modules # Exclude node_modules
+    depends_on:
+      - rabbitmq
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:management # RabbitMQ with management plugin
+    ports:
+      - "5673:5672" # Communication port
+      - "15673:15672" # Management interface
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: "256M"
+    restart: unless-stopped

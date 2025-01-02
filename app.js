@@ -15,6 +15,8 @@ const bookingRoute = require("./modules/shared/Route/bookingRoute")
 const carRoute = require("./modules/shared/Route/carRoute")
 const reviewRoute = require("./modules/shared/Route/reviewRoute")
 const emailAndPhoneRoute = require("./modules/shared/Route/emailAndPhoneRoute")
+const {connectRabbitMq} = require("./rabbitmq.js")
+
 
 
 
@@ -36,6 +38,14 @@ connectMongoDb(process.env.DB_URL)
 
   app.get('/', (req, res) => {
     res.status(200).json("Welcome To The Open Ride Backend 2");
+  });
+
+  connectRabbitMq()
+  .then(() => {
+    console.log("RabbitMQ connection established.");
+  })
+  .catch((error) => {
+    console.error("Failed to connect to RabbitMQ:", error);
   });
 
 app.use("/api/otp",OtpRoutes)
