@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,13 +28,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        tags: pawan042/openride:latest
 
     - name: Deploy to Server
       run: |
@@ -69,4 +62,12 @@ jobs:
             echo "Starting new container with PM2..."
             pm2 start /path/to/docker-compose.yml --name ride
           fi
+          
+          # Check if the container is running and display details
+          echo "Checking if the container is running..."
+          docker ps --filter "name=ride"
+          
+          # Display container details
+          echo "Container details:"
+          docker inspect ride
         EOF
