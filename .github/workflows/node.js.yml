@@ -3,7 +3,7 @@ name: Docker CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger the pipeline on pushes to the 'main' branch
+      - main
 
 jobs:
   deploy:
@@ -46,6 +46,21 @@ jobs:
         
         # SSH into the server to continue deployment
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          # Ensure the directory exists and navigate to it
+          echo "Changing to app directory..."
+          cd /home/${{ secrets.SERVER_USER }}/app/
+          
+          # Verify if the docker-compose.yml file is present
+          ls -l docker-compose.yml
+
+          # Ensure docker-compose is installed
+          if ! command -v docker-compose &> /dev/null
+          then
+            echo "docker-compose is not installed. Installing..."
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+          
           # Ensure PM2 is installed
           if ! command -v pm2 &> /dev/null
           then
@@ -53,7 +68,7 @@ jobs:
             npm install pm2@latest -g
           fi
           
-          # Log in to DockerHub on the server (if not already done)
+          # Log in to DockerHub on the server
           echo "Logging in to DockerHub..."
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           
