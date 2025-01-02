@@ -39,7 +39,19 @@ jobs:
     - name: Deploy to Server
       run: |
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          # Pull the latest image
           docker pull pawan042/openride:latest
+          
+          # Shut down old containers
           docker-compose down
-          docker-compose up -d
+          
+          # Start the container with PM2
+          # Check if the container with the name 'ride' exists
+          if pm2 show ride > /dev/null 2>&1; then
+            # If it exists, reload the container
+            pm2 reload ride
+          else
+            # If it doesn't exist, start a new container with PM2
+            pm2 start docker-compose.yml --name ride
+          fi
         EOF
