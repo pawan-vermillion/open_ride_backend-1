@@ -41,8 +41,9 @@ jobs:
         # Create the target directory on the server if it doesn't exist
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /home/${{ secrets.SERVER_USER }}/app/"
         
-        # Now, copy docker-compose.yml to the newly created directory
+        # Now, copy docker-compose.yml and .env to the newly created directory
         scp -i ~/.ssh/my_ec2_key ./docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
+        scp -i ~/.ssh/my_ec2_key ./.env ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
         
         # SSH into the server to continue deployment
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
@@ -50,8 +51,8 @@ jobs:
           echo "Changing to app directory..."
           cd /home/${{ secrets.SERVER_USER }}/app/
           
-          # Verify if the docker-compose.yml file is present
-          ls -l docker-compose.yml
+          # Verify if the docker-compose.yml and .env files are present
+          ls -l docker-compose.yml .env
 
           # Ensure docker-compose is installed
           if ! command -v docker-compose &> /dev/null

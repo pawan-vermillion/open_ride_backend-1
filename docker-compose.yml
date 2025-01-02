@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   app:
@@ -8,7 +8,7 @@ services:
     ports:
       - "3002:3002"
     env_file:
-      - /home/${{ secrets.SERVER_USER }}/app/.env
+      - .env
 
     volumes:
       - .:/usr/src/app
