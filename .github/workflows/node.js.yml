@@ -45,19 +45,19 @@ jobs:
             echo "PM2 is not installed. Installing..."
             npm install pm2@latest -g
           fi
-
+          
           # Log in to DockerHub on the server (if not already done)
           echo "Logging in to DockerHub..."
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
-          # Pull the latest Docker image
+          
+          # Pull the latest Docker image from Docker Hub
           echo "Pulling the latest Docker image..."
           docker pull pawan042/openride:latest
-
+          
           # Shut down old containers
           echo "Shutting down old containers..."
           docker-compose down
-
+          
           # Start or reload the container with PM2
           echo "Checking if PM2 process exists..."
           if pm2 show ride > /dev/null 2>&1; then
