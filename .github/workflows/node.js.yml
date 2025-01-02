@@ -18,7 +18,6 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/my_ec2_key
         chmod 600 ~/.ssh/my_ec2_key
-        # Ensure the known_hosts file is set up correctly
         ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
       env:
         EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
@@ -29,24 +28,31 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Build Docker image
+      run: |
+        docker build -t pawan042/openride:latest .
+
+    - name: Push Docker image
+      run: |
+        docker push pawan042/openride:latest
+
     - name: Deploy to Server
       run: |
-        # SSH into the server to pull and run the Docker image
         ssh -i ~/.ssh/my_ec2_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           # Pull the latest Docker image from Docker Hub
           echo "Pulling the latest Docker image..."
           docker pull pawan042/openride:latest
 
-          # Check if there are existing containers and remove them
+          # Stop and remove any existing containers
           echo "Stopping and removing old containers..."
           docker stop ride || true
           docker rm ride || true
 
           # Run the new container
           echo "Running the new container..."
-          docker run -d --name ride -p 3002:3002 pawan042/openride:latest
+          docker-compose -f /path/to/your/docker-compose.yml up -d
 
-          # Check if the container is running
-          echo "Checking if the container is running..."
+          # Verify if the containers are running
+          echo "Checking if the containers are running..."
           docker ps --filter "name=ride"
         EOF
