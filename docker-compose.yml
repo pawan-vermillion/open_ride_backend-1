@@ -18,4 +18,4 @@ services:
     depends_on:
       - rabbitmq
     environment:
-      RABBITMQ_URL: amqp://rabbitmq:5672 # Use rabbitmq as the hostname, not localhost
+      RABBITMQ_URL: amqp://localhost:15673 # Use rabbitmq as the hostname, not localhost
