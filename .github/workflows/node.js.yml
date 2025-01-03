@@ -20,7 +20,7 @@ jobs:
         run: docker pull pawan042/openride:latest
 
       - name: Deploy on EC2
-        uses: appleboy/ssh-action@v0.5.6
+        uses: appleboy/ssh-action
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
