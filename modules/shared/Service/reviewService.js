@@ -16,9 +16,9 @@ class GetReviewService {
         .skip(skip)
         .limit(pageSize)
         .exec();
-      if (review.length === 0) {
-        return [];
-      }
+      // if (review.length === 0) {
+      //   return [];
+      // }
       const formattedReviews = review.map(review => {
         return {
             ...review.toObject(),
