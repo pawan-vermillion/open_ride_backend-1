@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code 
@@ -37,6 +37,14 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -x # Enable debugging
+
+            # Clean up unused Docker resources to free up space
+
+            docker container prune -f
+            docker image prune -a -f
+            docker volume prune -f
+            docker network prune -f
+            
             # Pull the latest docker image
             docker pull pawan042/openride:latest
 
