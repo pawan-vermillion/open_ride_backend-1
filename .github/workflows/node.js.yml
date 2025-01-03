@@ -1,33 +1,35 @@
-name: Node.js CI
+name: Deploy to EC2
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [22.x]
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: |
-        npm install --prefer-offline
-        npm run build --if-present
-    - run: |
-        if pm2 describe ride > /dev/null; then
-        pm2 restart ride
-        pm2 save --force
-        else
-        pm2 start run.sh --name ride
-        pm2 save --force
-        fi
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Pull Docker Image
+        run: docker pull pawan042/openride:latest
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v0.5.6
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            docker stop ride || true
+            docker rm ride || true
+            docker run -d --name ride -p 3002:3002 pawan042/openride:latest
+
+            docker stop rabbitmq || true
+            docker rm rabbitmq || true
+            docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 rabbitmq:3-management

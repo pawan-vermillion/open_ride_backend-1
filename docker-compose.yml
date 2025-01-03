@@ -1,50 +1,21 @@
-
-
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3002"
-    env_file:
-      - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - rabbitmq
-    networks:
-      - mynetwork
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: "1024M"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
       - "5673:5672"
       - "15673:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    networks:
-      - mynetwork
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: "512M"
-    restart: unless-stopped
 
-networks:
-  mynetwork:
-    driver: bridge
+  app:
+    build:
+      context: .
+    container_name: ride
+    ports:
+      - "3002:3002"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672 # Use rabbitmq as the hostname, not localhost

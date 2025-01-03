@@ -1,20 +1,21 @@
-# Use official Node.js image
-FROM node:18
+# Use Node.js base image
+FROM node:22
 
-# Set working directory
-WORKDIR /usr/src/app
+# Set the working directory
+WORKDIR /app
 
-# Copy package files first for caching dependencies
+# Copy package.json and install dependencies
 COPY package*.json ./
+RUN npm install
 
-# Install production dependencies
-RUN npm ci --only=production
-
-# Copy application code
+# Copy the application code
 COPY . .
 
-# Expose the application's port
+# Copy the .env file into the container
+COPY .env .env
+
+# Expose port 3002
 EXPOSE 3002
 
-# Command to start the app
+# Start the application
 CMD ["npm", "start"]
