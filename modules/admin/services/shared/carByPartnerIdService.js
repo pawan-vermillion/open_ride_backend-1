@@ -10,7 +10,7 @@ class CarGetByPartnerIdService {
             const cars = await CarDetails.find({partnerId}).skip(skip)
             .limit(pageSize);
             if (!cars || cars.length === 0) {
-                throw new Error("No Cars found for this Partner")
+               return []
             }
             return {
                 page: currentPage,

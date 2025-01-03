@@ -21,9 +21,9 @@ class AdminCarService {
 
       const cars = await CarDetails.find(searchQuery)
         .select(
-          "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission"
+          "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission ownerFullName"
         )
-        .populate("companyName", "carCompany -_id")
+        .populate("companyName", "carCompany -_id logoImage")
         .populate("modelName", "model -_id")
         .populate("subModel", "subModel -_id")
         .populate("bodyStyle", "bodyStyle -_id")
@@ -43,7 +43,9 @@ class AdminCarService {
         noOfSeat: car.numberOfSeat,
         fuelType: car.fuelType,
         exteriorImage: car.exteriorImage?.[0] || "",
-        transmission: car.transmission,
+        transmission: car?.transmission || "",
+        ownerName: car?.ownerFullName || "",
+        companyLogo: car?.companyName?.logoImage || ""
       }));
 
       return formattedCars;

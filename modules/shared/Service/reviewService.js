@@ -17,7 +17,7 @@ class GetReviewService {
         .limit(pageSize)
         .exec();
       if (review.length === 0) {
-        return { error: "Review not found", statusCode: 404 };
+        return [];
       }
       const formattedReviews = review.map(review => {
         return {
