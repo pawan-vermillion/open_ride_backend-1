@@ -59,8 +59,16 @@ jobs:
             fi
 
             # Ensure the docker-compose file is updated on the server
-            cd /path/to/your/docker-compose-directory
-            git pull origin main  # Ensure the latest docker-compose file is pulled
+            cd /home/ubuntu/currant/_work/open_ride_backend-1/open_ride_backend-1
+            git fetch origin
+            git reset --hard origin/main  # Force update to the latest version of the main branch
+
+            # Check if docker-compose file has been updated
+            if git diff --name-only HEAD^ HEAD | grep "docker-compose.yml"; then
+              echo "docker-compose.yml has been updated. Rebuilding containers."
+            else
+              echo "No changes detected in docker-compose.yml."
+            fi
 
             # Start the services using docker-compose
             docker-compose down
