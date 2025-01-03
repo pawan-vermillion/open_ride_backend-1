@@ -62,7 +62,7 @@ class AdminCarService {
         .populate("subModel", "subModel")
         .populate("modelName", "model")
         .select("-createdAt -updatedAt -__v");
-  
+     
       if (!car) {
         throw new Error("Car not found.");
       }
@@ -108,7 +108,7 @@ class AdminCarService {
         modelYear: car.modelYear,
         rating: averageRating,
         ratingCounts: ratingCountsString, // Send the string keys in the response
-        exteriorImage: car.exteriorImage[0] || "",
+        exteriorImage: car.exteriorImage || "",
       };
     } catch (error) {
       console.log(error);
