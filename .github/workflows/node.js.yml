@@ -45,7 +45,8 @@ jobs:
             else
               echo "Ride container is not running. Running a new one."
             fi
-            docker run -d --name ride -p 3002:3002 pawan042/openride:latest
+            docker run -d --name ride -p 3002:3002 pawan042/openride:latest || echo "Failed to start ride container"
+
 
             # Check if the rabbitmq container is running
             if docker ps -q -f name=rabbitmq; then
