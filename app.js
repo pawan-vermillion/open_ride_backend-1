@@ -43,7 +43,7 @@ connectMongoDb(process.env.DB_URL)
 // Check the environment variable
 const environment = process.env.DEV;
 
-if (environment === "production") {
+if (environment === "production") { 
   // If in production, establish RabbitMQ connection
   connectRabbitMq()
     .then(() => {
