@@ -8,7 +8,7 @@ const connectRabbitMq = async () => {
   let retries = 5; 
   while (retries > 0) {
     try {
-      connection = await amqp.connect("amqp://rabbitmq:5673");
+      connection = await amqp.connect("amqp://rabbitmq:15673");
       channel = await connection.createChannel();
       await channel.assertQueue("otpQueue", { durable: true });
       console.log("RabbitMQ connected and queue asserted");
