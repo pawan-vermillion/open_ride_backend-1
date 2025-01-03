@@ -41,7 +41,7 @@ jobs:
             set -x # Enable debugging
 
             # Clean up unused Docker resources to free up space
-            docker image prune -a -f
+            docker image prune -f
             docker container prune -f
             
             docker volume prune -f
