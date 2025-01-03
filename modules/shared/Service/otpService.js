@@ -2,7 +2,6 @@ const User = require('../../user/model/user')
 const Admin = require('../../admin/model/admin')
 const Partner = require('../../partner/model/partner')
 const nodemailer = require("nodemailer");
-const {sendOtpToQueue} = require("../../../rabbitmq.js")
 
 
 class OtpService {
@@ -76,15 +75,54 @@ class OtpService {
 
 
       await this.storeOtp(key, otp);
-      sendOtpToQueue({ emailAddress, otp })
 
 
-      return { message: 'OTP sent successfully to the queue' };
+      if (emailAddress) {
+       const transporter = nodemailer.createTransport({
+               host: "smtp.hostinger.com",
+           port: 465,
+           secure: true, 
+           auth: {
+             user: "otp@trennd.in",
+             pass: "Bhargav@2121",
+           },
+           tls: {
+             rejectUnauthorized: false,
+           },
+             });
+       
+             const mailOption = {
+               from: process.env.MAIL_USERNAME,
+               to: emailAddress,
+               subject: "OpenRide Account Verification",
+               html: `
+                 <div style="font-size: 16px;">
+                   Thank you for choosing OpenRide! To complete your account creation, please enter the following One-Time Password (OTP):
+                   <br><br>
+                   <strong style="font-size: 25px;">${otp}</strong>
+                   <br><br>
+                   This OTP is valid for 5 minutes. For security reasons, do not share this code with anyone.
+                   <br><br>
+                   If you did not request this OTP, you can safely ignore this message.
+                   <br><br>
+                   Welcome to OpenRide!
+                   <br><br>
+                   Sincerely,
+                   <br>The OpenRide Team
+                 </div>
+               `,
+             };
+       
+
+        await transporter.sendMail(mailOption);
+      }
+
+      return { message: 'OTP sent successfully' };
     } catch (error) {
       console.error('Error in sendOtp:', error);
       throw new Error(`Failed to send OTP: ${error.message}`);
     }
-  
+
   }
 
 }
