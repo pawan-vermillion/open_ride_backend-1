@@ -26,10 +26,22 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker stop ride || true
-            docker rm ride || true
+            # Check if the ride container is running
+            if docker ps -q -f name=ride; then
+              echo "Ride container is running. Stopping and updating it."
+              docker stop ride || true
+              docker rm ride || true
+            else
+              echo "Ride container is not running. Running a new one."
+            fi
             docker run -d --name ride -p 3002:3002 pawan042/openride:latest
 
-            docker stop rabbitmq || true
-            docker rm rabbitmq || true
+            # Check if the rabbitmq container is running
+            if docker ps -q -f name=rabbitmq; then
+              echo "RabbitMQ container is running. Stopping and updating it."
+              docker stop rabbitmq || true
+              docker rm rabbitmq || true
+            else
+              echo "RabbitMQ container is not running. Running a new one."
+            fi
             docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 rabbitmq:3-management
