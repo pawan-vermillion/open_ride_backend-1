@@ -29,6 +29,10 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
+      - name: clean image
+        run: | 
+          docker image prune -a -f
+
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.9
         with:
