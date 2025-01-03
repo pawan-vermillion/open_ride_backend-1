@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
@@ -37,6 +37,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -x # Enable debugging
+            # Pull the latest docker image
+            docker pull pawan042/openride:latest
+
             # Check if the ride container is running
             if docker ps -q -f name=ride; then
               echo "Ride container is running. Stopping and updating it."
@@ -45,8 +48,6 @@ jobs:
             else
               echo "Ride container is not running. Running a new one."
             fi
-            docker run -d --name ride -p 3002:3002 pawan042/openride:latest || echo "Failed to start ride container"
-
 
             # Check if the rabbitmq container is running
             if docker ps -q -f name=rabbitmq; then
@@ -56,4 +57,11 @@ jobs:
             else
               echo "RabbitMQ container is not running. Running a new one."
             fi
-            docker run -d --name rabbitmq -p 5673:5672 -p 15673:15672 rabbitmq:3-management
+
+            # Ensure the docker-compose file is updated on the server
+            cd /path/to/your/docker-compose-directory
+            git pull origin main  # Ensure the latest docker-compose file is pulled
+
+            # Start the services using docker-compose
+            docker-compose down
+            docker-compose up -d --build
