@@ -3,7 +3,7 @@ const secret = "$Open@Ride#@$";
 
 const generateToken = (data , type) => {
     
-    return jwt.sign({id:data._id , type:type} ,secret , {expiresIn : "7d"})
+    return jwt.sign({id:data._id , type:type} ,secret , {expiresIn : "70d"})
 
 }
 const verifyToken = (token) => {

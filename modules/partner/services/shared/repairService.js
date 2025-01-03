@@ -104,17 +104,17 @@ class RepaircarService {
 
             return {
                 ...carData,
-                companyName: carId.companyName.carCompany ? carId.companyName.carCompany : 'N/A',
-                modelName: carId.modelName.model ? carId.modelName.model : 'N/A',
-                subModel: carId.subModel.subModel ? carId.subModel.subModel : 'N/A',
-                bodyStyle: carId.bodyStyle.bodyStyle ? carId.bodyStyle.bodyStyle : 'N/A',
-                modelYear: carId.modelYear,
-                rating: carId.rating,
-                fromtoDate: moment(car.fromtoDate).format('YYYY-MM-DD'),  // Format the date as per your requirement
-                toDate: moment(car.toDate).format('YYYY-MM-DD'),          // Format the date as per your requirement
-                fromtoTime: car.fromtoTime,
-                toTime: car.toTime,
-                exteriorImage:carId.exteriorImage[0] || ""
+                companyName: carId?.companyName?.carCompany ? carId.companyName?.carCompany : 'N/A',
+                modelName: carId?.modelName?.model ? carId.modelName?.model : 'N/A',
+                subModel: carId?.subModel?.subModel ? carId.subModel?.subModel : 'N/A',
+                bodyStyle: carId?.bodyStyle?.bodyStyle ? carId.bodyStyle?.bodyStyle : 'N/A',
+                modelYear: carId?.modelYear,
+                rating: carId?.rating,
+                fromtoDate: moment(car?.fromtoDate).format('YYYY-MM-DD'),  // Format the date as per your requirement
+                toDate: moment(car?.toDate).format('YYYY-MM-DD'),          // Format the date as per your requirement
+                fromtoTime: car?.fromtoTime,
+                toTime: car?.toTime,
+                exteriorImage:carId?.exteriorImage[0] || ""
             };
         });
 
