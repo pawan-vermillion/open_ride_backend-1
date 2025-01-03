@@ -1,85 +1,33 @@
-name: Deploy to EC2 
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main 
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.x]
 
     steps:
-      - name: Checkout code 
-        uses: actions/checkout@v3
-
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Pull Docker Image
-        run: docker pull pawan042/openride:latest
-
-      - name: Set up SSH key and permissions
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/my_ec2_key
-          chmod 600 ~/.ssh/my_ec2_key
-
-      - name: Add EC2 host to known_hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-
-
-      - name: Deploy on EC2
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            set -x # Enable debugging
-
-            # Clean up unused Docker resources to free up space
-            docker image prune -f
-            docker container prune -f
-            
-            docker volume prune -f
-            docker network prune -f
-            
-            # Pull the latest docker image
-            docker pull pawan042/openride:latest
-
-            # Check if the ride container is running
-            if docker ps -q -f name=ride; then
-              echo "Ride container is running. Stopping and updating it."
-              docker stop ride || true
-              docker rm ride || true
-            else
-              echo "Ride container is not running. Running a new one."
-            fi
-
-            # Check if the rabbitmq container is running
-            if docker ps -q -f name=rabbitmq; then
-              echo "RabbitMQ container is running. Stopping and updating it."
-              docker stop rabbitmq || true
-              docker rm rabbitmq || true
-            else
-              echo "RabbitMQ container is not running. Running a new one."
-            fi
-
-            # Ensure the docker-compose file is updated on the server
-            cd /home/ubuntu/currant/_work/open_ride_backend-1/open_ride_backend-1
-            git fetch origin
-            git reset --hard origin/main  # Force update to the latest version of the main branch
-
-            # Check if docker-compose file has been updated
-            if git diff --name-only HEAD^ HEAD | grep "docker-compose.yml"; then
-              echo "docker-compose.yml has been updated. Rebuilding containers."
-            else
-              echo "No changes detected in docker-compose.yml."
-            fi
-
-            # Start the services using docker-compose
-            docker-compose down
-            docker-compose up -d --build 
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: |
+        npm install --prefer-offline
+        npm run build --if-present
+    - run: |
+        if pm2 describe ride > /dev/null; then
+        pm2 restart ride
+        pm2 save --force
+        else
+        pm2 start run.sh --name ride
+        pm2 save --force
+        fi
