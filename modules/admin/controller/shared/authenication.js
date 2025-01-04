@@ -63,7 +63,7 @@ class AuthController {
       }
       return res
         .status(500)
-        .json({ message: "Error logging in admin", error: error.message });
+        .json({ message: "Error logging in admin"});
     }
   }
 

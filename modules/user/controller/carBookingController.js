@@ -25,7 +25,7 @@ class CarBookingController {
       const carId = req.params.carId;
       const data = req.body;
 
-      if (!data.pickUpData || !data.returnData) {
+      if (!data) {
         return res.status(400).json({ error: 'Missing required booking details' });
       }
 
@@ -51,6 +51,38 @@ console.log(error)
       res.status(500).json({ message: error.message });
     }
   }
+
+
+
+  async bookCar(req, res) {
+    try {
+     
+      const { pickUpDate, pickUpTime, pickupLocation, returnDate, returnTime } = req.body;
+  
+      
+      const { price, model, company, carType, seat,modelYear,transmission,fuelType ,page , limit } = req.query;
+  
+      
+ 
+  
+    
+      const result = await CarBookingService.searchCar({
+        pickUpDate,
+        pickUpTime,
+        pickupLocation,
+        returnDate,
+        returnTime,
+        filters: { price, model, company, carType, seat,modelYear ,transmission,fuelType},
+        pagination: { page, limit },
+      });
+  
+      res.status(200).json(  result );
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  
+
 }
 
 

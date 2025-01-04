@@ -4,41 +4,24 @@ const { body, validationResult } = require('express-validator');
 const summaryValidationRules = ()=>{
     return[
 
-    body('pickUpData.pickUpDate')
+    body('pickUpDate')
         .isString()
         .withMessage('Pick-up date is required.'),
-    body('pickUpData.pickUpTime')
+    body('pickUpTime')
         .isString()
         .withMessage('Pick-up time is required.'),
-    body('pickUpData.pickUpLocation')
+    body('pickupLocation')
         .isString()
         .withMessage('Pick-up location is required.'),
-    body('pickUpData.pickUpLatitude')
+    body('returnDate')
         .isString()
-        .withMessage('Pick-up latitude is required.'),
-    body('pickUpData.pickUpLongitude')
+        .withMessage('Return Date is required.'),
+    body('returnTime')
         .isString()
-        .withMessage('Pick-up longitude is required.'),
+        .withMessage('Return Time is required.'),
 
 
-    body('returnData.returnDate')
-        .isString()
-        .withMessage('Return date is required.'),
-    body('returnData.returnTime')
-        .isString()
-        .withMessage('Return time is required.'),
-    body('returnData.returnLocation')
-        .isString()
-        .withMessage('Return location is required.'),
-    body('returnData.returnLatitude')
-        .isString()
-        .withMessage('Return latitude is required.'),
-    body('returnData.returnLongitude')
-        .isString()
-        .withMessage('Return longitude is required.'),
 
-
-   
 
     
 ];

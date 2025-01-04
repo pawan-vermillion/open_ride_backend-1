@@ -26,18 +26,11 @@ const carBooking = new mongoose.Schema({
             type: String,
             required: true
         },
-        pickUpLocation: {
+        pickupLocation: {
             type: String,
             required: true
         },
-        pickUpLatitude: {
-            type: String,
-            required: true
-        },
-        pickUpLongitude: {
-            type: String,
-            required: true
-        }
+      
     },
     returnData: {
         returnDate: {
@@ -48,19 +41,7 @@ const carBooking = new mongoose.Schema({
             type: String,
             required: true
         },
-        returnLocation: {
-            type: String,
-            required: true
-        },
-        returnLatitude: {
-            type: String,
-
-            required: true
-        },
-        returnLongitude: {
-            type: String,
-            required: true
-        }
+       
     },
     summary: {
         unit: {
@@ -161,7 +142,7 @@ const carBooking = new mongoose.Schema({
       },
       status: {
         type: String,
-        enum: ["pending", "confirmed", "completed", "cancelled"],
+        enum: ["pending", "confirmed", "complete", "cancelled"],
         required: true,
         default: "pending",
       },
