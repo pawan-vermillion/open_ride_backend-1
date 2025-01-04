@@ -61,30 +61,6 @@ class CarBookingService {
 
 
 
-    checkAvailabilityForRange = async ({ carId, startDate, endDate }) => {
-        try {
-            const bookings = await CarBooking.find({ carId }).select('bookedDates isCancel');
-            const offlineBookings = await OfflineBooking.find({ carId });//for offline   booking
-
-
-            const bookedDates = bookings.flatMap(booking =>
-                !booking.isCancel ? booking.bookedDates.map(date => date.toISOString().split('T')[0]) : []
-            );
-            //for offline   booking
-            const offlineDates = offlineBookings.flatMap(booking =>
-                this.generateDateRange(booking.pickUpDate, booking.returnDate)
-            );
-
-            const checkDates = this.generateDateRange(startDate, endDate);
-
-            return checkDates.map(date => ({
-                date: date,
-                isAvailable: !bookedDates.includes(date) && !offlineDates.includes(date)
-            }));
-        } catch (error) {
-            throw new Error(`Error checking car availability for range: ${error.message}`);
-        }
-    };
 
  
 
@@ -165,29 +141,39 @@ class CarBookingService {
  
 
     checkAvailabilityForRange = async ({ carId, startDate, endDate, startTime, endTime }) => {
-        const bookings = await CarBooking.find({
-            carId,
-            $or: [
-                { pickUpDateTime: { $lte: new Date(endDate + ' ' + endTime) } },
-                { returnDateTime: { $gte: new Date(startDate + ' ' + startTime) } },
-            ],
-        });
+        try {
+            const startDateTime = new Date(`${startDate}T${startTime}:00`);
+            const endDateTime = new Date(`${endDate}T${endTime}:00`);
     
-        const bookedDatesAndTimes = bookings.flatMap(booking => {
-            const bookingStart = moment(booking.pickUpDateTime);
-            const bookingEnd = moment(booking.returnDateTime);
-            const dateRange = this.generateDateRange(bookingStart.format('YYYY-MM-DD'), bookingEnd.format('YYYY-MM-DD'));
-            return dateRange.map(date => ({
-                date,
-                isAvailable: !(bookingStart.isBefore(moment(date).endOf('day')) && bookingEnd.isAfter(moment(date).startOf('day')))
+            const bookings = await CarBooking.find({ carId }).select('pickUpData returnData isCancel');
+            const offlineBookings = await OfflineBooking.find({ carId });
+    
+            const bookedRanges = bookings
+                .filter(booking => !booking.isCancel)
+                .map(booking => ({
+                    start: new Date(`${booking.pickUpData.pickUpDate}T${booking.pickUpData.pickUpTime}`),
+                    end: new Date(`${booking.returnData.returnDate}T${booking.returnData.returnTime}`)
+                }));
+    
+            const offlineRanges = offlineBookings.map(booking => ({
+                start: new Date(booking.pickUpDate),
+                end: new Date(booking.returnDate)
             }));
-        });
     
-        const allDates = this.generateDateRange(startDate, endDate);
-        return allDates.map(date => ({
-            date,
-            isAvailable: !bookedDatesAndTimes.some(b => b.date === date && !b.isAvailable),
-        }));
+            const allRanges = [...bookedRanges, ...offlineRanges];
+    
+            // Check if the car is available for the entire range
+            const isAvailable = !allRanges.some(range =>
+                (startDateTime >= range.start && startDateTime < range.end) || // Overlaps at start
+                (endDateTime > range.start && endDateTime <= range.end) || // Overlaps at end
+                (range.start >= startDateTime && range.end <= endDateTime) // Fully inside
+            );
+    
+            return isAvailable;
+    
+        } catch (error) {
+            throw new Error(`Error checking car availability: ${error.message}`);
+        }
     };
     
 
@@ -262,8 +248,8 @@ class CarBookingService {
               endTime: returnDateTime.format('HH:mm'),
             });
       
-            if (availability.every(date => date.isAvailable)) {
-              availableCars.push(car);
+            if (availability) { // Directly use the boolean result
+                availableCars.push(car);
             }
           }
       
