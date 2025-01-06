@@ -3,6 +3,7 @@ const User = require("../../user/model/user");
 const Partner = require("../../partner/model/partner");
 const WalletHistory = require("../../user/model/walletBalance");
 const moment = require("moment");
+const mongoose = require("mongoose")
 
 class BookingService {
   canCancelBooking = async (booking) => {
@@ -85,6 +86,8 @@ class BookingService {
     }
   };
 
+  
+
   getBooking = async ({ entityType, entityId, status, page, limit }) => {
     let query = {};
     if (entityType === "User") {
@@ -119,36 +122,51 @@ class BookingService {
           ],
         })
         .exec();
-      const bookings = rawBookings.map((booking) => ({
-        ...booking._doc,
-        bookingId: booking._id,
-        carId: {
-       
-          carNumber: booking.carId?.carNumber,
-          carCompany: booking.carId?.companyName?.carCompany,
-          model: booking.carId?.modelName?.model,
-          subModel: booking.carId?.subModel?.subModel,
-          bodyStyle: booking.carId?.bodyStyle?.bodyStyle,
-          exteriorImage: booking.carId?.exteriorImage?.[0], 
-          modelYear: booking.carId?.modelYear,
-        },
-      }));
-
-      const totalPages = Math.ceil(totalDocuments / limit);
-
-      return {
-        totalDocuments,
-        totalPages,
-        currentPage: page,
-        limit,
-        bookings,
-      };
-    } catch (error) {
-      return {
-        message: "Error retrieving bookings",
-        error: error.message,
-      };
-    }
+        const bookings = await Promise.all(
+          rawBookings.map(async (booking) => {
+            const carId = booking.carId;
+    
+            // Calculate average rating inside API
+            const avgRating = await mongoose
+              .model("CarReview")
+              .aggregate([
+                { $match: { carId: carId?._id } },
+                { $group: { _id: null, averageRating: { $avg: "$rating" } } },
+              ])
+              .then((result) => (result[0]?.averageRating || 0));
+    
+            return {
+              ...booking._doc,
+              bookingId: booking._id,
+              carId: {
+                carNumber: carId?.carNumber,
+                carCompany: carId?.companyName?.carCompany,
+                model: carId?.modelName?.model,
+                subModel: carId?.subModel?.subModel,
+                bodyStyle: carId?.bodyStyle?.bodyStyle,
+                exteriorImage: carId?.exteriorImage?.[0],
+                modelYear: carId?.modelYear,
+                averageRating: avgRating, // Add the calculated average rating
+              },
+            };
+          })
+        );
+    
+        const totalPages = Math.ceil(totalDocuments / limit);
+    
+        return {
+          totalDocuments,
+          totalPages,
+          currentPage: page,
+          limit,
+          bookings,
+        };
+      } catch (error) {
+        return {
+          message: "Error retrieving bookings",
+          error: error.message,
+        };
+      }
   };
 
   getBookingByBookingId = async ({ bookingId }) => {
