@@ -297,10 +297,8 @@ class CarBookingService {
 
           
 
-            const pickUpDateTime = `${data.pickUpDate} ${data.pickUpTime}`;
-            const returnDateTime = ` ${data.returnDate} ${data.returnTime}`;
-            const pickUpMoment = moment(pickUpDateTime, 'YYYY-MM-DD HH:mm');
-            const returnMoment = moment(returnDateTime, 'YYYY-MM-DD HH:mm');
+            const pickUpMoment = moment(`${data.pickUpDate} ${data.pickUpTime}`, 'YYYY-MM-DD HH:mm');
+const returnMoment = moment(`${data.returnDate} ${data.returnTime}`, 'YYYY-MM-DD HH:mm');
             if (pickUpMoment.isBefore(moment(), 'minute')) {
                 throw new Error("Pickup date and time cannot be in the past");
             }
@@ -316,10 +314,13 @@ class CarBookingService {
             const availability = await this.checkAvailabilityForRange({
                 carId,
                 startDate: pickUpMoment.format('YYYY-MM-DD'),
-                endDate: returnMoment.format('YYYY-MM-DD')
+                endDate: returnMoment.format('YYYY-MM-DD'),
+                startTime: pickUpMoment.format('HH:mm'),
+                endTime: returnMoment.format('HH:mm')
             });
+            console.log(availability)
 
-            if (availability.some(date => !date.isAvailable)) {
+            if (!availability) {
                 throw new Error("Car is not available for the selected dates");
             }
 
@@ -379,7 +380,7 @@ class CarBookingService {
             return booking;
         } catch (error) {
             console.log(error)
-            throw new Error(`Error in Book Car`);
+            throw new Error(error.message)
         }
     };
       
