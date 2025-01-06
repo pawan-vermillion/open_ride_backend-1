@@ -1,36 +1,33 @@
 const CarBooking = require("../model/booking");
-const User = require("../../user/model/user")
-const Partner = require("../../partner/model/partner")
-const WalletHistory = require("../../user/model/walletBalance")
-const moment = require('moment');
+const User = require("../../user/model/user");
+const Partner = require("../../partner/model/partner");
+const WalletHistory = require("../../user/model/walletBalance");
+const moment = require("moment");
 
 class BookingService {
   canCancelBooking = async (booking) => {
     const bookingTime = moment(booking.bookingTime);
     const currentTime = moment();
-    const hoursDifference = currentTime.diff(bookingTime, 'hours');
+    const hoursDifference = currentTime.diff(bookingTime, "hours");
 
     // Allow cancellation within 3 hours
     return hoursDifference <= 3;
-  }
+  };
 
   cancelBooking = async ({ userType, bookingId, cancelReason }) => {
     try {
-
-
       const booking = await CarBooking.findById(bookingId);
 
       if (!booking) {
         return { error: "Booking not found", statusCode: 404 };
       }
 
-
       if (booking.isCancel) {
         return { error: "Booking has already been cancelled", statusCode: 400 };
       }
 
       // Set booking cancellation details
-      booking.status = "cancelled"
+      booking.status = "cancelled";
       booking.cancelBy = userType;
       booking.cancelReason = cancelReason;
       booking.isCancel = true;
@@ -39,7 +36,6 @@ class BookingService {
       const user = await User.findById(booking.userId);
 
       if (!user) {
-
         return { error: "User not found", statusCode: 404 };
       }
 
@@ -47,9 +43,7 @@ class BookingService {
       user.walletBalance += booking.summary.partnerAmmount;
       await user.save();
 
-
-
-      const transactionType = 'Credit';
+      const transactionType = "Credit";
 
       try {
         const walletHistoryEntry = new WalletHistory({
@@ -67,58 +61,79 @@ class BookingService {
 
       // amount delete in partner
 
-
       const partner = await Partner.findById(booking.partnerId);
       if (!partner) {
         return { error: "Partner not found", statusCode: 404 };
       }
 
-      partner.walletBalance -= booking.summary.partnerAmmount
+      partner.walletBalance -= booking.summary.partnerAmmount;
 
-      await partner.save()
+      await partner.save();
       const walletHistoryEntryForPartner = new WalletHistory({
         userId: booking.userId,
         partnerId: booking.partnerId,
-        transactionType: 'Debit',
+        transactionType: "Debit",
         amount: booking.summary.partnerAmmount,
         bookingId: booking._id,
       });
 
       await walletHistoryEntryForPartner.save();
 
-
       return { message: "Booking cancelled successfully" };
     } catch (error) {
-
       return { error: "Internal Server Error", statusCode: 500 };
     }
   };
 
   getBooking = async ({ entityType, entityId, status, page, limit }) => {
     let query = {};
-    if (entityType === 'User') {
+    if (entityType === "User") {
       query.userId = entityId;
-    } else if (entityType === 'Partner') {
+    } else if (entityType === "Partner") {
       query.partnerId = entityId;
     } else {
-      throw new Error('Invalid entityType');
+      throw new Error("Invalid entityType");
     }
 
-    if (status !== 'all') {
+    if (status !== "all") {
       query.status = status;
     }
 
-
     try {
-
       const totalDocuments = await CarBooking.countDocuments(query).exec();
 
-      const bookings = await CarBooking.find(query)
+      const rawBookings = await CarBooking.find(query)
         .skip((page - 1) * limit)
         .limit(limit)
-        .populate("userId", 'emailAddress phoneNumber firstName lastName')
-        .populate("partnerId", 'emailAddress phoneNumber firstName lastName')
+        .populate("userId", "emailAddress phoneNumber firstName lastName")
+        .populate("partnerId", "emailAddress phoneNumber firstName lastName")
+        .populate({
+          path: "carId",
+          select:
+            "carNumber companyName modelName subModel bodyStyle exteriorImage modelYear",
+          populate: [
+            { path: "companyName", select: "carCompany" },
+            { path: "modelName", select: "model" },
+            { path: "subModel", select: "subModel" },
+            { path: "bodyStyle", select: "bodyStyle" },
+          ],
+        })
         .exec();
+      const bookings = rawBookings.map((booking) => ({
+        ...booking._doc,
+        
+        carId: {
+          bookingId: booking._id,
+          carNumber: booking.carId?.carNumber,
+          carCompany: booking.carId?.companyName?.carCompany,
+          model: booking.carId?.modelName?.model,
+          subModel: booking.carId?.subModel?.subModel,
+          bodyStyle: booking.carId?.bodyStyle?.bodyStyle,
+          exteriorImage: booking.carId?.exteriorImage?.[0], 
+          modelYear: booking.carId?.modelYear,
+        },
+      }));
+
       const totalPages = Math.ceil(totalDocuments / limit);
 
       return {
@@ -126,24 +141,22 @@ class BookingService {
         totalPages,
         currentPage: page,
         limit,
-        bookings
+        bookings,
       };
     } catch (error) {
-
       return {
         message: "Error retrieving bookings",
         error: error.message,
       };
     }
-  }
-
-
+  };
 
   getBookingByBookingId = async ({ bookingId }) => {
     try {
-
-      const booking = await CarBooking.findById(bookingId).populate("carId", 'modelName  companyName bodyStyle').populate("partnerId", 'phoneNumber emailAddress  firstName lastName').populate("userId", 'phoneNumber emailAddress  firstName lastName')
-
+      const booking = await CarBooking.findById(bookingId)
+        .populate("carId", "modelName  companyName bodyStyle")
+        .populate("partnerId", "phoneNumber emailAddress  firstName lastName")
+        .populate("userId", "phoneNumber emailAddress  firstName lastName");
 
       if (!booking) {
         throw new Error("Booking not found");
@@ -153,6 +166,6 @@ class BookingService {
     } catch (error) {
       throw error;
     }
-  }
+  };
 }
 module.exports = new BookingService();
