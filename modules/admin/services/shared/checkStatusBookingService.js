@@ -1,64 +1,106 @@
-const CarBooking = require("../../../shared/model/booking")
+const CarBooking = require("../../../shared/model/booking");
 
 class CheckStatusBookingService {
-    partnerGetBooking = async ({ status, partnerId, page, limit }) => {
-        try {
-            const pageSize = parseInt(limit) || 10;
-            const currentPage = parseInt(page) || 1;
-            const skip = (currentPage - 1) * pageSize;
+  partnerGetBooking = async ({ status, partnerId, page, limit }) => {
+    try {
+      const pageSize = parseInt(limit) || 10;
+      const currentPage = parseInt(page) || 1;
+      const skip = (currentPage - 1) * pageSize;
 
-            
-            const query = { partnerId };
-            if (status && status !== 'all') {
-                query.status = status;
-            }
-       
-            const total = await CarBooking.countDocuments(query);
-            
+      const query = { partnerId };
+      if (status && status !== "all") {
+        query.status = status;
+      }
 
-            const booking = await CarBooking.find(query).populate("partnerId", 'emailAddress phoneNumber firstName lastName').populate("userId", 'emailAddress phoneNumber firstName lastName').populate("carId", 'carNumber companyName modelName subModel')
-                .skip(skip)
-                .limit(pageSize);
+      const total = await CarBooking.countDocuments(query);
 
-            return {
-                page: currentPage,
-                limit: pageSize,
-                total: total,
-                booking,
-            };
-        } catch (error) {
-            throw error;
-        }
+      const booking = await CarBooking.find(query)
+        .populate("partnerId", "emailAddress phoneNumber firstName lastName")
+        .populate("userId", "emailAddress phoneNumber firstName lastName")
+        .populate({
+          path: "carId",
+          select: "carNumber companyName modelName subModel",
+          populate: [
+            {
+              path: "companyName",
+              select: "carCompany",
+            },
+            {
+              path: "modelName",
+              select: "model",
+            },
+
+            {
+              path: "subModel",
+              select: "subModel",
+            },
+          ],
+        })
+        .skip(skip)
+        .limit(pageSize);
+
+      return {
+        page: currentPage,
+        limit: pageSize,
+        total: total,
+        booking,
+      };
+    } catch (error) {
+      throw error;
     }
-    userGetBooking = async ({ status, userId, page, limit }) => {
-        try {
-            const pageSize = parseInt(limit) || 10;
-            const currentPage = parseInt(page) || 1;
-            const skip = (currentPage - 1) * pageSize;
+  };
+  userGetBooking = async ({ status, userId, page, limit }) => {
+    try {
+      const pageSize = parseInt(limit) || 10;
+      const currentPage = parseInt(page) || 1;
+      const skip = (currentPage - 1) * pageSize;
 
-            
-            const query = { userId };
-            if (status && status !== 'all') {
-                query.status = status;
-            }
-       
-            const total = await CarBooking.countDocuments(query);
-           
+      const query = { userId };
+      if (status && status !== "all") {
+        query.status = status;
+      }
 
-            const booking = await CarBooking.find(query).populate("partnerId", 'emailAddress phoneNumber firstName lastName ').populate("userId", 'emailAddress phoneNumber firstName lastName profileImage').populate("carId", 'carNumber companyName modelName subModel')
-                .skip(skip)
-                .limit(pageSize);  
+      const total = await CarBooking.countDocuments(query);
 
-            return {
-                page: currentPage,
-                limit: pageSize,
-                total: total,
-                booking,
-            };
-        } catch (error) {
-            throw error;
-        }
+      const booking = await CarBooking.find(query)
+        .populate("partnerId", "emailAddress phoneNumber firstName lastName ")
+        .populate(
+          "userId",
+          "emailAddress phoneNumber firstName lastName profileImage"
+        )
+        .populate({
+          path: "carId",
+          select: "carNumber companyName modelName subModel",
+          populate: [
+            {
+              path: "companyName",
+              select: "carCompany",
+            },
+            {
+              path: "modelName",
+              select: "model",
+            },
+
+            {
+              path: "subModel",
+              select: "subModel",
+            },
+          ],
+        })
+
+        .skip(skip)
+        .limit(pageSize);
+
+      return {
+        page: currentPage,
+        limit: pageSize,
+        total: total,
+        booking,
+      };
+    } catch (error) {
+      throw error;
     }
+  };
 }
 
 module.exports = new CheckStatusBookingService();

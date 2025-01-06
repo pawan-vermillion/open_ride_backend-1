@@ -23,8 +23,9 @@ class CheckStatusBookingController {
 
     UserCheckStausBooking = async (req, res) => {
         try {
+           
             const { status, userId } = req.params;
-
+           
             const { limit, page } = req.query;
 
             const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled', 'all'];
