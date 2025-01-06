@@ -40,7 +40,7 @@ class PartnerService {
 
             if (!partners || partners.length === 0) {
                 const error = new Error("Partner not found");
-                error.statusCode = 404;
+                error.statusCode = 200;
                 throw error;
             }
 
