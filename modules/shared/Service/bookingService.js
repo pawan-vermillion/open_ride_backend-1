@@ -121,9 +121,9 @@ class BookingService {
         .exec();
       const bookings = rawBookings.map((booking) => ({
         ...booking._doc,
-        
+        bookingId: booking._id,
         carId: {
-          bookingId: booking._id,
+       
           carNumber: booking.carId?.carNumber,
           carCompany: booking.carId?.companyName?.carCompany,
           model: booking.carId?.modelName?.model,
