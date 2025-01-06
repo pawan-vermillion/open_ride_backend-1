@@ -138,6 +138,13 @@ class BookingService {
             return {
               ...booking._doc,
               bookingId: booking._id,
+              user: {
+                userId: booking.userId?._id, // Include userId separately
+                firstName: booking.userId?.firstName,
+                lastName: booking.userId?.lastName,
+                emailAddress: booking.userId?.emailAddress,
+                phoneNumber: booking.userId?.phoneNumber,
+              },
               carId: {
                 carNumber: carId?.carNumber,
                 carCompany: carId?.companyName?.carCompany,
@@ -148,6 +155,7 @@ class BookingService {
                 modelYear: carId?.modelYear,
                 averageRating: avgRating, // Add the calculated average rating
               },
+              
             };
           })
         );
