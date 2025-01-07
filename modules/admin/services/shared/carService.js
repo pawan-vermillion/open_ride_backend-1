@@ -104,9 +104,13 @@ class AdminCarService {
       return {
         ...carData,
         companyName: companyName ? companyName.carCompany : 'N/A',
+        carCompanyId: companyName ? companyName._id : 'N/A',
         modelName: modelName ? modelName.model : 'N/A',
+        modelId: modelName ? modelName._id : 'N/A',
         subModel: subModel ? subModel.subModel : 'N/A',
+        subModelId: subModel ? subModel._id : 'N/A',
         bodyStyle: bodyStyle ? bodyStyle.bodyStyle : 'N/A',
+        bodyStyleId: bodyStyle ? bodyStyle._id : 'N/A',
         modelYear: car.modelYear,
         rating: averageRating,
         ratingCounts: ratingCountsString, // Send the string keys in the response
