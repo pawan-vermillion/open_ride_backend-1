@@ -215,7 +215,8 @@ class CarController {
   uploadCarImages = async (req, res) => {
     const carId = req.params.id;
     const partnerId = req.user.id;
-    const imageType = req.query.type;
+    const {imageType} = req.body;
+    
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
