@@ -10,6 +10,6 @@ const {upload ,
 router.use(partnerAuthenication);
 router.post("/details", upload.single('driverImage'), DriverController.addDriver);
 router.get("/allDriver",DriverController.getDriversByPartner );
-router.patch("/updateDetails/:driverId",DriverController.updateDrivers);
+router.patch("/updateDetails/:driverId",upload.single('driverImage'),DriverController.updateDrivers);
 router.delete("/deleteDriver/:driverId",DriverController.deleteDriver)
 module.exports = router;

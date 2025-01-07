@@ -45,7 +45,10 @@ class DriverController {
             const driverId = req.params.driverId;       
             const updateData = req.body;
     
-    
+            if (req.file) {
+              
+                updateData.driverImage = req.file.path;  
+            }
             const updatedDriver = await driverService.updateDriver({
                 driverId,
                 partnerId,
