@@ -153,8 +153,8 @@ const carBooking = new mongoose.Schema({
       assignedDriver: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        required: true,
-        default:"Not Assigned",
+        required: false,
+        default:null,
       },
     
 

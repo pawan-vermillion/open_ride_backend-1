@@ -333,10 +333,10 @@ const returnMoment = moment(`${data.returnDate} ${data.returnTime}`, 'YYYY-MM-DD
             const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
             const commisionAmmount = parseFloat(userAmmount * commisionRate / 100);
 
-            const sgstRate = parseFloat(process.env.SGST_RATE) || 0.09;
-            const cgstRate = parseFloat(process.env.CGST_RATE) || 0.09;
-            const sgst = parseFloat((commisionAmmount * sgstRate).toFixed(2));
-            const cgst = parseFloat((commisionAmmount * cgstRate).toFixed(2));
+            const sgstRate = parseFloat(process.env.SGST_RATE) || 9;
+            const cgstRate = parseFloat(process.env.CGST_RATE) || 9;
+            const sgst = parseFloat((commisionAmmount * (sgstRate / 100)).toFixed(2));
+            const cgst = parseFloat((commisionAmmount * (cgstRate / 100)).toFixed(2));
             const totalTax = parseFloat((sgst + cgst).toFixed(2));
 
             const partnerAmmount = parseFloat((userAmmount - commisionAmmount - totalTax).toFixed(2));
@@ -366,7 +366,7 @@ const returnMoment = moment(`${data.returnDate} ${data.returnTime}`, 'YYYY-MM-DD
                     partnerAmmount,
                     userAmmount,
                     orderId,
-                    totalCommisionTax: commisionAmmount,
+                    totalCommisionTax: commisionAmmount + sgst + cgst,
                     totalTax,
                 },
                 bookedDates,
