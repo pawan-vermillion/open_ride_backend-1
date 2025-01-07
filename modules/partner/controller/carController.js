@@ -288,7 +288,7 @@ class CarController {
   };
 
   deleteCarImage = async (req, res) => {
-    const { imageUrl } = req.body;
+    const { imageUrl } = req.query;
     const carId = req.params.id;
     const partnerId = req.user.id;
     const type = req.query.type;
