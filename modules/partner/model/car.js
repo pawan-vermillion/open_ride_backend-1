@@ -78,7 +78,8 @@ const CarDetailsSchema = new mongoose.Schema({
     },
     rcPhoto:{
         type:String,
-        required:true
+        required:true,
+        default:null
     },
     address:{
         type:String,

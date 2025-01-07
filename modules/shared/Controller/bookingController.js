@@ -28,12 +28,12 @@ class BookingController {
       const result = await BookingService.cancelBooking({ userType, bookingId, cancelReason });
 
       if (result.error) {
-        return res.status(result.statusCode).json({ error: result.error });
+        return res.status(result.statusCode).json({ message: result.error });
       }
 
       return res.json({ message: result.message });
     } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 

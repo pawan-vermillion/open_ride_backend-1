@@ -10,6 +10,7 @@ const deleteOldImage = async (publicId) => {
     if (result.result === 'not found') {
       console.warn(`Image with public ID: ${publicId} not found for deletion.`);
     }
+    return result;
   } catch (error) {
     console.error('Failed to delete image:', error.message);
   }
@@ -168,9 +169,9 @@ const uploadMultiple = (req, res, next) => {
       return res.status(500).json({ message: 'Unexpected error during file upload.' });
     }
     
-    if (!req.files || !req.files.exteriorImage || !req.files.interiorImage || !req.files.rcPhoto) {
-      return res.status(400).json({ message: 'Missing required files.' });
-    }
+    // if (!req.files || !req.files.exteriorImage || !req.files.interiorImage || !req.files.rcPhoto) {
+    //   return res.status(400).json({ message: 'Missing required files.' });
+    // }
     next();
   });
 };
