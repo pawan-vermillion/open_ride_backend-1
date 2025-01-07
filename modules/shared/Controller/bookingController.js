@@ -1,3 +1,4 @@
+const Driver = require("../../partner/model/driver");
 const CarBooking = require("../model/booking");
 const BookingService = require("../Service/bookingService")
 
@@ -81,6 +82,145 @@ class BookingController {
       res.status(500).json({ message: error.message });
   }
 }
+
+
+
+changeBookingStatus = async (req, res) => {
+  try {
+      const driverId = req.params.driverId;
+      const { status, bookingId } = req.body;
+
+  
+      if (!['confirmed', 'completed'].includes(status)) {
+        return res.status(400).json({ message: "Status must be 'confirmed' or 'completed'" });
+      }
+
+     
+      if (!driverId && status === 'confirmed' && !bookingId) {
+        return res.status(400).json({ message: "Driver ID is required for confirmed status" });
+      }
+
+
+      const checkBooking = await CarBooking.findById(bookingId);
+      if (!checkBooking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      
+      const checkDriver = await Driver.findById(driverId);
+      if (!checkDriver) {
+        return res.status(404).json({ message: "Driver not found" });
+      }
+
+    
+      if (status === 'confirmed' && checkBooking.status !== 'pending') {
+        return res.status(400).json({ message: "Booking status must be 'pending' for confirmation" });
+      }
+
+      
+      if (status === 'completed' && checkBooking.status !== 'confirmed') {
+        return res.status(400).json({ message: "Booking status must be 'confirmed' for completion" });
+      }
+
+     
+      const pickupDateTime = new Date(`${checkBooking.pickUpData.pickUpDate} ${checkBooking.pickUpData.pickUpTime}`);
+      const returnDateTime = new Date(`${checkBooking.returnData.returnDate} ${checkBooking.returnData.returnTime}`);
+
+    
+      if (status === 'confirmed') {
+        const overlappingTrip = checkDriver.trips.find(trip => {
+          const tripFromDateTime = new Date(trip.fromDateTime);
+          const tripToDateTime = new Date(trip.toDateTime);
+
+        
+          return (pickupDateTime < tripToDateTime && returnDateTime > tripFromDateTime);
+        });
+
+        if (overlappingTrip) {
+          return res.status(400).json({ message: "Driver is not available for the selected time slot" });
+        }
+
+       
+        const updatedBooking = await CarBooking.updateOne(
+          { _id: bookingId },
+          {
+            $set: {
+              status: 'confirmed', 
+              assignedDriver: driverId 
+            }
+          }
+        );
+
+        if (updatedBooking.nModified === 0) {
+          return res.status(400).json({ message: "Failed to update the booking" });
+        }
+
+       
+        const tripDetails = {
+          bookingId: bookingId,
+          fromDateTime: pickupDateTime, 
+          toDateTime: returnDateTime, 
+          status: 'pending' 
+        };
+
+        const updatedDriver = await Driver.updateOne(
+          { _id: driverId },
+          {
+            $push: { trips: tripDetails } 
+          }
+        );
+
+        if (updatedDriver.nModified === 0) {
+          return res.status(400).json({ message: "Failed to update the driver's trips" });
+        }
+
+   
+        return res.status(200).json({ message: "Booking status updated to 'confirmed', driver assigned, and trip added successfully" });
+      }
+
+     
+      if (status === 'completed') {
+        const updatedBooking = await CarBooking.updateOne(
+          { _id: bookingId },
+          {
+            $set: { status: 'completed' } 
+          }
+        );
+
+        if (updatedBooking.nModified === 0) {
+          return res.status(400).json({ message: "Failed to update the booking" });
+        }
+
+      
+        const updatedDriver = await Driver.updateOne(
+          { _id: driverId, 'trips.bookingId': bookingId },
+          {
+            $set: {
+              'trips.$.status': 'completed' 
+            }
+          }
+        );
+
+        if (updatedDriver.nModified === 0) {
+          return res.status(400).json({ message: "Failed to update the driver's trip status" });
+        }
+
+ 
+        return res.status(200).json({ message: "Booking status updated to 'completed' and driver's trip status updated successfully" });
+      }
+
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Error updating booking and driver status', error: error.message });
+  }
+};
+
+
+
+
+
+
+
   }
 
 

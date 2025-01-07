@@ -26,7 +26,27 @@ const driverSchema = new mongoose.Schema({
     driverImage:{
         type:String,
         required:false
-    }
+    },
+    trips: [{
+        bookingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'CarBooking', 
+            required: true
+        },
+        fromDateTime: {
+            type: Date,
+            required: true
+        },
+        toDateTime: {
+            type: Date,
+            required: true
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'completed'],
+            default: 'pending'
+        }
+    }]
 }, { timestamps: true });
 
 const Driver = mongoose.model('Driver', driverSchema);

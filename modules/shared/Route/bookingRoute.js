@@ -10,6 +10,7 @@ router.use(sharedAuthentication)
 router.post('/cancle/:bookingId',cancelBookingValidator(), bookingValidate, BookingController.cancelBooking);
 
 router.get("/:status", BookingController.getBookingController);
+router.post("/bookingStatus/:driverId", BookingController.changeBookingStatus);
 
 router.get("/get/:bookingId", BookingController.getBookingByBookingId)
 
