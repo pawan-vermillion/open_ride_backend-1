@@ -1,18 +1,20 @@
 const multer = require("multer");
 const cloudinary = require("./cloudinary");
 const path = require("path");
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { log } = require("console");
+const tmp = require("tmp"); // Temporary file module
+const fs = require("fs");
 
 const deleteOldImage = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-    if (result.result === 'not found') {
+    if (result.result === "not found") {
       console.warn(`Image with public ID: ${publicId} not found for deletion.`);
     }
     return result;
   } catch (error) {
-    console.error('Failed to delete image:', error.message);
+    console.error("Failed to delete image:", error.message);
   }
 };
 
@@ -20,40 +22,40 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
     let folder;
-    if (req.type === 'Partner') {
-      if (file.fieldname === 'profileImage') {
-        folder = 'uploads/partner/profile/';
-      } else if (file.fieldname === 'exteriorImage') {
-        folder = 'uploads/partner/car/exterior';
-      } else if (file.fieldname === 'interiorImage') {
-        folder = 'uploads/partner/car/interior';
-      } else if (file.fieldname === 'rcPhoto') {
-        folder = 'uploads/partner/car/rcBook';
-      }else if (file.fieldname === 'driverImage') {  
-        folder = 'uploads/partner/driverimage/';
+    if (req.type === "Partner") {
+      if (file.fieldname === "profileImage") {
+        folder = "uploads/partner/profile/";
+      } else if (file.fieldname === "exteriorImage") {
+        folder = "uploads/partner/car/exterior";
+      } else if (file.fieldname === "interiorImage") {
+        folder = "uploads/partner/car/interior";
+      } else if (file.fieldname === "rcPhoto") {
+        folder = "uploads/partner/car/rcBook";
+      } else if (file.fieldname === "driverImage") {
+        folder = "uploads/partner/driverimage/";
       }
-    } else if (req.type === 'User') {
-      if (file.fieldname === 'profileImage') {
-        folder = 'uploads/user/profile/';
+    } else if (req.type === "User") {
+      if (file.fieldname === "profileImage") {
+        folder = "uploads/user/profile/";
       }
-    } else if (file.fieldname === 'logoImage') {
-      folder = 'uploads/admin/logo'
-    }
-    else {
-      folder = 'uploads/other/profile';
+    } else if (file.fieldname === "logoImage") {
+      folder = "uploads/admin/logo";
+    } else {
+      folder = "uploads/other/profile";
     }
 
     return {
       folder: folder,
       format: path.extname(file.originalname).substring(1),
       public_id: Date.now().toString(),
-      transformation: [{ quality: 'auto' }],
+      transformation: [{ quality: "auto" }],
     };
   },
 });
 
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
+
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|pdf/; // Allowed file types
@@ -61,83 +63,75 @@ const upload = multer({
     if (mimetype) {
       return cb(null, true);
     } else {
-      cb(new Error('Only images and PDFs are allowed'));
+      cb(new Error("Only images and PDFs are allowed"));
     }
-  }
+  },
 });
 
 const uploadLogo = multer({
   storage: new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: 'uploads/admin/logo',
+      folder: "uploads/admin/logo",
       format: (req, file) => path.extname(file.originalname).substring(1),
       public_id: (req, file) => Date.now().toString(),
-      transformation: [{ quality: 'auto' }],
+      transformation: [{ quality: "auto" }],
     },
   }),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-}).single('logoImage');
-
-
+}).single("logoImage");
 
 const uploadToCloudinary = async (req, filePath, fieldname) => {
   try {
     // Validate filePath
     if (!filePath) {
-      throw new Error('Invalid file path: filePath is undefined or empty');
+      throw new Error("Invalid file path: filePath is undefined or empty");
     }
 
     let folder;
 
-    if (req.type === 'Partner') {
-      if (fieldname === 'profileImage') {
-        folder = 'uploads/partner/profile/';
-      } else if (fieldname === 'exteriorImage') {
-        folder = 'uploads/partner/car/exterior/';
-      } else if (fieldname === 'interiorImage') {
-        folder = 'uploads/partner/car/interior/';
-      } else if (fieldname === 'rcPhoto') {
-        folder = 'uploads/partner/car/rcBook/';
-      }else if (fieldname === 'driverImage') {  
-        folder = 'uploads/partner/driverimage/';
-      }else {
-        throw new Error('Invalid fieldname for Partner');
-      }
-    } else if (req.type === 'User') {
-      if (fieldname === 'profileImage') {
-        folder = 'uploads/user/profile/';
+    if (req.type === "Partner") {
+      if (fieldname === "profileImage") {
+        folder = "uploads/partner/profile/";
+      } else if (fieldname === "exteriorImage") {
+        folder = "uploads/partner/car/exterior/";
+      } else if (fieldname === "interiorImage") {
+        folder = "uploads/partner/car/interior/";
+      } else if (fieldname === "rcPhoto") {
+        folder = "uploads/partner/car/rcBook/";
+      } else if (fieldname === "driverImage") {
+        folder = "uploads/partner/driverimage/";
       } else {
-        throw new Error('Invalid fieldname for User');
+        throw new Error("Invalid fieldname for Partner");
       }
-    } else if (fieldname === 'logoImage') {
-      folder = 'uploads/admin/logo/';
+    } else if (req.type === "User") {
+      if (fieldname === "profileImage") {
+        folder = "uploads/user/profile/";
+      } else {
+        throw new Error("Invalid fieldname for User");
+      }
+    } else if (fieldname === "logoImage") {
+      folder = "uploads/admin/logo/";
     } else {
-      throw new Error('Invalid request type or fieldname');
+      throw new Error("Invalid request type or fieldname");
     }
 
     const randomFiveDigit = Math.floor(10000 + Math.random() * 90000);
     const currentTime = Date.now();
     const uniquePublicId = `${randomFiveDigit}-${currentTime}`;
 
-
-    
     const result = await cloudinary.uploader.upload(filePath, {
       folder: folder,
       public_id: uniquePublicId,
-      transformation: [{ quality: 'auto' }],
+      transformation: [{ quality: "auto" }],
     });
-
 
     return result.secure_url;
   } catch (error) {
-    console.error('Error uploading to Cloudinary:', error);
-    throw new Error('Error uploading file to Cloudinary');
+    console.error("Error uploading to Cloudinary:", error);
+    throw new Error("Error uploading file to Cloudinary");
   }
 };
-
-
-
 
 const uploadAndDeleteOld = async (req, oldImageUrl) => {
   // First delete the old image
@@ -146,29 +140,30 @@ const uploadAndDeleteOld = async (req, oldImageUrl) => {
   // Then upload the new image (upload logic from your existing code)
   upload(req, req.file, (error) => {
     if (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error);
       return;
     }
   });
 };
 
-
 const uploadMultiple = (req, res, next) => {
   upload.fields([
-    { name: 'exteriorImage', maxCount: 5 },
-    { name: 'interiorImage', maxCount: 5 },
-    { name: 'rcPhoto', maxCount: 1 },
-    { name: 'logoImage', maxCount: 1 },
-    { name: 'driverImage', maxCount: 1 },
+    { name: "exteriorImage", maxCount: 5 },
+    { name: "interiorImage", maxCount: 5 },
+    { name: "rcPhoto", maxCount: 1 },
+    { name: "logoImage", maxCount: 1 },
+    { name: "driverImage", maxCount: 1 },
   ])(req, res, (err) => {
     if (err instanceof multer.MulterError) {
-      console.error('Multer error:', err.message);
+      console.error("Multer error:", err.message);
       return res.status(500).json({ message: err.message });
     } else if (err) {
-      console.error('Unknown error:', err);
-      return res.status(500).json({ message: 'Unexpected error during file upload.' });
+      console.error("Unknown error:", err);
+      return res
+        .status(500)
+        .json({ message: "Unexpected error during file upload." });
     }
-    
+
     // if (!req.files || !req.files.exteriorImage || !req.files.interiorImage || !req.files.rcPhoto) {
     //   return res.status(400).json({ message: 'Missing required files.' });
     // }
@@ -176,8 +171,21 @@ const uploadMultiple = (req, res, next) => {
   });
 };
 
+const convertBufferToFile = (req, res, next) => {
+  const file = req.file;
 
+  if (!file) {
+    return res.status(400).send("No file uploaded");
+  }
 
+  const tempFile = tmp.fileSync({ postfix: path.extname(file.originalname) });
+
+  fs.writeFileSync(tempFile.name, file.buffer);
+
+  req.file.path = tempFile.name;
+
+  next();
+};
 
 module.exports = {
   deleteOldImage,
@@ -186,5 +194,6 @@ module.exports = {
   uploadToCloudinary,
   uploadMultiple,
   cloudinary,
-  uploadLogo
+  uploadLogo,
+  convertBufferToFile,
 };

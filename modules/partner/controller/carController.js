@@ -171,6 +171,7 @@ class CarController {
   updateCar = async (req, res) => {
     const carId = req.params.id;
     const errors = validationResult(req);
+    console.log(req.body)
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }

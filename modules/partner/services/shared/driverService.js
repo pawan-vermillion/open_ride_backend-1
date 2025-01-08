@@ -61,6 +61,20 @@ class DriverService {
 
     updateDriver = async ({ driverId, partnerId, updateData }) => {
         try {
+            if (updateData.phoneNumber) {
+                const { phoneNumber } = updateData;
+                
+               
+                const checkPhone = await Driver.findOne({
+                    partnerId: partnerId,
+                    phoneNumber: phoneNumber
+                });
+    
+                
+                if (checkPhone) {
+                    throw new Error("This phone number is already registered with the same partner. A partner cannot add the same phone number for a driver more than once.");
+                }
+            }
             const updatedDriver = await Driver.findOneAndUpdate(
                 { _id: driverId, partnerId }, 
                 updateData,                 
