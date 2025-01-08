@@ -395,6 +395,9 @@ class CarBookingService {
         (userAmmount - commisionAmmount - totalTax).toFixed(2)
       );
 
+      const genratedBookingId = Math.floor(100000 + Math.random() * 900000);
+
+
       let orderId;
       do {
         orderId = crypto.randomBytes(16).toString("hex");
@@ -404,7 +407,7 @@ class CarBookingService {
         partnerId: car.partnerId,
         userId,
         pickUpData: data,
-
+        genratedBookingId:genratedBookingId,
         returnData: data,
         summary: {
           unit: "Hour",

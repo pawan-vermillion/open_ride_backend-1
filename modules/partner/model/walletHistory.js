@@ -18,10 +18,26 @@ const walletHistorySchema = new Schema({
     ref:"Booking",
     required:true
    },
+   genratedBookingId :{
+    type :Number,
+    ref:"Booking",
+    required:true
+   },
    transactionType :{
     type: String,
     enum: ["Credit", "Debit", "Withdraw", "Refund"],
     required: true,
+   },
+   UiType  :{
+    type: String,
+    enum: ["Wallet", "Withdraw"],
+    required: true,
+   },
+   status  :{
+    type: String,
+    enum: ["Confirmed", "Pending", "Rejected"],
+    required: true,
+    default: "Pending"
    },
    paymentId :{
     type :String,
@@ -30,6 +46,11 @@ const walletHistorySchema = new Schema({
    amount :{
     type :Number,
     required:true
+   },
+   isWithdrewble :{
+    type :Boolean,
+    required:false,
+    default:false
    },
 
 },

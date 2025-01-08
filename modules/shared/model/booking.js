@@ -160,6 +160,10 @@ const carBooking = new mongoose.Schema({
         required: false,
         default:null,
       },
+      genratedBookingId:{
+        type:Number,
+        required:true
+      }
       
     
 
