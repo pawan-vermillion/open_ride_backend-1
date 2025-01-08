@@ -390,7 +390,7 @@ class CarBookingService {
       const sgst = parseFloat((commisionAmmount * (sgstRate / 100)).toFixed(2));
       const cgst = parseFloat((commisionAmmount * (cgstRate / 100)).toFixed(2));
       const totalTax = parseFloat((sgst + cgst).toFixed(2));
-
+      const bookingOtp = Math.floor(1000+ Math.random()*9000)
       const partnerAmmount = parseFloat(
         (userAmmount - commisionAmmount - totalTax).toFixed(2)
       );
@@ -422,6 +422,7 @@ class CarBookingService {
           orderId,
           totalCommisionTax: commisionAmmount + sgst + cgst,
           totalTax,
+          bookingOtp
         },
         bookedDates,
         status: "pending",

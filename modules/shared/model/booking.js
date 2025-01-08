@@ -105,7 +105,11 @@ const carBooking = new mongoose.Schema({
         totalTax: {
             type: Number,
             required: true
-        }
+        },
+        bookingOtp:{
+            type:Number,
+            required:false,
+          }
 
     },
     paymentDetails: {
@@ -156,6 +160,7 @@ const carBooking = new mongoose.Schema({
         required: false,
         default:null,
       },
+      
     
 
 }, { timestamps: true })
