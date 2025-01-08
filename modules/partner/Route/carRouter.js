@@ -32,5 +32,6 @@ router.get('/carId/:id', CarController.getCarById);
 router.patch('/updateCar/:id', CarController.updateCar);
 router.patch('/updateCarImages/:id', uploadMultiple, CarController.uploadCarImages);
 router.delete('/deleteCarImages/:id', CarController.deleteCarImage);
+router.delete('/deleteCar/:id', CarController.deleteCar);
 
 module.exports = router;

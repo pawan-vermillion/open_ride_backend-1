@@ -31,6 +31,7 @@ class CarVerificationService {
             const query = {
                 ...searchQuery,
                 isCarVarified: true,
+                isDelete: false,
             };
 
          

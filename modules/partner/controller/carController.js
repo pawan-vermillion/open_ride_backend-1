@@ -215,8 +215,7 @@ class CarController {
   uploadCarImages = async (req, res) => {
     const carId = req.params.id;
     const partnerId = req.user.id;
-    const {imageType} = req.body;
-    
+    const { imageType } = req.body;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -302,8 +301,6 @@ class CarController {
       const parts = imageUrl.split("/");
       const publicId = parts.slice(7).join("/").split(".")[0];
 
-  
-
       const car = await CarService.removeCarImageReference(
         carId,
         partnerId,
@@ -321,6 +318,29 @@ class CarController {
           .status(404)
           .json({ message: "Image not found or already deleted", result });
       }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  };
+
+  deleteCar = async (req, res) => {
+    const carId = req.params.id;
+    const partnerId = req.user.id;
+
+    try {
+      const findCar = await CarDetails.findOne({ _id: carId, partnerId });
+      if (!findCar) {
+        return res.status(404).json({ message: "Car not found" });
+      }
+
+      const deleteCar = await CarDetails.findOneAndUpdate(
+        { _id: carId, partnerId }, 
+        { isDelete: true },        
+        { new: true }             
+      );
+
+      res.status(200).json({ message: "Car deleted successfully" ,deleteCar});
     } catch (error) {
       console.error("Error deleting image:", error);
       return res.status(500).json({ message: error.message });
