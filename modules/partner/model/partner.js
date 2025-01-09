@@ -32,6 +32,11 @@ const partnerSchema = new Schema({
         type: Number,
         default: 0
     },
+    useableWalletBalance: {
+        type: Number,
+        default: 0
+    },
+
 
 },
     {timestamps : true}

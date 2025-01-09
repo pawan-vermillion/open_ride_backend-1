@@ -60,7 +60,7 @@ class WalletBalanceService {
                 throw new Error("Partner not found");
             }
     
-            const walletBalance = partner.walletBalance;
+            const walletBalance = partner.useableWalletBalance;
     
     
             if (walletBalance < amount) {
