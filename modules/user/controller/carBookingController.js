@@ -1,4 +1,8 @@
+const Partner = require("../../partner/model/partner");
+const walletHistory = require("../../partner/model/walletHistory");
 const CarBooking = require("../../shared/model/booking");
+const User = require("../model/user");
+const WalletBalance = require("../model/walletBalance");
 const CarBookingService = require("../service/carBookingService");
 const razorpay = require("razorpay");
 const RazorpayInstance = new razorpay({
@@ -111,16 +115,92 @@ class CarBookingController {
   }
 
   async createPayment(req, res) {
-  
     const { amount, bookingId, genratedPaymentId } = req.body;
+
     try {
-    
-      const checkBooking = await CarBooking.findOne({_id:bookingId});
+      const checkBooking = await CarBooking.findOne({ _id: bookingId });
       if (!checkBooking) {
         return res.status(404).json({ message: "Booking not found" });
       }
-    
-   
+
+      // Check if the amount is <= 0
+      if (amount <= 0) {
+        // Directly handle booking and payment logic
+        const booking = await CarBooking.findById({ _id: bookingId });
+        if (!booking) {
+          throw new Error("Booking not found");
+        }
+
+        const partner = await Partner.findById(booking.partnerId);
+        if (!partner) {
+          throw new Error("Partner not found");
+        }
+
+        booking.status = "pending";
+        booking.paymentDetails.isPaymentVerified = true;
+        booking.paymentDetails.paymentId = genratedPaymentId; // Use the provided generated payment ID
+        booking.paymentDetails.orderId = genratedPaymentId; // Use the same ID for consistency
+        await booking.save();
+
+        const totalAmount =
+          booking.summary.subTotal -
+          booking.summary.discount -
+          booking.summary.commisionAmmount -
+          booking.summary.totalTax;
+
+        let userAmount = booking.summary.subTotal - booking.summary.discount;
+
+        const userId = booking.userId;
+        const userWalletBalanceDoc = await User.findById(userId);
+        let walletBalance = parseFloat(
+          userWalletBalanceDoc?.walletBalance || 0
+        );
+
+        const amountToDeduct = Math.min(walletBalance, userAmount);
+
+        if (amountToDeduct > 0) {
+          walletBalance -= amountToDeduct;
+          userAmount -= amountToDeduct;
+
+          await User.findByIdAndUpdate(userId, { walletBalance });
+
+          const userWalletHistory = new WalletBalance({
+            partnerId: booking.partnerId,
+            userId,
+            bookingId: booking._id,
+            transactionType: "Debit",
+            paymentId: booking.genratedBookingId,
+            amount: amountToDeduct,
+          });
+          await userWalletHistory.save();
+        }
+
+        const remainingAmountForPartner = totalAmount;
+
+        partner.walletBalance =
+          (parseFloat(partner.walletBalance) || 0) + remainingAmountForPartner;
+
+        const partnerWalletHistory = new walletHistory({
+          partnerId: booking.partnerId,
+          userId,
+          bookingId: booking._id,
+          transactionType: "Credit",
+          genratedBookingId: booking.genratedBookingId,
+          UiType: "Wallet",
+          status: "Confirmed",
+          isWithdrewble: false,
+          amount: remainingAmountForPartner,
+          bookingId: booking._id,
+        });
+
+        await partnerWalletHistory.save();
+        await partner.save();
+
+        return res.status(200).json({
+          success: true,
+          message: "Payment handled directly. Booking updated successfully.",
+        });
+      }
 
       const orderOptions = {
         amount: amount * 100,
@@ -129,17 +209,15 @@ class CarBookingController {
         payment_capture: 1,
       };
 
-      console.log(amount * 100)
-
       RazorpayInstance.orders.create(orderOptions, async (err, order) => {
         if (err) {
+          console.error("Razorpay Error:", err);
           return res
             .status(500)
-            .json({ error: "Error creating Razorpay order", details:err });
+            .json({ error: "Error creating Razorpay order", details: err });
         }
 
         checkBooking.paymentDetails.reciptNumber = genratedPaymentId;
-
         await checkBooking.save();
 
         return res.status(200).json({

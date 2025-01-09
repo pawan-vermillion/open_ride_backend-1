@@ -132,7 +132,7 @@ class CarBookingService {
         throw new Error("Payment verification failed");
       }
 
-      booking.status = "confirmed";
+      booking.status = "pending";
       booking.paymentDetails.isPaymentVerified = true;
       booking.paymentDetails.paymentId = paymentId;
       booking.paymentDetails.orderId = orderId;
