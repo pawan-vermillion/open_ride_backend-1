@@ -8,6 +8,7 @@ const OfflineBooking = require("../../partner/model/offlineBooking");
 const CarDetails = require("../../partner/model/car");
 const User = require("../model/user");
 const { type } = require("os");
+const WalletBalance = require("../model/walletBalance");
 
 class CarBookingService {
   generateDateRange = (start, end) => {
@@ -388,15 +389,17 @@ class CarBookingService {
       // Calculate user amount based on wallet balance
 
       let userAmount = subTotal - discount;
-
+      const amountToDeduct = Math.min(walletBalance, userAmount);
       // Deduct only the required amount from the wallet balance
       if (walletBalance > 0) {
-        const amountToDeduct = Math.min(walletBalance, userAmount); // Take the lesser of wallet balance or user amount
+        // Take the lesser of wallet balance or user amount
         walletBalance -= amountToDeduct; // Deduct this amount from the wallet balance
-        userAmount -= amountToDeduct;   // Reduce the user amount by this deducted amount
+        userAmount -= amountToDeduct; // Reduce the user amount by this deducted amount
       }
 
-      const netAmount = subTotal - discount
+      await User.findByIdAndUpdate(userId, { walletBalance });
+
+      const netAmount = subTotal - discount;
 
       const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
       const commisionAmmount = parseFloat((netAmount * commisionRate) / 100);
@@ -436,7 +439,7 @@ class CarBookingService {
           cgst,
           commisionAmmount,
           partnerAmmount,
-          userAmmount:userAmount,
+          userAmmount: userAmount,
           walletBalance,
           orderId,
           totalCommisionTax: commisionAmmount + sgst + cgst,
@@ -451,6 +454,36 @@ class CarBookingService {
       const booking = new CarBooking(bookingData);
       await booking.save();
 
+      if(amountToDeduct != 0){
+        const userWalletHistory = new WalletBalance({
+          partnerId: car.partnerId,
+          userId: userId,
+          bookingId: booking._id,
+          transactionType: "Debit",
+          paymentId: genratedBookingId,
+          amount: amountToDeduct,
+        });
+   
+           await userWalletHistory.save();
+      }
+     
+   
+
+      const partnerWalletHistory = new walletHistory({
+        partnerId: car.partnerId,
+        userId: userId,
+        bookingId: booking._id,
+        transactionType: "Credit",
+        paymentId: genratedBookingId,
+        genratedBookingId: genratedBookingId,
+        UiType: "Wallet",
+        status:"Confirmed",
+        isWithdrewble:false,
+        amount: partnerAmmount,
+      });
+   
+      await partnerWalletHistory.save();
+    
       return booking;
     } catch (error) {
       console.log(error);
