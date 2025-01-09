@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Payment Test</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        async function initiatePayment() {
+            // Hardcoded values for testing
+            const amount = 6000 ;  // Amount in INR (310.00 INR)
+            const bookingId = "677f9326dcd4bbadac3b4ce4";
+            const genratedPaymentId = "709289";
+
+            const response = await fetch("http://localhost:3002/api/user/booking/createPayment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NjBmN2IyMTMyNzUwMTU3MTVjNGFiMyIsInR5cGUiOiJVc2VyIiwiaWF0IjoxNzM1OTY5NTczLCJleHAiOjE3NDIwMTc1NzN9.xmXwIOt6sG21OZpxZtDDd-NsEzwIZl7I6s_Bg8j3KxY"  // Replace with actual token
+                },
+                body: JSON.stringify({
+                    amount: amount ,
+                    bookingId: bookingId,
+                    genratedPaymentId: genratedPaymentId
+                })
+            });
+
+            const data = await response.json();
+            console.log(data);  // Display response in the console
+
+            if (data.success) {
+                const options = {
+                    key: "rzp_test_hjeWF4WgQiTBJG",  // Replace with your Razorpay key
+                    amount: data.amount * 100,  // Amount in paise
+                    currency: "INR",
+                    order_id: data.orderId,
+                    name: "Test Payment",
+                    description: "Booking Payment",
+                    handler: function (response) {
+                        console.log("Payment Successful:", response);
+                        alert("Payment Successful");
+                    },
+                    prefill: {
+                        name: "John Doe",
+                        email: "johndoe@example.com",
+                        contact: "9876543210"
+                    },
+                    theme: {
+                        color: "#F37254"
+                    }
+                };
+
+                const rzp1 = new Razorpay(options);
+                rzp1.open();  // Open Razorpay checkout
+            } else {
+                alert("Error creating payment order");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Test Razorpay Payment</h1>
+    <button onclick="initiatePayment()">Pay Now</button>
+</body>
+</html>

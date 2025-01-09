@@ -9,6 +9,11 @@ const CarDetails = require("../../partner/model/car");
 const User = require("../model/user");
 const { type } = require("os");
 const WalletBalance = require("../model/walletBalance");
+const razorpay = require("razorpay");
+const RazorpayInstance = new razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 class CarBookingService {
   generateDateRange = (start, end) => {
@@ -76,6 +81,30 @@ class CarBookingService {
     }
   };
 
+  verifyPayment = async ({ orderId, paymentId, signature }) => {
+    try {
+      const body = `${orderId}|${paymentId}`;
+      const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(body)
+        .digest("hex");
+
+      if (expectedSignature === signature) {
+        const payment = await RazorpayInstance.payments.fetch(paymentId);
+        if (payment.status === "captured") {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Payment Verification Error:", error);
+      return false;
+    }
+  };
+
   bookingVerification = async ({
     orderId,
     paymentId,
@@ -87,6 +116,11 @@ class CarBookingService {
 
       if (!booking) {
         throw new Error("Booking not found");
+      }
+
+      const partner = await Partner.findById(booking.partnerId);
+      if (!partner) {
+        throw new Error("Partner not found");
       }
 
       const isPaymentVerified = await this.verifyPayment({
@@ -104,37 +138,61 @@ class CarBookingService {
       booking.paymentDetails.orderId = orderId;
       await booking.save();
 
-      const partner = await Partner.findById(booking.partnerId);
-      if (!partner) {
-        throw new Error("Partner not found");
-      }
-
       const totalAmount =
         booking.summary.subTotal -
         booking.summary.discount -
         booking.summary.commisionAmmount -
         booking.summary.totalTax;
 
-      // Update partner's wallet balance
-      partner.walletBalance =
-        (parseFloat(partner.walletBalance) || 0) + totalAmount;
+      let userAmount = booking.summary.subTotal - booking.summary.discount;
 
       const userId = booking.userId;
-      const transactionType = "Credit";
+      const userWalletBalanceDoc = await User.findById(userId);
+      let walletBalance = parseFloat(userWalletBalanceDoc?.walletBalance || 0);
 
-      const walletHistoryEntry = new walletHistory({
+      const amountToDeduct = Math.min(walletBalance, userAmount);
+
+      if (amountToDeduct > 0) {
+        walletBalance -= amountToDeduct;
+        userAmount -= amountToDeduct;
+
+        await User.findByIdAndUpdate(userId, { walletBalance });
+
+        const userWalletHistory = new WalletBalance({
+          partnerId: booking.partnerId,
+          userId,
+          bookingId: booking._id,
+          transactionType: "Debit",
+          paymentId: booking.genratedBookingId,
+          amount: amountToDeduct,
+        });
+        await userWalletHistory.save();
+      }
+
+      const remainingAmountForPartner = totalAmount;
+
+      partner.walletBalance =
+        (parseFloat(partner.walletBalance) || 0) + remainingAmountForPartner;
+
+      const partnerWalletHistory = new walletHistory({
         partnerId: booking.partnerId,
         userId,
-        transactionType,
-        amount: totalAmount,
+        bookingId: booking._id,
+        transactionType: "Credit",
+        genratedBookingId: booking.genratedBookingId,
+        UiType: "Wallet",
+        status: "Confirmed",
+        isWithdrewble: false,
+        amount: remainingAmountForPartner,
         bookingId: booking._id,
       });
 
-      await walletHistoryEntry.save();
+      await partnerWalletHistory.save();
+      await partner.save();
 
-      await partner.save().catch((err) => console.error("Save Error:", err));
       return booking;
     } catch (error) {
+      console.log(error);
       throw new Error(error.message);
     }
   };
@@ -336,8 +394,6 @@ class CarBookingService {
 
   getBookingSummary = async ({ userId, carId, data }) => {
     try {
-      // const { pickUpData } = data;
-
       const car = await Car.findOne({ _id: carId, isDelete: false });
       if (!car) {
         throw new Error("Car Not Found or is deleted");
@@ -358,7 +414,7 @@ class CarBookingService {
       if (returnMoment.isBefore(moment(), "minute")) {
         throw new Error("Return date and time cannot be in the past");
       }
-      // New validation check
+
       if (returnMoment.isBefore(pickUpMoment)) {
         throw new Error("Return date cannot be before the pick-up date");
       }
@@ -386,18 +442,13 @@ class CarBookingService {
       const userWalletBalanceDoc = await User.findById(userId);
       let walletBalance = parseFloat(userWalletBalanceDoc?.walletBalance || 0);
 
-      // Calculate user amount based on wallet balance
-
       let userAmount = subTotal - discount;
       const amountToDeduct = Math.min(walletBalance, userAmount);
-      // Deduct only the required amount from the wallet balance
-      if (walletBalance > 0) {
-        // Take the lesser of wallet balance or user amount
-        walletBalance -= amountToDeduct; // Deduct this amount from the wallet balance
-        userAmount -= amountToDeduct; // Reduce the user amount by this deducted amount
-      }
 
-      await User.findByIdAndUpdate(userId, { walletBalance });
+      if (walletBalance > 0) {
+        walletBalance -= amountToDeduct;
+        userAmount -= amountToDeduct;
+      }
 
       const netAmount = subTotal - discount;
 
@@ -454,46 +505,12 @@ class CarBookingService {
       const booking = new CarBooking(bookingData);
       await booking.save();
 
-      if(amountToDeduct != 0){
-        const userWalletHistory = new WalletBalance({
-          partnerId: car.partnerId,
-          userId: userId,
-          bookingId: booking._id,
-          transactionType: "Debit",
-          paymentId: genratedBookingId,
-          amount: amountToDeduct,
-        });
-   
-           await userWalletHistory.save();
-      }
-     
-   
-
-      const partnerWalletHistory = new walletHistory({
-        partnerId: car.partnerId,
-        userId: userId,
-        bookingId: booking._id,
-        transactionType: "Credit",
-        paymentId: genratedBookingId,
-        genratedBookingId: genratedBookingId,
-        UiType: "Wallet",
-        status:"Confirmed",
-        isWithdrewble:false,
-        amount: partnerAmmount,
-      });
-   
-      await partnerWalletHistory.save();
-    
       return booking;
     } catch (error) {
       console.log(error);
       throw new Error(error.message);
     }
   };
-
-  // Check car availability for a date range
-
-  // Generate a range of dates between start and end
 }
 
 module.exports = new CarBookingService();

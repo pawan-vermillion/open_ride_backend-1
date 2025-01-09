@@ -1,3 +1,4 @@
+const { phone_number } = require("faker/lib/locales/en_CA")
 const mongoose = require("mongoose")
 
 
@@ -123,6 +124,10 @@ const carBooking = new mongoose.Schema({
         },
         isPaymentVerified: {
             type: Boolean,
+            default: false,
+        },
+        reciptNumber: {
+            type: Number,
             default: false,
         },
     },
