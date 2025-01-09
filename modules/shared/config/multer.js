@@ -187,6 +187,35 @@ const convertBufferToFile = (req, res, next) => {
   next();
 };
 
+
+const convertBufferToFiles = (req, res, next) => {
+  try {
+    const files = req.files;
+
+    if (!files) {
+      return res.status(400).send("No files uploaded");
+    }
+
+    // Process each field in the uploaded files
+    for (const field in files) {
+      const fileArray = Array.isArray(files[field]) ? files[field] : [files[field]];
+
+      // Process each file in the array
+      fileArray.forEach((file) => {
+        const tempFile = tmp.fileSync({ postfix: path.extname(file.originalname) });
+        fs.writeFileSync(tempFile.name, file.buffer);
+        file.path = tempFile.name; // Store the path for further processing
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error processing files:", error);
+    return res.status(500).send("Error processing files.");
+  }
+};
+
+
 module.exports = {
   deleteOldImage,
   upload,
@@ -196,4 +225,5 @@ module.exports = {
   cloudinary,
   uploadLogo,
   convertBufferToFile,
+  convertBufferToFiles
 };

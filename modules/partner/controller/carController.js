@@ -30,21 +30,17 @@ class CarController {
       const interiorImages = req.files.interiorImage || [];
       const rcPhoto = req.files.rcPhoto ? req.files.rcPhoto[0] : null;
 
-      const exteriorImageUrls =
-        exteriorImages.length > 0
-          ? exteriorImages.map((file) => file.path)
-          : [];
-      const interiorImageUrls =
-        interiorImages.length > 0
-          ? interiorImages.map((file) => file.path)
-          : [];
+      const exteriorImageUrls = exteriorImages.length > 0
+      ? await Promise.all(exteriorImages.map((file) => uploadToCloudinary(req, file.path, "exteriorImage")))
+      : [];
+    const interiorImageUrls = interiorImages.length > 0
+      ? await Promise.all(interiorImages.map((file) => uploadToCloudinary(req, file.path, "interiorImage")))
+      : [];
+    const rcPhotoUrl = rcPhoto ? await uploadToCloudinary(req, rcPhoto.path, "rcPhoto") : null;
 
-      const rcPhotoUrl = rcPhoto ? rcPhoto.path : null;
-
-      if (!rcPhotoUrl) {
-        return res.status(422).json({ message: "rcPhoto is required." });
-      }
-
+    if (!rcPhotoUrl) {
+      return res.status(422).json({ message: "rcPhoto is required." });
+    }
       const carData = {
         partnerId: req.user.id,
         ownerFullName: req.body.ownerFullName,

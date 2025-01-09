@@ -81,6 +81,25 @@ console.log(error)
       res.status(500).json({ message: error.message });
     }
   }
+
+
+
+
+  async createPayment(req, res) {
+    try {
+      const { amount , bookingId } = req.body;
+     
+
+
+      const result = await CarBookingService.bookingVerification({ orderId, paymentId, signature, bookingId });
+
+      res.status(200).json({ message: 'Payment verified successfully', booking: result });
+    } catch (error) {
+
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   
 
 }

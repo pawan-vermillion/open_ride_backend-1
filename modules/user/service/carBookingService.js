@@ -6,6 +6,8 @@ const Partner = require("../../partner/model/partner");
 const walletHistory = require("../../partner/model/walletHistory");
 const OfflineBooking = require("../../partner/model/offlineBooking");
 const CarDetails = require("../../partner/model/car");
+const User = require("../model/user");
+const { type } = require("os");
 
 class CarBookingService {
   generateDateRange = (start, end) => {
@@ -380,23 +382,36 @@ class CarBookingService {
       const totalHour = returnMoment.diff(pickUpMoment, "hours");
       let subTotal = car.rate * totalHour;
       const discount = 0;
+      const userWalletBalanceDoc = await User.findById(userId);
+      let walletBalance = parseFloat(userWalletBalanceDoc?.walletBalance || 0);
 
-      const userAmmount = parseFloat(subTotal - discount);
+      // Calculate user amount based on wallet balance
+
+      let userAmount = subTotal - discount;
+
+      // Deduct only the required amount from the wallet balance
+      if (walletBalance > 0) {
+        const amountToDeduct = Math.min(walletBalance, userAmount); // Take the lesser of wallet balance or user amount
+        walletBalance -= amountToDeduct; // Deduct this amount from the wallet balance
+        userAmount -= amountToDeduct;   // Reduce the user amount by this deducted amount
+      }
+
+      const netAmount = subTotal - discount
+
       const commisionRate = parseFloat(process.env.COMMISSION_RATE) || 10;
-      const commisionAmmount = parseFloat((userAmmount * commisionRate) / 100);
+      const commisionAmmount = parseFloat((netAmount * commisionRate) / 100);
 
       const sgstRate = parseFloat(process.env.SGST_RATE) || 9;
       const cgstRate = parseFloat(process.env.CGST_RATE) || 9;
       const sgst = parseFloat((commisionAmmount * (sgstRate / 100)).toFixed(2));
       const cgst = parseFloat((commisionAmmount * (cgstRate / 100)).toFixed(2));
       const totalTax = parseFloat((sgst + cgst).toFixed(2));
-      const bookingOtp = Math.floor(1000+ Math.random()*9000)
+      const bookingOtp = Math.floor(1000 + Math.random() * 9000);
       const partnerAmmount = parseFloat(
-        (userAmmount - commisionAmmount - totalTax).toFixed(2)
+        (netAmount - commisionAmmount - totalTax).toFixed(2)
       );
 
       const genratedBookingId = Math.floor(100000 + Math.random() * 900000);
-
 
       let orderId;
       do {
@@ -407,7 +422,7 @@ class CarBookingService {
         partnerId: car.partnerId,
         userId,
         pickUpData: data,
-        genratedBookingId:genratedBookingId,
+        genratedBookingId: genratedBookingId,
         returnData: data,
         summary: {
           unit: "Hour",
@@ -421,11 +436,12 @@ class CarBookingService {
           cgst,
           commisionAmmount,
           partnerAmmount,
-          userAmmount,
+          userAmmount:userAmount,
+          walletBalance,
           orderId,
           totalCommisionTax: commisionAmmount + sgst + cgst,
           totalTax,
-          bookingOtp
+          bookingOtp,
         },
         bookedDates,
         status: "pending",

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const CarController = require('../controller/carController');
 const {partnerAuthenication } = require('../middleware/partnerAuthenication');
-const { uploadMultiple ,uploadToCloudinary} = require('../../shared/config/multer');
+const { uploadMultiple ,uploadToCloudinary, convertBufferToFile, convertBufferToFiles} = require('../../shared/config/multer');
 const { CarValidationRules, carValidation } = require('../middleware/carValidator');
 
 router.use(partnerAuthenication);
@@ -26,7 +26,7 @@ router.post("/api/car",
     }
 );
 // Define routes for car operations
-router.post('/addCar',uploadMultiple,  CarValidationRules(), carValidation, CarController.createCar);
+router.post('/addCar',uploadMultiple,convertBufferToFiles ,  CarValidationRules(), carValidation, CarController.createCar);
 router.get('/allCars', CarController.getAllCars);
 router.get('/carId/:id', CarController.getCarById);
 router.patch('/updateCar/:id', CarController.updateCar);
