@@ -1,4 +1,5 @@
 const Driver = require("../../partner/model/driver");
+const walletHistory = require("../../partner/model/walletHistory");
 const CarBooking = require("../model/booking");
 const BookingService = require("../Service/bookingService")
 
@@ -180,7 +181,17 @@ class BookingController {
       const updatedBooking = await CarBooking.updateOne(
         { _id: bookingId },
         { $set: { status: 'completed' } }
+
+       
+
+
       );
+      const updateAmountStatus = await walletHistory.findOneAndUpdate(
+        { bookingId: bookingId },
+        { $set: { isWithdrewble: true } },
+        { new: true } 
+      );
+
 
       if (updatedBooking.nModified === 0) {
         return res.status(400).json({ message: "Failed to update the booking" });
