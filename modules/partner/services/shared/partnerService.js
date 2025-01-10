@@ -2,6 +2,7 @@ const Partner = require("../../model/partner")
 const bcrypt = require("bcrypt")
 const { generateToken } = require("../../../shared/Service/authenication")
 const cloudinary = require("../../../shared/config/cloudinary")
+const { uploadToCloudinary } = require("../../../shared/config/multer")
 
 
 
@@ -80,7 +81,7 @@ class PartnerService {
            
             await cloudinary.uploader.destroy(`uploads/partner/profile/${oldImagePublicId}`);
         }
-
+       
             const updatePartner = await Partner.findByIdAndUpdate(PartnerId , partnerData , {new:true}).select("-__v -password -createdAt -updatedAt");
             return updatePartner;
             

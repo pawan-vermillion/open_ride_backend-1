@@ -22,8 +22,15 @@ class PartnerController {
       if (req.file) {
         partnerData.profileImage = req.file.path;
       }
+      console.log(req.file)
+     
+
 
       const result = await PartnerService.updatePartner(partnerData, PartnerId)
+      const profileImage = partnerData.profileImage
+      ? await uploadToCloudinary(req, partnerData.profileImage, "profileImage")
+      : null;
+
       return res.status(201).json({
         message: 'Update Successfully',
       

@@ -13,7 +13,7 @@ const Partner = require("../model/partner");
 class CarController {
   createCar = async (req, res) => {
     const errors = validationResult(req);
-    console.log(req.body)
+
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
@@ -154,6 +154,27 @@ class CarController {
       res.status(500).json({ message: error.message });
     }
   };
+
+
+  getPartnerCar = async (req, res) => {
+    try {
+      const partnerId = req.user.id;  // Get partnerId from the token
+  
+      const { limit, page, search } = req.query;  // Add search to the query
+      const cars = await AdminCarService.getAllCarsServicePartner({
+        partnerId,
+        search,
+        page,
+        limit,
+      });
+      return res.status(200).json(cars);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
+
+
   getCarById = async (req, res) => {
     const carId = req.params.id;
     try {

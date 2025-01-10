@@ -61,31 +61,43 @@ class DriverService {
 
     updateDriver = async ({ driverId, partnerId, updateData }) => {
         try {
-            if (updateData.phoneNumber) {
-                const { phoneNumber } = updateData;
-                
-               
-                const checkPhone = await Driver.findOne({
-                    partnerId: partnerId,
-                    phoneNumber: phoneNumber
-                });
-    
-                
-                if (checkPhone) {
-                    throw new Error("This phone number is already registered with the same partner. A partner cannot add the same phone number for a driver more than once.");
-                }
+          // Retrieve the existing driver data to check the current phone number
+          const existingDriver = await Driver.findOne({ _id: driverId, partnerId });
+      
+          if (!existingDriver) {
+            throw new Error("Driver not found");
+          }
+      
+          // Check if the phone number is being updated
+          if (updateData.phoneNumber && updateData.phoneNumber !== existingDriver.phoneNumber) {
+            const { phoneNumber } = updateData;
+      
+            // Check if the new phone number already exists for the same partner
+            const checkPhone = await Driver.findOne({
+              partnerId: partnerId,
+              phoneNumber: phoneNumber
+            });
+      
+            // If the phone number is already registered, throw an error
+            if (checkPhone) {
+              throw new Error("This phone number is already registered with the same partner. A partner cannot add the same phone number for a driver more than once.");
             }
-            const updatedDriver = await Driver.findOneAndUpdate(
-                { _id: driverId, partnerId }, 
-                updateData,                 
-                { new: true } 
-            );
-            return updatedDriver;
+          }
+      
+          // Proceed with the update (including other fields like name, etc.)
+          const updatedDriver = await Driver.findOneAndUpdate(
+            { _id: driverId, partnerId },
+            updateData,                
+            { new: true }  // Return the updated driver
+          );
+      
+          return updatedDriver;
         } catch (error) {
-            console.error("Error updating driver:", error.message);
-            throw error;
+          console.error("Error updating driver:", error.message);
+          throw error;
         }
-    };
+      };
+      
     deleteDriver = async ({ driverId, partnerId }) => {
         try {
             const deletedDriver = await Driver.findOneAndDelete({

@@ -68,7 +68,7 @@ class CarService {
   
       return car; 
     } catch (error) {
-      console.error("Error updating car images:", error.message);
+      console.error("Error updating car images:", error);
       throw new Error(error.message);
     }
   };
