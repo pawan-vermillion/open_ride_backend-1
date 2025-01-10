@@ -68,6 +68,21 @@ const upload = multer({
   },
 });
 
+
+const upload2 = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif|pdf/; // Allowed file types
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only images and PDFs are allowed'));
+    }
+  }
+});
+
 const uploadLogo = multer({
   storage: new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -147,7 +162,7 @@ const uploadAndDeleteOld = async (req, oldImageUrl) => {
 };
 
 const uploadMultiple = (req, res, next) => {
-  upload.fields([
+  upload2.fields([
     { name: "exteriorImage", maxCount: 5 },
     { name: "interiorImage", maxCount: 5 },
     { name: "rcPhoto", maxCount: 1 },

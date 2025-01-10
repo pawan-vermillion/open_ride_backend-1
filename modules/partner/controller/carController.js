@@ -252,6 +252,7 @@ class CarController {
     }
 
     try {
+ 
       const images = req.files ? req.files[validImageTypes[imageType]] : [];
       if (!images || images.length === 0) {
         return res
