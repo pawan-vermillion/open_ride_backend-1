@@ -116,6 +116,7 @@ class BookingService {
         .limit(limit)
         .populate("userId", "emailAddress phoneNumber firstName lastName")
         .populate("partnerId", "emailAddress phoneNumber firstName lastName")
+        .populate("assignedDriver", "firstName lastName phoneNumber age driverImage")
         .populate({
           path: "carId",
           select:
@@ -125,6 +126,7 @@ class BookingService {
             { path: "modelName", select: "model" },
             { path: "subModel", select: "subModel" },
             { path: "bodyStyle", select: "bodyStyle" },
+           
           ],
         })
         .exec();
