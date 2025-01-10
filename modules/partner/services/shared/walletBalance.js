@@ -28,9 +28,15 @@ class WalletBalanceService {
             combinedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
     
+            const formattedData = combinedData.map(item => ({
+                ...item._doc, 
+                createdAt: new Date(item.createdAt).toISOString().split('T')[0],
+                updatedAt: new Date(item.updatedAt).toISOString().split('T')[0], 
+            }));
+    
             const total = await WalletHistory.countDocuments({ partnerId }) + await WithdrawRequest.countDocuments({ partnerId });
     
-            return   combinedData; // Return the merged data
+            return formattedData;
            
         } catch (error) {
             throw error;

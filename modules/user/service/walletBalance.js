@@ -17,7 +17,13 @@ class WalletBalanceService {
                 .limit(pageSize);
 
 
-            return  walletHistoryData;
+                const formattedData = walletHistoryData.map(item => ({
+                    ...item._doc, 
+                    createdAt: new Date(item.createdAt).toISOString().split('T')[0],
+                    updatedAt: new Date(item.updatedAt).toISOString().split('T')[0],
+                }));
+        
+                return formattedData;
         } catch (error) {
             console.error(`Error fetching wallet history: ${error.message}`);
             throw error;
