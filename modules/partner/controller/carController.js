@@ -13,6 +13,7 @@ const Partner = require("../model/partner");
 class CarController {
   createCar = async (req, res) => {
     const errors = validationResult(req);
+    console.log(req.body)
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
