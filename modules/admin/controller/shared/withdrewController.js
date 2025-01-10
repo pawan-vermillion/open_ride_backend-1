@@ -17,14 +17,14 @@ class WithdrawRequestController{
       const { requestId } = req.params;
       const { action } = req.body; // 'approve' or 'reject'
   
-      if (!['approved', 'rejected'].includes(action)) {
+      if (!['Confirmed', 'Rejected'].includes(action)) {
         return res.status(400).json({ error: 'Invalid action' });
       }
   
       let result;
-      if (action === 'approved') {
+      if (action === 'Confirmed') {
         result = await WithdrawRequestService.approvedRequest(requestId);
-      } else if (action === 'rejected') {
+      } else if (action === 'Rejected') {
         result = await WithdrawRequestService.rejectRequest(requestId);
       }
   

@@ -85,15 +85,27 @@ class WithdrawRequestService {
   
 
 async approvedRequest(requestId) {
-  const withdrewRequest = await WithdrawRequest.findById(requestId);
+  const withdrewRequest = await walletHistory.findById(requestId);
 
-  if (!withdrewRequest || withdrewRequest.status !== "pending") {
+  if (!withdrewRequest || withdrewRequest.status !== "Pending") {
     throw new Error("Invalid request or already processed");
   }
 
   
-  withdrewRequest.status = "approved";
+  withdrewRequest.status = "Confirmed";
+  withdrewRequest.isWithdrewble = true;
+
   await withdrewRequest.save();
+
+  const partnerId = await Partner.findByIdAndUpdate(
+    withdrewRequest.partnerId,
+    { $inc: { useableWalletBalance: -withdrewRequest.amount ,walletBalance: -withdrewRequest.amount} },
+    { new: true }
+  );
+
+  
+
+  
 
   
 

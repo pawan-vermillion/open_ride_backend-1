@@ -1,7 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const WalletHistory = require("../../model/walletHistory");
 const WithdrawRequest = require("../../model/withdrewRequest");
-const Partner = require("../../model/partner")
+const Partner = require("../../model/partner");
+const walletHistory = require("../../model/walletHistory");
 require("dotenv").config();
 
 class WalletBalanceService {
@@ -74,10 +75,13 @@ class WalletBalanceService {
             }
     
             
-            const withdrawRequest = new WithdrawRequest({
+            const withdrawRequest = new walletHistory({
                 partnerId,
                 amount,
-                status: "pending",
+                transactionType:"Withdraw",
+                UiType:"Withdraw",
+                status: "Pending",
+                isWithdrewble:false
             });
     
             await withdrawRequest.save({ session });

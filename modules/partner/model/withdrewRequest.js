@@ -18,8 +18,8 @@ const WithdrawRequestSchema = new mongoose.Schema({
     },
     type:{
         type:String,
-        enum:['withdrew'],
-        default:'withdrew',
+        enum:['Withdraw'],
+        default:'Withdraw',
         
     }
 } ,{ timestamps: true });

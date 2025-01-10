@@ -51,6 +51,7 @@ class BookingService {
           userId: booking.userId,
           partnerId: booking.partnerId,
           transactionType,
+          paymentId:booking.paymentDetails.paymentId,
           amount: booking.summary.partnerAmmount,
           bookingId: booking._id,
         });
@@ -74,8 +75,13 @@ class BookingService {
         userId: booking.userId,
         partnerId: booking.partnerId,
         transactionType: "Debit",
+        genratedBookingId:booking.genratedBookingId,
+        paymentId:booking.paymentDetails.paymentId,
         amount: booking.summary.partnerAmmount,
         bookingId: booking._id,
+        UiType:"Wallet",
+        status:"Confirmed",
+        isWithdrewble:false
       });
 
       await walletHistoryEntryForPartner.save();

@@ -1,6 +1,8 @@
 const {model , Schema, default: mongoose} = require("mongoose")
 const bcrypt = require('bcrypt')
 const {generateToken} = require("../../shared/Service/authenication")
+const timestampFormatter = require("../../../timestampFormatter.js");
+mongoose.plugin(timestampFormatter);
 
 const walletHistorySchema = new Schema({
    partnerId :{
@@ -11,17 +13,17 @@ const walletHistorySchema = new Schema({
    userId :{
     type :mongoose.Schema.Types.ObjectId,
     ref:"User",
-    required:true
+    required:false
    },
    bookingId :{
     type :mongoose.Schema.Types.ObjectId,
     ref:"Booking",
-    required:true
+    required:false
    },
    genratedBookingId :{
     type :Number,
     ref:"Booking",
-    required:true
+    required:false
    },
    transactionType :{
     type: String,

@@ -15,8 +15,10 @@ const bookingRoute = require("./modules/shared/Route/bookingRoute")
 const carRoute = require("./modules/shared/Route/carRoute")
 const reviewRoute = require("./modules/shared/Route/reviewRoute")
 const emailAndPhoneRoute = require("./modules/shared/Route/emailAndPhoneRoute")
+const mongoose = require("mongoose");
+const timestampFormatter = require("./timestampFormatter.js");
 const {connectRabbitMq} = require("./rabbitmq.js")
-
+mongoose.plugin(timestampFormatter);
 
 
 
