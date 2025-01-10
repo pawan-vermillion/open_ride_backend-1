@@ -62,13 +62,7 @@ const CarValidationRules = () => {
             .exists().withMessage("Address is required")
             .isString().withMessage("Address must be a string"),
 
-        body("latitude")
-            .exists().withMessage("Latitude is required")
-            .isNumeric().withMessage("Latitude must be a numeric value"),
-
-        body("longitude")
-            .exists().withMessage("Longitude is required")
-            .isNumeric().withMessage("Longitude must be a numeric value"),
+       
     ];
 };
 
