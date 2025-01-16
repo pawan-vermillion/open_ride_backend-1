@@ -4,8 +4,9 @@ const CarController = require('../controller/carController');
 const {partnerAuthenication } = require('../middleware/partnerAuthenication');
 const { uploadMultiple ,uploadToCloudinary, convertBufferToFile, convertBufferToFiles} = require('../../shared/config/multer');
 const { CarValidationRules, carValidation } = require('../middleware/carValidator');
+const { sharedAuthentication } = require('../../shared/Middleware/validator/sharedAuthenication');
 
-router.use(partnerAuthenication);
+
 
 router.post("/api/car",
     CarValidationRules(),
@@ -26,13 +27,13 @@ router.post("/api/car",
     }
 );
 // Define routes for car operations
-router.post('/addCar',uploadMultiple,convertBufferToFiles ,  CarValidationRules(), carValidation, CarController.createCar);
-router.get('/allCars', CarController.getAllCars);
-router.get('/myCar', CarController.getPartnerCar);
-router.get('/carId/:id', CarController.getCarById);
-router.patch('/updateCar/:id', CarController.updateCar);
-router.patch('/updateCarImages/:id', uploadMultiple, CarController.uploadCarImages);
-router.delete('/deleteCarImages/:id', CarController.deleteCarImage);
-router.delete('/deleteCar/:id', CarController.deleteCar);
+router.post('/addCar',partnerAuthenication,uploadMultiple,convertBufferToFiles ,  CarValidationRules(), carValidation, CarController.createCar);
+router.get('/allCars', partnerAuthenication,CarController.getAllCars);
+router.get('/myCar',partnerAuthenication, CarController.getPartnerCar);
+router.get('/carId/:id', sharedAuthentication,CarController.getCarById);
+router.patch('/updateCar/:id',partnerAuthenication, CarController.updateCar);
+router.patch('/updateCarImages/:id',partnerAuthenication, uploadMultiple, CarController.uploadCarImages);
+router.delete('/deleteCarImages/:id',partnerAuthenication, CarController.deleteCarImage);
+router.delete('/deleteCar/:id',partnerAuthenication, CarController.deleteCar);
 
 module.exports = router;
