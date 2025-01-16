@@ -70,7 +70,7 @@ const upload = multer({
 
 
 const upload2 = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|pdf/; // Allowed file types
@@ -189,8 +189,9 @@ const uploadMultiple = (req, res, next) => {
 const convertBufferToFile = (req, res, next) => {
   const file = req.file;
 
-  if (!file) {
-    return res.status(400).send("No file uploaded");
+  if (!file || Object.keys(file).length === 0) {
+ 
+    return next();  
   }
 
   const tempFile = tmp.fileSync({ postfix: path.extname(file.originalname) });
@@ -207,8 +208,11 @@ const convertBufferToFiles = (req, res, next) => {
   try {
     const files = req.files;
 
-    if (!files) {
-      return res.status(400).send("No files uploaded");
+    // Log the files to check their content
+    console.log('Uploaded files:', files);
+
+    if (!files || Object.keys(files).length === 0) {
+      return next();
     }
 
     // Process each field in the uploaded files
@@ -217,6 +221,13 @@ const convertBufferToFiles = (req, res, next) => {
 
       // Process each file in the array
       fileArray.forEach((file) => {
+        console.log('Processing file:', file);  // Log each file to check its properties
+
+        // Check if the buffer exists
+        if (!file.buffer) {
+          throw new Error('File buffer is undefined!');
+        }
+
         const tempFile = tmp.fileSync({ postfix: path.extname(file.originalname) });
         fs.writeFileSync(tempFile.name, file.buffer);
         file.path = tempFile.name; // Store the path for further processing
@@ -229,6 +240,7 @@ const convertBufferToFiles = (req, res, next) => {
     return res.status(500).send("Error processing files.");
   }
 };
+
 
 
 module.exports = {

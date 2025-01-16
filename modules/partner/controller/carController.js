@@ -310,7 +310,7 @@ class CarController {
     const carId = req.params.id;
     const partnerId = req.user.id;
     const type = req.query.type;
-
+    
     if (!imageUrl) {
       return res.status(400).json({ message: "Image URL is required" });
     }

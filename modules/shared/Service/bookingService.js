@@ -120,7 +120,7 @@ class BookingService {
         .populate({
           path: "carId",
           select:
-            "carNumber companyName modelName subModel bodyStyle exteriorImage modelYear",
+            "carNumber companyName modelName subModel bodyStyle exteriorImage modelYear ",
           populate: [
             { path: "companyName", select: "carCompany" },
             { path: "modelName", select: "model" },
@@ -154,6 +154,7 @@ class BookingService {
                 phoneNumber: booking.userId?.phoneNumber,
               },
               carId: {
+                carId: carId?._id,
                 carNumber: carId?.carNumber,
                 carCompany: carId?.companyName?.carCompany,
                 model: carId?.modelName?.model,
