@@ -4,11 +4,12 @@ const {getUser , updateUser} = require("../controller/userController");
 const { userAuthenticate } = require("../middleware/userAuthenication");
 const {
     upload,
-    uploadToCloudinary
+    uploadToCloudinary,
+    convertBufferToFile
   } = require("../../shared/config/multer")
 
 router.use(userAuthenticate);
 router.get("/" , getUser);
-router.patch("/update"  , upload.single('profileImage'),updateUser )
+router.patch("/update"  , upload.single('profileImage'),convertBufferToFile,updateUser )
 
 module.exports = router

@@ -22,9 +22,13 @@ class UserController {
             const userData = req.body;
 
             if (req.file) {
-                userData.profileImage = req.file.path;
-            }
-
+                const profileImageURL = await uploadToCloudinary(
+                  req,
+                  req.file.path,
+                  "profileImage"
+                );
+                userData.profileImage = profileImageURL;
+              }
             const result = await UserService.updateUser(userData, userId);
 
             return res.status(201).json({ message: "User Updated Successfully", result });
