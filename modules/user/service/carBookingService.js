@@ -372,18 +372,20 @@ class CarBookingService {
       // Prepare response with available cars
       const result = availableCars.map((car) => ({
         carId: car._id,
-        modelName: car.modelName.model,
+        carModel: car.modelName.model,
         price: car.rate,
-        companyName: car.companyName.carCompany,
-        subModelName: car.subModel.subModel,
+        carCompany: car.companyName.carCompany,
+        carSubModel: car.subModel.subModel,
         bodyStyle: car.bodyStyle.bodyStyle,
-        avgRating: car.rating,
-        carImage: car.exteriorImage[0],
-        seat: car.numberOfSeat,
+        rating: car.rating,
+        exteriorImage: car.exteriorImage[0],
+        noOfSeat: car.numberOfSeat,
         fuelType: car.fuelType,
         door: car.numberOfDoors,
         modelYear: car.modelYear,
         transmission: car.transmission,
+        isCarVarified:car.isCarVarified
+
       }));
 
       return result;
