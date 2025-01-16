@@ -27,8 +27,9 @@ class RepairCarController {
     getAllRepairCars = async (req, res) => {
         try {
             const { page, limit } = req.query; 
+            const partnerId= req.user.id;
 
-            const result = await RepaircarService.getAllRepairCars({ page, limit });
+            const result = await RepaircarService.getAllRepairCars({ page, limit,partnerId });
 
             return res.status(200).json(result);
         } catch (error) {

@@ -60,7 +60,7 @@ class RepaircarService {
     }
     
     
-    async getAllRepairCars({ page, limit }) {
+    async getAllRepairCars({ page, limit,partnerId }) {
         try {
 
             const pageNumber = parseInt(page) || 1;
@@ -68,7 +68,7 @@ class RepaircarService {
             const skip = (pageNumber - 1) * pageSize;
 
 
-            const repairCars = await RepairCar.find()
+            const repairCars = await RepairCar.find({partnerId})
             .skip(skip)
             .select('-__v -_id -createdAt -updatedAt -partnerId ')
             .limit(pageSize)
