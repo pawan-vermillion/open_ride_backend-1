@@ -11,7 +11,7 @@ router.get("/availability/:carId", CarBookingController.checkAvailability);
 router.post("/bookingsummary/:carId",summaryValidationRules(),validate,CarBookingController.getBookingController)
 
 router.post("/paymentVerify", CarBookingController.verifyPayment)
-router.post("/createPayment", CarBookingController.createPayment)
+// router.post("/createPayment", CarBookingController.createPayment)
 router.get("/searchCarForBooking", CarBookingController.bookCar)
 
 module.exports = router

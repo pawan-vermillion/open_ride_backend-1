@@ -10,6 +10,7 @@ const User = require("../model/user");
 const { type } = require("os");
 const WalletBalance = require("../model/walletBalance");
 const razorpay = require("razorpay");
+const carCompany = require("../../admin/model/carCompany");
 const RazorpayInstance = new razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -113,54 +114,95 @@ class CarBookingService {
   }) => {
     try {
       const booking = await CarBooking.findById({ _id: bookingId });
-
+  
       if (!booking) {
         throw new Error("Booking not found");
       }
-
+      console.log(booking)
+  
       const partner = await Partner.findById(booking.partnerId);
       if (!partner) {
         throw new Error("Partner not found");
       }
-
+  
+      const userAmount = booking.summary.userAmmount
+    
+      
+      if (userAmount <= 0) {
+        booking.status = "pending";
+        booking.paymentDetails.isPaymentVerified = true;
+        booking.paymentDetails.paymentId = paymentId || `direct-${Date.now()}`;
+        booking.paymentDetails.orderId = orderId || `direct-${Date.now()}`;
+        await booking.save();
+  
+        const totalAmount =
+          booking.summary.subTotal -
+          booking.summary.discount -
+          booking.summary.commisionAmmount -
+          booking.summary.totalTax;
+  
+      
+        partner.walletBalance =
+          (parseFloat(partner.walletBalance) || 0) + totalAmount;
+  
+        const partnerWalletHistory = new walletHistory({
+          partnerId: booking.partnerId,
+          userId: booking.userId,
+          bookingId: booking._id,
+          transactionType: "Credit",
+          genratedBookingId: booking.genratedBookingId,
+          UiType: "Wallet",
+          status: "Confirmed",
+          isWithdrewble: false,
+          amount: totalAmount,
+        });
+  
+        await partnerWalletHistory.save();
+        await partner.save();
+  
+        return {
+          success: true,
+          message: "Payment directly verified and booking updated successfully.",
+          booking,
+        };
+      }
+  
+     
       const isPaymentVerified = await this.verifyPayment({
         orderId,
         paymentId,
         signature,
       });
+   
+  
       if (!isPaymentVerified) {
         throw new Error("Payment verification failed");
       }
-
+  
       booking.status = "pending";
       booking.paymentDetails.isPaymentVerified = true;
       booking.paymentDetails.paymentId = paymentId;
       booking.paymentDetails.orderId = orderId;
       await booking.save();
-
+  
       const totalAmount =
         booking.summary.subTotal -
         booking.summary.discount -
         booking.summary.commisionAmmount -
         booking.summary.totalTax;
-
-      let userAmount = booking.summary.subTotal - booking.summary.discount;
-
-      const userId = booking.userId;
-      const userWalletBalanceDoc = await User.findById(userId);
-      let walletBalance = parseFloat(userWalletBalanceDoc?.walletBalance || 0);
-
+  
+      let walletBalance = parseFloat(
+        (await User.findById(booking.userId))?.walletBalance || 0
+      );
+  
       const amountToDeduct = Math.min(walletBalance, userAmount);
-
       if (amountToDeduct > 0) {
         walletBalance -= amountToDeduct;
-        userAmount -= amountToDeduct;
-
-        await User.findByIdAndUpdate(userId, { walletBalance });
-
+        await User.findByIdAndUpdate(booking.userId, { walletBalance });
+  
         const userWalletHistory = new WalletBalance({
           partnerId: booking.partnerId,
-          userId,
+          userId: booking.userId,
           bookingId: booking._id,
           transactionType: "Debit",
           paymentId: booking.genratedBookingId,
@@ -168,34 +210,32 @@ class CarBookingService {
         });
         await userWalletHistory.save();
       }
-
-      const remainingAmountForPartner = totalAmount;
-
+  
       partner.walletBalance =
-        (parseFloat(partner.walletBalance) || 0) + remainingAmountForPartner;
-
+        (parseFloat(partner.walletBalance) || 0) + totalAmount;
+  
       const partnerWalletHistory = new walletHistory({
         partnerId: booking.partnerId,
-        userId,
+        userId: booking.userId,
         bookingId: booking._id,
         transactionType: "Credit",
         genratedBookingId: booking.genratedBookingId,
         UiType: "Wallet",
         status: "Confirmed",
         isWithdrewble: false,
-        amount: remainingAmountForPartner,
-        bookingId: booking._id,
+        amount: totalAmount,
       });
-
+  
       await partnerWalletHistory.save();
       await partner.save();
-
+  
       return booking;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new Error(error.message);
     }
   };
+  
 
   checkAvailabilityForRange = async ({
     carId,
@@ -437,7 +477,7 @@ class CarBookingService {
         startTime: pickUpMoment.format("HH:mm"),
         endTime: returnMoment.format("HH:mm"),
       });
-      console.log(availability);
+    
 
       if (!availability) {
         throw new Error("Car is not available for the selected dates");
@@ -513,10 +553,36 @@ class CarBookingService {
         expiresAt: moment().add(30, "minutes").toDate(),
       };
 
+
+
       const booking = new CarBooking(bookingData);
+      const populatedCarDetails = await Car.findById(carId).populate([
+        { path: "companyName", select: "carCompany" }, // Adjust the fields you want to populate
+        { path: "modelName", select: "CarModel" },
+        { path: "bodyStyle", select: "bodyStyle" },
+        { path: "subModel", select: "subModel" },
+      ]);
+      const populatedCar = { carId: carId,
+        carCompany: populatedCarDetails?.companyName?.carCompany, // Example field
+        carModel: populatedCarDetails?.modelName?.model,
+        bodyStyle: populatedCarDetails?.bodyStyle?.bodyStyle,
+        carSubModel: populatedCarDetails?.subModel?.subModel,
+        modelYear: populatedCarDetails?.modelYear,
+        isCarVarified: populatedCarDetails?.isCarVarified,
+        rating: populatedCarDetails?.rating,
+        exteriorImage: populatedCarDetails?.exteriorImage[0],
+        noOfSeat: populatedCarDetails?.numberOfSeat,
+        fuelType: populatedCarDetails?.fuelType,
+        price: populatedCarDetails?.rate,
+        transmission: populatedCarDetails?.transmission,
+      
+      }
+
+      console.log(populatedCar)
+    
       await booking.save();
 
-      return booking;
+      return {booking,populatedCar};
     } catch (error) {
       console.log(error);
       throw new Error(error.message);
