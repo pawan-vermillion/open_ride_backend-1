@@ -245,14 +245,30 @@ class CarBookingService {
     }
   };
 
+  haversineDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   async searchCar({
     pickUpDate,
     pickUpTime,
-    pickupLocation,
+
     returnDate,
     returnTime,
     filters,
     pagination,
+    latitude,
+    longitude,
   }) {
     try {
       const {
@@ -267,9 +283,8 @@ class CarBookingService {
         fuelType,
       } = filters || {};
 
-      // Set default pagination values if not provided
-      const page = pagination?.page || 1; // Default to page 1 if not provided
-      const limit = pagination?.limit || 10; // Default to 10 items per page if not provided
+      const page = pagination?.page || 1;
+      const limit = pagination?.limit || 10;
 
       const pickUpDateTime = moment(
         `${pickUpDate} ${pickUpTime}`,
@@ -280,18 +295,17 @@ class CarBookingService {
         "YYYY-MM-DD HH:mm"
       );
 
-      // Validate mandatory fields
       if (
         !pickUpDate ||
         !pickUpTime ||
         !returnDate ||
         !returnTime ||
-        !pickupLocation
+        !latitude ||
+        !longitude
       ) {
         throw new Error("All mandatory fields must be provided.");
       }
 
-      // Validate date-time
       if (pickUpDateTime.isBefore(moment(), "minute")) {
         throw new Error("Pick-up date and time cannot be in the past.");
       }
@@ -300,26 +314,23 @@ class CarBookingService {
         throw new Error("Return date cannot be before pick-up date.");
       }
 
-      // Query for cars based on pickUpLocation and other mandatory fields
       let query = {
-        address: { $regex: pickupLocation, $options: "i" }, // Case-insensitive search on address
         isCarVarified: true,
         isDelete: false,
       };
 
-      // Step 2: Query database for cars based on location and availability
       const carsQuery = CarDetails.find(query)
         .populate("companyName", "carCompany logoImage")
         .populate("modelName", "model")
         .populate("subModel", "subModel")
         .populate("bodyStyle", "bodyStyle")
-        .skip((page - 1) * limit) // Skip based on page
-        .limit(Number(limit)); // Limit the number of records
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
 
       const cars = await carsQuery;
 
-      // Step 3: Apply optional filters to the results
       let filteredCars = cars;
+
       if (price) filteredCars = filteredCars.filter((car) => car.rate <= price);
       if (model)
         filteredCars = filteredCars.filter(
@@ -348,29 +359,27 @@ class CarBookingService {
       if (fuelType)
         filteredCars = filteredCars.filter((car) => car.fuelType === fuelType);
 
-      // Step 4: Check car availability for the given date-time range
       const availableCars = [];
-      for (const car of filteredCars) {
-        const availability = await this.checkAvailabilityForRange({
-          carId: car._id,
-          startDate: pickUpDateTime.format("YYYY-MM-DD"),
-          endDate: returnDateTime.format("YYYY-MM-DD"),
-          startTime: pickUpDateTime.format("HH:mm"),
-          endTime: returnDateTime.format("HH:mm"),
-        });
 
-        if (availability) {
-          // Directly use the boolean result
-          availableCars.push(car);
+      for (const car of filteredCars) {
+        const carLatitude = car.latitude;
+        const carLongitude = car.longitude;
+
+        const distance = this.haversineDistance(
+          latitude,
+          longitude,
+          carLatitude,
+          carLongitude
+        );
+
+        if (distance <= 30) {
+          availableCars.push({ car, distance });
         }
       }
 
-      //   if (availableCars.length === 0) {
-      //     throw new Error("No cars available for the selected dates and times.");
-      //   }
+      availableCars.sort((a, b) => a.distance - b.distance);
 
-      // Prepare response with available cars
-      const result = availableCars.map((car) => ({
+      const result = availableCars.map(({ car, distance }) => ({
         carId: car._id,
         carModel: car.modelName.model,
         price: car.rate,
@@ -384,8 +393,8 @@ class CarBookingService {
         door: car.numberOfDoors,
         modelYear: car.modelYear,
         transmission: car.transmission,
-        isCarVarified:car.isCarVarified
-
+        distance,
+        isCarVarified: car.isCarVarified,
       }));
 
       return result;

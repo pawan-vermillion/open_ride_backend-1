@@ -73,8 +73,6 @@ class CarBookingController {
 
   async bookCar(req, res) {
     try {
-      
-
       const {
         price,
         model,
@@ -86,15 +84,26 @@ class CarBookingController {
         fuelType,
         page,
         limit,
-        pickUpDate, pickUpTime, pickupLocation, returnDate, returnTime 
+        pickUpDate,
+        pickUpTime,
+        returnDate,
+        returnTime,
+        longitude,
+        latitude,
       } = req.query;
-
+  
+     
+      if (!longitude || !latitude) {
+        return res.status(400).json({ message: "Latitude and Longitude are required." });
+      }
+  
+    
       const result = await CarBookingService.searchCar({
         pickUpDate,
         pickUpTime,
-        pickupLocation,
         returnDate,
         returnTime,
+        latitude, longitude,
         filters: {
           price,
           model,
@@ -106,13 +115,15 @@ class CarBookingController {
           fuelType,
         },
         pagination: { page, limit },
+     
       });
-
+  
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+  
 
   async createPayment(req, res) {
     const { amount, bookingId, genratedPaymentId } = req.body;
