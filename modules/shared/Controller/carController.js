@@ -1,3 +1,7 @@
+const BodyStyle = require("../../admin/model/bodyStyle");
+const carCompany = require("../../admin/model/carCompany");
+const carModel = require("../../admin/model/carModel");
+const CarDetails = require("../../partner/model/car");
 const GetCarService = require("../Service/carService")
 
 class GetCarController {
@@ -39,6 +43,25 @@ class GetCarController {
             }
         }
     };
+    getAllCarDetailsForFilter = async (req, res) => {
+        try {
+          
+            const carCompanies = await carCompany.find({}, " carCompany");
+            const carModels = await carModel.find({}, " model");
+            const bodyStyles = await BodyStyle.find({}, " bodyStyle");
+    
+       
+            const response = {
+                carCompanies: carCompanies.map((company) => (company.carCompany)),
+                carModels: carModels.map((model) => (  model.model)),
+                bodyStyles: bodyStyles.map((style) => (style.bodyStyle))
+            };
+    
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Error fetching details:", error);
+            res.status(500).json({ error: "Failed to fetch details" });
+    }};
     
 }
 
