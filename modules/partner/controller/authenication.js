@@ -43,7 +43,7 @@ class PartnerController {
         }
     
         if (phoneNumber.toString().length !== 10) {
-          return res.status(400).json({ message: "PhoneNumber must be 10 digits" });
+          return res.status(404).json({ message: "PhoneNumber must be 10 digits" });
         }
     
         const token = await Partner.matchPasswordGenerateToken(phoneNumber, password);
@@ -56,7 +56,7 @@ class PartnerController {
           error.message ===
             "Invalid Access, Please check your password and PhoneNumber"
         ) {
-          return res.status(404).json({
+          return res.status(501).json({
             error: true,
             message: "Invalid Access, please check your password and phoneNumber",
           });
