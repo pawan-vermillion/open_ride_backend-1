@@ -73,8 +73,7 @@ class CarBookingController {
 
   async bookCar(req, res) {
     try {
-      const { pickUpDate, pickUpTime, pickupLocation, returnDate, returnTime } =
-        req.body;
+      
 
       const {
         price,
@@ -87,6 +86,7 @@ class CarBookingController {
         fuelType,
         page,
         limit,
+        pickUpDate, pickUpTime, pickupLocation, returnDate, returnTime 
       } = req.query;
 
       const result = await CarBookingService.searchCar({
