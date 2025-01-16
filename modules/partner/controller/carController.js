@@ -229,16 +229,16 @@ class CarController {
     }
   };
 
-  uploadCarImages = async (req, res) => {
+   uploadCarImages = async (req, res) => {
     const carId = req.params.id;
     const partnerId = req.user.id;
     const { imageType } = req.body;
-
+  
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
-
+  
     const validImageTypes = {
       exterior: "exteriorImage",
       interior: "interiorImage",
@@ -246,64 +246,61 @@ class CarController {
       logo: "logoImage",
       driver: "driverImage",
     };
-
+  
     if (!validImageTypes[imageType]) {
       return res.status(400).json({ message: "Invalid image type" });
     }
-
+  
     try {
- 
+     
       const images = req.files ? req.files[validImageTypes[imageType]] : [];
       if (!images || images.length === 0) {
-        return res
-          .status(400)
-          .json({ message: `No images provided for ${imageType}` });
+        return res.status(400).json({ message: `No images provided for ${imageType}` });
       }
+  
 
+      const uploadedImageUrls = await Promise.all(
+        images.map((file) => uploadToCloudinary(req, file.path, validImageTypes[imageType]))
+      );
+  
+    
       if (imageType === "rcBook") {
         if (images.length > 1) {
-          return res
-            .status(400)
-            .json({ message: "You can upload only 1 RC photo" });
+          return res.status(400).json({ message: "You can upload only 1 RC photo" });
         }
-
-        const uploadedImageUrl = images[0].path;
-
+  
+        const uploadedImageUrl = uploadedImageUrls[0];
+  
+  
         const updatedCar = await CarDetails.findOneAndUpdate(
           { _id: carId, partnerId },
           { $set: { rcPhoto: uploadedImageUrl } },
           { new: true }
         );
-
+  
         if (!updatedCar) {
-          return res
-            .status(404)
-            .json({ message: "Car not found or not owned by the partner" });
+          return res.status(404).json({ message: "Car not found or not owned by the partner" });
         }
-
+  
         return res.status(200).json({
           message: "RC photo updated successfully",
           updatedCar,
         });
       }
-
-      const uploadedImageUrls = images.map((file) => file.path);
-
+  
+     
       const carData = {};
       carData[`${imageType}Image`] = uploadedImageUrls;
-
-      const updatedCar = await CarService.addCarImages(
-        carId,
-        partnerId,
-        carData
-      );
-
+  
+      const updatedCar = await CarService.addCarImages(carId, partnerId, carData);
+  
       return res.status(200).json(updatedCar);
     } catch (error) {
       console.error("Error uploading car images:", error);
       return res.status(500).json({ message: error.message });
     }
   };
+  
 
   deleteCarImage = async (req, res) => {
     const { imageUrl } = req.query;

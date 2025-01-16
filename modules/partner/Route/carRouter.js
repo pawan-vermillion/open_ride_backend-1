@@ -32,7 +32,7 @@ router.get('/allCars', partnerAuthenication,CarController.getAllCars);
 router.get('/myCar',partnerAuthenication, CarController.getPartnerCar);
 router.get('/carId/:id', sharedAuthentication,CarController.getCarById);
 router.patch('/updateCar/:id',partnerAuthenication, CarController.updateCar);
-router.patch('/updateCarImages/:id',partnerAuthenication, uploadMultiple, CarController.uploadCarImages);
+router.patch('/updateCarImages/:id',partnerAuthenication, uploadMultiple,convertBufferToFiles, CarController.uploadCarImages);
 router.delete('/deleteCarImages/:id',partnerAuthenication, CarController.deleteCarImage);
 router.delete('/deleteCar/:id',partnerAuthenication, CarController.deleteCar);
 
