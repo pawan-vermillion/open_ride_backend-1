@@ -14,9 +14,11 @@ class WalletBalanceController {
             );
 
 
-            return res.status(201).json(walletHistoryData);
+            return res.status(200).json(walletHistoryData);
         } catch (error) {
-            next(error);
+            res.status(500).josn({
+                error: error.message
+            })
         }
     }
 }

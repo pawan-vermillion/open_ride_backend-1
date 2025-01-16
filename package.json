@@ -28,6 +28,7 @@
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.7",
     "razorpay": "^2.9.4",
-    "stripe": "^16.8.0"
+    "stripe": "^16.8.0",
+    "tmp": "^0.2.3"
   }
 }
