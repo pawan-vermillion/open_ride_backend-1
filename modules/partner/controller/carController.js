@@ -188,7 +188,7 @@ class CarController {
   updateCar = async (req, res) => {
     const carId = req.params.id;
     const errors = validationResult(req);
-    console.log(req.body)
+   
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
@@ -210,7 +210,9 @@ class CarController {
         unit: req.body.unit,
         description: req.body.description,
         address: req.body.address,
-        
+        latitude:req.body.latitude,
+        longitude:req.body.longitude,
+      
         rating: req.body.rating || 0,
         isCarVarified: req.body.isCarVarified || false,
         bodyStyle: req.body.bodyStyle,
