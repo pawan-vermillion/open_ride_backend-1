@@ -374,15 +374,15 @@ class CarBookingService {
       if (price) filteredCars = filteredCars.filter((car) => car.rate <= price);
       if (model)
         filteredCars = filteredCars.filter(
-          (car) => car.modelName.model === model
+          (car) => car?.modelName?.model === model
         );
       if (company)
         filteredCars = filteredCars.filter(
-          (car) => car.companyName.carCompany === company
+          (car) => car?.companyName?.carCompany === company
         );
       if (carType)
         filteredCars = filteredCars.filter(
-          (car) => car.bodyStyle.bodyStyle === carType
+          (car) => car?.bodyStyle?.bodyStyle === carType
         );
       if (seat)
         filteredCars = filteredCars.filter((car) => car.numberOfSeat == seat);
