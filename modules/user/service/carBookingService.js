@@ -494,8 +494,9 @@ class CarBookingService {
 
       let userAmount = subTotal - discount;
       const amountToDeduct = Math.min(walletBalance, userAmount);
-
+      let walletUsage ;
       if (walletBalance > 0) {
+        walletUsage = amountToDeduct;
         walletBalance -= amountToDeduct;
         userAmount -= amountToDeduct;
       }
@@ -546,24 +547,27 @@ class CarBookingService {
           totalCommisionTax: commisionAmmount + sgst + cgst,
           totalTax,
           bookingOtp,
+          
         },
         bookedDates,
         status: "pending",
         expiresAt: moment().add(30, "minutes").toDate(),
       };
 
+     
+
 
 
       const booking = new CarBooking(bookingData);
       const populatedCarDetails = await Car.findById(carId).populate([
         { path: "companyName", select: "carCompany" }, // Adjust the fields you want to populate
-        { path: "modelName", select: "CarModel" },
+        { path: "modelName", select: "model" },
         { path: "bodyStyle", select: "bodyStyle" },
         { path: "subModel", select: "subModel" },
       ]);
       const populatedCar = { carId: carId,
         carCompany: populatedCarDetails?.companyName?.carCompany, // Example field
-        carModel: populatedCarDetails?.modelName?.model,
+        carModel: populatedCarDetails?.modelName?.model || "",
         bodyStyle: populatedCarDetails?.bodyStyle?.bodyStyle,
         carSubModel: populatedCarDetails?.subModel?.subModel,
         modelYear: populatedCarDetails?.modelYear,
@@ -574,10 +578,11 @@ class CarBookingService {
         fuelType: populatedCarDetails?.fuelType,
         price: populatedCarDetails?.rate,
         transmission: populatedCarDetails?.transmission,
+        walletUsage: walletUsage || 0,
       
       }
 
-      console.log(populatedCar)
+      
     
       await booking.save();
 

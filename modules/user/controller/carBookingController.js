@@ -98,11 +98,12 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
     }
 
     const orderOptions = {
-      amount: amount * 100,
+      amount: Math.round(amount * 100),
       currency: "INR",
       receipt: `${genratedPaymentId}`,
       payment_capture: 1,
     };
+  
 
     const order = await new Promise((resolve, reject) => {
       RazorpayInstance.orders.create(orderOptions, (err, order) => {
