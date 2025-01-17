@@ -165,9 +165,10 @@ class CarBookingController {
         data,
       });
   
-      const payment = await createPayment(bookingSummary?.booking?.summary?.userAmmount,bookingSummary?.booking._id,bookingSummary?.booking.genratedBookingId)
+      const payment = await createPayment(bookingSummary?.booking?.summary?.userAmmount,bookingSummary?.booking._id,bookingSummary?.booking.genratedBookingId);
+      const bookingId = bookingSummary?.booking._id;
       
-      res.status(201).json({ message: "success", bookingSummary ,payment});
+      res.status(201).json({ message: "success", bookingSummary ,payment,bookingId});
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
