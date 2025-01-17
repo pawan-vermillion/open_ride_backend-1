@@ -57,7 +57,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
         walletBalance -= amountToDeduct;
         userAmount -= amountToDeduct;
 
-        await User.findByIdAndUpdate(userId, { walletBalance });
+        // await User.findByIdAndUpdate(userId, { walletBalance });
 
         const userWalletHistory = new WalletBalance({
           partnerId: booking.partnerId,
@@ -67,7 +67,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
           paymentId: booking.genratedBookingId,
           amount: amountToDeduct,
         });
-        await userWalletHistory.save();
+        // await userWalletHistory.save();
       }
 
       const remainingAmountForPartner = totalAmount;
@@ -88,8 +88,8 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
         bookingId: booking._id,
       });
 
-      await partnerWalletHistory.save();
-      await partner.save();
+      // await partnerWalletHistory.save();
+      // await partner.save();
 
       return {
         success: true,
