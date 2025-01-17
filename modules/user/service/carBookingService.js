@@ -249,12 +249,15 @@ class CarBookingService {
       const endDateTime = new Date(`${endDate}T${endTime}:00`);
 
       const bookings = await CarBooking.find({ carId }).select(
-        "pickUpData returnData isCancel"
+        "pickUpData returnData isCancel status"
       );
       const offlineBookings = await OfflineBooking.find({ carId });
-
+   
       const bookedRanges = bookings
-        .filter((booking) => !booking.isCancel)
+      .filter((booking) => {
+    
+        return !booking.isCancel && booking.status !== "pending";
+      })
         .map((booking) => ({
           start: new Date(
             `${booking.pickUpData.pickUpDate}T${booking.pickUpData.pickUpTime}`
@@ -302,7 +305,6 @@ class CarBookingService {
   async searchCar({
     pickUpDate,
     pickUpTime,
-
     returnDate,
     returnTime,
     filters,
@@ -322,43 +324,30 @@ class CarBookingService {
         transmission,
         fuelType,
       } = filters || {};
-
+  
       const page = pagination?.page || 1;
       const limit = pagination?.limit || 10;
-
-      const pickUpDateTime = moment(
-        `${pickUpDate} ${pickUpTime}`,
-        "YYYY-MM-DD HH:mm"
-      );
-      const returnDateTime = moment(
-        `${returnDate} ${returnTime}`,
-        "YYYY-MM-DD HH:mm"
-      );
-
-      if (
-        !pickUpDate ||
-        !pickUpTime ||
-        !returnDate ||
-        !returnTime ||
-        !latitude ||
-        !longitude
-      ) {
+  
+      const pickUpDateTime = moment(`${pickUpDate} ${pickUpTime}`, "YYYY-MM-DD HH:mm");
+      const returnDateTime = moment(`${returnDate} ${returnTime}`, "YYYY-MM-DD HH:mm");
+  
+      if (!pickUpDate || !pickUpTime || !returnDate || !returnTime || !latitude || !longitude) {
         throw new Error("All mandatory fields must be provided.");
       }
-
+  
       if (pickUpDateTime.isBefore(moment(), "minute")) {
         throw new Error("Pick-up date and time cannot be in the past.");
       }
-
+  
       if (returnDateTime.isBefore(pickUpDateTime)) {
         throw new Error("Return date cannot be before pick-up date.");
       }
-
+  
       let query = {
         isCarVarified: true,
         isDelete: false,
       };
-
+  
       const carsQuery = CarDetails.find(query)
         .populate("companyName", "carCompany logoImage")
         .populate("modelName", "model")
@@ -366,75 +355,69 @@ class CarBookingService {
         .populate("bodyStyle", "bodyStyle")
         .skip((page - 1) * limit)
         .limit(Number(limit));
-
-      const cars = await carsQuery;
-
-      let filteredCars = cars;
-
-      if (price) filteredCars = filteredCars.filter((car) => car.rate <= price);
-      if (model)
-        filteredCars = filteredCars.filter(
-          (car) => car?.modelName?.model === model
-        );
-      if (company)
-        filteredCars = filteredCars.filter(
-          (car) => car?.companyName?.carCompany === company
-        );
-      if (carType)
-        filteredCars = filteredCars.filter(
-          (car) => car?.bodyStyle?.bodyStyle === carType
-        );
-      if (seat)
-        filteredCars = filteredCars.filter((car) => car.numberOfSeat == seat);
-      if (door)
-        filteredCars = filteredCars.filter((car) => car.numberOfDoors == door);
-      if (modelYear)
-        filteredCars = filteredCars.filter(
-          (car) => car.modelYear === modelYear
-        );
-      if (transmission)
-        filteredCars = filteredCars.filter(
-          (car) => car.transmission === transmission
-        );
-      if (fuelType)
-        filteredCars = filteredCars.filter((car) => car.fuelType === fuelType);
-
-      const availableCars = [];
-
-      const pickUpMoment = moment(`${pickUpDate} ${pickUpTime}`, "YYYY-MM-DD HH:mm");
-      const returnMoment = moment(`${returnDate} ${returnTime}`, "YYYY-MM-DD HH:mm");
   
-      // Check availability for the filtered cars
+      const cars = await carsQuery;
+  
+      const availableCars = [];
+  
+   
       for (const car of cars) {
         const availability = await this.checkAvailabilityForRange({
           carId: car._id,
-          startDate: pickUpMoment.format("YYYY-MM-DD"),
-          endDate: returnMoment.format("YYYY-MM-DD"),
-          startTime: pickUpMoment.format("HH:mm"),
-          endTime: returnMoment.format("HH:mm"),
+          startDate: pickUpDateTime.format("YYYY-MM-DD"),
+          endDate: returnDateTime.format("YYYY-MM-DD"),
+          startTime: pickUpDateTime.format("HH:mm"),
+          endTime: returnDateTime.format("HH:mm"),
         });
   
         if (availability) {
           const carLatitude = car.latitude;
           const carLongitude = car.longitude;
   
-          const distance = this.haversineDistance(
-            latitude,
-            longitude,
-            carLatitude,
-            carLongitude
-          );
+          const distance = this.haversineDistance(latitude, longitude, carLatitude, carLongitude);
   
+   
           if (distance <= 30) {
             availableCars.push({ car, distance });
           }
         }
       }
   
-      // Sort by distance
-      availableCars.sort((a, b) => a.distance - b.distance);
-
-      const result = availableCars.map(({ car, distance }) => ({
+     
+      let filteredCars = availableCars;
+  
+      if (price) filteredCars = filteredCars.filter((car) => car.car.rate <= price);
+      if (model)
+        filteredCars = filteredCars.filter(
+          (car) => car?.car?.modelName?.model === model
+        );
+      if (company)
+        filteredCars = filteredCars.filter(
+          (car) => car?.car?.companyName?.carCompany === company
+        );
+      if (carType)
+        filteredCars = filteredCars.filter(
+          (car) => car?.car?.bodyStyle?.bodyStyle === carType
+        );
+      if (seat)
+        filteredCars = filteredCars.filter((car) => car.car.numberOfSeat == seat);
+      if (door)
+        filteredCars = filteredCars.filter((car) => car.car.numberOfDoors == door);
+      if (modelYear)
+        filteredCars = filteredCars.filter(
+          (car) => car.car.modelYear === modelYear
+        );
+      if (transmission)
+        filteredCars = filteredCars.filter(
+          (car) => car.car.transmission === transmission
+        );
+      if (fuelType)
+        filteredCars = filteredCars.filter((car) => car.car.fuelType === fuelType);
+  
+   
+      filteredCars.sort((a, b) => a.distance - b.distance);
+  
+      const result = filteredCars.map(({ car, distance }) => ({
         carId: car._id,
         carModel: car.modelName.model,
         price: car.rate,
@@ -451,12 +434,13 @@ class CarBookingService {
         distance,
         isCarVarified: car.isCarVarified,
       }));
-
+  
       return result;
     } catch (error) {
       throw new Error(error.message);
     }
   }
+  
 
   getBookingSummary = async ({ userId, carId, data }) => {
     try {
