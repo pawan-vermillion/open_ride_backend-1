@@ -91,10 +91,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
       // await partnerWalletHistory.save();
       // await partner.save();
 
-      return {
-        success: true,
-        message: "Payment handled directly. Booking updated successfully.",
-      };
+      return ""
     }
 
     const orderOptions = {
@@ -118,7 +115,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
       checkBooking.paymentDetails.reciptNumber = genratedPaymentId;
       await checkBooking.save();
       console.log("Razorpay order created:", order);
-      return order.id
+     c
     
     
   } catch (error) {
