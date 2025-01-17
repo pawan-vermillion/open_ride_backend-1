@@ -151,9 +151,9 @@ const carBooking = new mongoose.Schema({
       },
       status: {
         type: String,
-        enum: ["pending", "confirmed", "complete", "cancelled"],
+        enum: ["onProcess", "pending", "confirmed", "complete", "cancelled"],
         required: true,
-        default: "pending",
+        default: "onProcess",
       },
       isCancel: {
         type: Boolean,

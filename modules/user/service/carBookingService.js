@@ -401,22 +401,37 @@ class CarBookingService {
 
       const availableCars = [];
 
-      for (const car of filteredCars) {
-        const carLatitude = car.latitude;
-        const carLongitude = car.longitude;
-
-        const distance = this.haversineDistance(
-          latitude,
-          longitude,
-          carLatitude,
-          carLongitude
-        );
-
-        if (distance <= 30) {
-          availableCars.push({ car, distance });
+      const pickUpMoment = moment(`${pickUpDate} ${pickUpTime}`, "YYYY-MM-DD HH:mm");
+      const returnMoment = moment(`${returnDate} ${returnTime}`, "YYYY-MM-DD HH:mm");
+  
+      // Check availability for the filtered cars
+      for (const car of cars) {
+        const availability = await this.checkAvailabilityForRange({
+          carId: car._id,
+          startDate: pickUpMoment.format("YYYY-MM-DD"),
+          endDate: returnMoment.format("YYYY-MM-DD"),
+          startTime: pickUpMoment.format("HH:mm"),
+          endTime: returnMoment.format("HH:mm"),
+        });
+  
+        if (availability) {
+          const carLatitude = car.latitude;
+          const carLongitude = car.longitude;
+  
+          const distance = this.haversineDistance(
+            latitude,
+            longitude,
+            carLatitude,
+            carLongitude
+          );
+  
+          if (distance <= 30) {
+            availableCars.push({ car, distance });
+          }
         }
       }
-
+  
+      // Sort by distance
       availableCars.sort((a, b) => a.distance - b.distance);
 
       const result = availableCars.map(({ car, distance }) => ({
