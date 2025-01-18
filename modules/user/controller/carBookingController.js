@@ -52,7 +52,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
       );
 
       const amountToDeduct = Math.min(walletBalance, userAmount);
-
+ 
       if (amountToDeduct > 0) {
         walletBalance -= amountToDeduct;
         userAmount -= amountToDeduct;
@@ -113,10 +113,11 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
     });
 
       checkBooking.paymentDetails.reciptNumber = genratedPaymentId;
+      checkBooking.status = "pending";
+   
       await checkBooking.save();
       console.log("Razorpay order created:", order);
-     c
-    
+      
     
   } catch (error) {
     console.error(error);

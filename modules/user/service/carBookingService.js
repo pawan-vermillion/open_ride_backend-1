@@ -257,7 +257,7 @@ class CarBookingService {
       const bookedRanges = bookings
       .filter((booking) => {
     
-        return !booking.isCancel && booking.status !== "pending";
+        return !booking.isCancel && booking.status !== "unPaid";
       })
         .map((booking) => ({
           start: new Date(
@@ -557,7 +557,7 @@ class CarBookingService {
           
         },
         bookedDates,
-        status: "pending",
+        status: "unPaid",
         expiresAt: moment().add(30, "minutes").toDate(),
       };
 
