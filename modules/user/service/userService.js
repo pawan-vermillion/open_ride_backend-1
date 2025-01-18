@@ -2,6 +2,7 @@ const User = require("../model/user")
 const bcrypt = require("bcrypt")
 const { generateToken } = require("../../shared/Service/authenication")
 const cloudinary = require("../../shared/config/cloudinary")
+const walletBalance = require("./walletBalance")
 
 
 class UserService {
@@ -46,7 +47,12 @@ class UserService {
                 error.statusCode = 404;
                 throw error;
             }
-            return user;
+
+            const roundUser = {
+                ...user._doc,
+                walletBalance:Math.round(user.walletBalance)
+            }
+            return roundUser;
         } catch (error) {
             throw error;
         }

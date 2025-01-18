@@ -135,5 +135,16 @@ CarDetailsSchema.statics.calculateAverageRating = async function (carId) {
     await this.findByIdAndUpdate(carId, { rating: averageRating });
 };
 
+CarDetailsSchema.virtual("averageRating").get(async function () {
+    const reviews = await mongoose.model("CarReview").find({ carId: this._id });
+    if (reviews.length === 0) return 0;
+    const avgRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+    return avgRating.toFixed(1); 
+  });
+  
+
+  CarDetailsSchema.set("toJSON", { virtuals: true });
+  CarDetailsSchema.set("toObject", { virtuals: true });
+
   const CarDetails = mongoose.model("Car", CarDetailsSchema);
   module.exports = CarDetails;

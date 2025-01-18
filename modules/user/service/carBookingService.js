@@ -11,6 +11,7 @@ const { type } = require("os");
 const WalletBalance = require("../model/walletBalance");
 const razorpay = require("razorpay");
 const carCompany = require("../../admin/model/carCompany");
+const { default: mongoose } = require("mongoose");
 const RazorpayInstance = new razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -378,7 +379,13 @@ class CarBookingService {
   
    
           if (distance <= 30) {
-            availableCars.push({ car, distance });
+          
+            const reviews = await mongoose.model("CarReview").find({ carId: car._id });
+            const averageRating = reviews.length
+              ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+              : 0;
+  
+            availableCars.push({ car, distance, averageRating });
           }
         }
       }

@@ -54,7 +54,13 @@ class PartnerService {
                 throw error;
             }
 
-            return partners
+            const roundedPartner = {
+                ...partners._doc,
+                walletBalance: Math.round(partners.walletBalance),
+                useableWalletBalance: Math.round(partners.useableWalletBalance )
+            };
+    
+            return roundedPartner;
             
         } catch (error) {
             throw error;
