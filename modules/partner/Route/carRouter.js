@@ -28,7 +28,7 @@ router.post("/api/car",
 );
 // Define routes for car operations
 router.post('/addCar',partnerAuthenication,uploadMultiple,convertBufferToFiles ,  CarValidationRules(), carValidation, CarController.createCar);
-router.get('/allCars', partnerAuthenication,CarController.getAllCars);
+// router.get('/allCars', partnerAuthenication,CarController.getAllCars);
 router.get('/myCar',partnerAuthenication, CarController.getPartnerCar);
 router.get('/carId/:id', sharedAuthentication,CarController.getCarById);
 router.patch('/updateCar/:id',partnerAuthenication, CarController.updateCar);

@@ -7,7 +7,7 @@ class AdminCarService {
       const pageSize = parseInt(limit) || 10;
       const currentPage = parseInt(page) || 1;
       const skip = (currentPage - 1) * pageSize;
-
+  
       const searchQuery = search
         ? {
             $and: [
@@ -18,11 +18,15 @@ class AdminCarService {
                   { modelName: { $regex: search, $options: "i" } },
                 ],
               },
-              { isDelete: false }, 
+              { isDelete: false },
             ],
           }
         : { isDelete: false };
-
+  
+      // Get the total count of cars matching the search query (for pagination)
+      const totalCount = await CarDetails.countDocuments(searchQuery);
+  
+      // Get the cars data with pagination
       const cars = await CarDetails.find(searchQuery)
         .select(
           "_id companyName modelName subModel modelYear bodyStyle isCarVarified rating numberOfSeat fuelType exteriorImage transmission ownerFullName isDelete"
@@ -33,7 +37,7 @@ class AdminCarService {
         .populate("bodyStyle", "bodyStyle -_id")
         .skip(skip)
         .limit(pageSize);
-
+  
       const formattedCars = cars.map((car) => ({
         carId: car._id,
         carCompany: car.companyName?.carCompany || "",
@@ -51,13 +55,23 @@ class AdminCarService {
         companyLogo: car?.companyName?.logoImage || "",
         isDelete: car.isDelete,
       }));
-
-      return formattedCars;
+  
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCount / pageSize);
+  
+      return {
+        currentPage,
+        totalPages,
+        totalCount,
+        pageSize,
+        cars: formattedCars,
+      };
     } catch (error) {
       console.error(error);
       throw new Error("Error occurred while fetching car data.");
     }
   }
+  
 
 
   async getAllCarsServicePartner({ search, page, limit, partnerId }) {
