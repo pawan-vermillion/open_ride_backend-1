@@ -8,12 +8,12 @@ class WithdrawRequestService {
   
     try {
       let matchStage = {};
-      if (filter === "approved") {
-        matchStage.status = "approved";
-      } else if (filter === "rejected") {
-        matchStage.status = "rejected";
-      } else if (filter === "pending") {
-        matchStage.status = "pending";
+      if (filter === "Approved") {
+        matchStage.status = "Approved";
+      } else if (filter === "Rejected") {
+        matchStage.status = "Rejected";
+      } else if (filter === "Pending") {
+        matchStage.status = "Pending";
       }
   
       const pageSize = parseInt(limit) || 10;
