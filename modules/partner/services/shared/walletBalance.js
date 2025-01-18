@@ -14,35 +14,39 @@ class WalletBalanceService {
     
           
             const walletHistoryData = await WalletHistory.find({ partnerId })
+                .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(pageSize)
-                .sort({ createdAt: -1 }); 
+                .limit(pageSize);
     
+          
             const withdrawRequestData = await WithdrawRequest.find({ partnerId })
+                .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(pageSize)
-                .sort({ createdAt: -1 });
+                .limit(pageSize);
     
+       
             const combinedData = [...walletHistoryData, ...withdrawRequestData];
     
-
+           
             combinedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
-    
+          
             const formattedData = combinedData.map(item => ({
-                ...item._doc, 
+                ...item._doc,
                 createdAt: new Date(item.createdAt).toISOString().split('T')[0],
-                updatedAt: new Date(item.updatedAt).toISOString().split('T')[0], 
+                updatedAt: new Date(item.updatedAt).toISOString().split('T')[0],
             }));
     
+            
             const total = await WalletHistory.countDocuments({ partnerId }) + await WithdrawRequest.countDocuments({ partnerId });
     
-            return formattedData;
-           
+            return { data: formattedData, total };
         } catch (error) {
+            console.error(`Error fetching wallet history: ${error.message}`);
             throw error;
         }
     }
+    
     
     
     async applyWithdrawRequest({ partnerId, amount }) {

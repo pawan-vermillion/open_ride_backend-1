@@ -7,28 +7,30 @@ class WalletBalanceService {
             const pageSize = parseInt(limit) || 10;
             const currentPage = parseInt(page) || 1;
             const skip = (currentPage - 1) * pageSize;
-
+    
 
             const total = await WalletBalance.countDocuments({ userId: new mongoose.Types.ObjectId(userId) });
-
-
+    
+           
             const walletHistoryData = await WalletBalance.find({ userId: new mongoose.Types.ObjectId(userId) })
+                .sort({ createdAt: -1 }) 
                 .skip(skip)
                 .limit(pageSize);
-
-
-                const formattedData = walletHistoryData.map(item => ({
-                    ...item._doc, 
-                    createdAt: new Date(item.createdAt).toISOString().split('T')[0],
-                    updatedAt: new Date(item.updatedAt).toISOString().split('T')[0],
-                }));
-        
-                return formattedData;
+    
+            // Format the data
+            const formattedData = walletHistoryData.map(item => ({
+                ...item._doc,
+                createdAt: new Date(item.createdAt).toISOString().split('T')[0],
+                updatedAt: new Date(item.updatedAt).toISOString().split('T')[0],
+            }));
+    
+            return formattedData;
         } catch (error) {
             console.error(`Error fetching wallet history: ${error.message}`);
             throw error;
         }
     }
+    
 }
 
 module.exports = new WalletBalanceService();
