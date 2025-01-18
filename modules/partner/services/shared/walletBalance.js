@@ -40,7 +40,7 @@ class WalletBalanceService {
             
             const total = await WalletHistory.countDocuments({ partnerId }) + await WithdrawRequest.countDocuments({ partnerId });
     
-            return { data: formattedData, total };
+            return  formattedData;
         } catch (error) {
             console.error(`Error fetching wallet history: ${error.message}`);
             throw error;
@@ -56,9 +56,9 @@ class WalletBalanceService {
             session.startTransaction();
     
            
-            const existingRequest = await WithdrawRequest.findOne({
+            const existingRequest = await walletHistory.findOne({
                 partnerId,
-                status: "pending",
+                status: "Pending",
             }).session(session);
     
             if (existingRequest) {
@@ -114,7 +114,7 @@ class WalletBalanceService {
           const total = await WithdrawRequest.countDocuments({ partnerId });
       
 
-          const withdrawRequests = await WithdrawRequest.find({ partnerId })
+          const withdrawRequests = await walletHistory.find({ partnerId })
             .skip(skip)
             .limit(limit)
             .exec();
@@ -126,6 +126,7 @@ class WalletBalanceService {
             withdrawRequests
           };
         } catch (error) {
+            console.log(error)
           throw error;
         }
       }

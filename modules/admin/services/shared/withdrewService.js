@@ -34,8 +34,9 @@ class WithdrawRequestService {
         {
           $addFields: {
             availableWalletBalance: {
-              $add: ['$partnerInfo.walletBalance', '$amount']
-            }
+              $toInt: { $add: ['$partnerInfo.walletBalance', '$amount'] }
+            },
+            amount: { $toInt: '$amount' }
           }
         },
         {
@@ -65,8 +66,8 @@ class WithdrawRequestService {
       ];
   
       const [totalCountResult, requests] = await Promise.all([
-        WithdrawRequest.aggregate(countPipeline),
-        WithdrawRequest.aggregate(pipeline)
+        walletHistory.aggregate(countPipeline),
+        walletHistory.aggregate(pipeline)
       ]);
   
       const totalCount = totalCountResult.length > 0 ? totalCountResult[0].totalCount : 0;

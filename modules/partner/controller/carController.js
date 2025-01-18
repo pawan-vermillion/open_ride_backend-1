@@ -62,7 +62,8 @@ class CarController {
         interiorImage: interiorImageUrls,
         rcPhoto: rcPhotoUrl,
         address: req.body.address,
-        
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
         rating: req.body.rating || 0,
         isCarVarified: req.body.isCarVarified || false,
         bodyStyle: req.body.bodyStyle,
