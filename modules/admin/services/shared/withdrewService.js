@@ -13,7 +13,7 @@ class WithdrawRequestService {
       } else if (filter === "Rejected") {
         matchStage.status = "Rejected";
       } else if (filter === "Pending") {
-        matchStage.status = "Pending";
+        matchStage.status = "Pending"; 
       }
   
       const pageSize = parseInt(limit) || 10;
