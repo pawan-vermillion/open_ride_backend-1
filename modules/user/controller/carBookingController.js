@@ -121,10 +121,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
     
   } catch (error) {
     console.error(error);
-    return {
-      success: false,
-      message: "error in creating razor pay order",
-    };
+    return "error in creating razor pay order"
   }
 }
 
