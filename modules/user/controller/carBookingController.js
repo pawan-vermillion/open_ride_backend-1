@@ -31,7 +31,7 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
         throw new Error("Partner not found"); 
       }
 
-      booking.status = "pending";
+      booking.status = "unPaid";
       booking.paymentDetails.isPaymentVerified = true;
       booking.paymentDetails.paymentId = genratedPaymentId; // Use the provided generated payment ID
       booking.paymentDetails.orderId = genratedPaymentId; // Use the same ID for consistency
