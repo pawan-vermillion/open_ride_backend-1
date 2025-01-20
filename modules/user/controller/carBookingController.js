@@ -113,11 +113,11 @@ const createPayment = async (amount, bookingId, genratedPaymentId)=> {
     });
 
       checkBooking.paymentDetails.reciptNumber = genratedPaymentId;
-      checkBooking.status = "pending";
+      checkBooking.status = "unPaid";
    
       await checkBooking.save();
       console.log("Razorpay order created:", order);
-      
+      return order.id;
     
   } catch (error) {
     console.error(error);
@@ -162,7 +162,7 @@ class CarBookingController {
   
       const payment = await createPayment(bookingSummary?.booking?.summary?.userAmmount,bookingSummary?.booking._id,bookingSummary?.booking.genratedBookingId);
       const bookingId = bookingSummary?.booking._id;
-      
+      console.log(payment)
       res.status(201).json({ message: "success", bookingSummary ,payment,bookingId});
     } catch (error) {
       console.log(error);
