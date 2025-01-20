@@ -8,9 +8,9 @@
     <script>
         async function initiatePayment() {
             // Hardcoded values for testing
-            const amount = 6000 ;  // Amount in INR (310.00 INR)
-            const bookingId = "678e0ec839ce363a8132b8c9";
-            const genratedPaymentId = "307322";
+            const amount = 10800 ;  // Amount in INR (310.00 INR)
+            const bookingId = "678e29abe8c26191b65b9747";
+            const genratedPaymentId = "193349";
 
             const response = await fetch("http://localhost:3002/api/user/booking/createPayment", {
                 method: "POST",
