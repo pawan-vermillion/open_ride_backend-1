@@ -193,6 +193,14 @@ class CarController {
     if (!errors.isEmpty()) {
       return res.status(422).json({ message: errors.array()[0].msg });
     }
+    const checkcar = await CarDetails.findById(carId)
+    let carVerifired;
+    if(!req.body.isCarVarified){
+      if(checkcar.isCarVarified){
+        carVerifired= true
+      }
+    }
+    
 
     try {
       const carData = {
@@ -215,7 +223,7 @@ class CarController {
         longitude:req.body.longitude,
       
         rating: req.body.rating || 0,
-        isCarVarified: req.body.isCarVarified || false,
+        isCarVarified: carVerifired || false,
         bodyStyle: req.body.bodyStyle,
         subModel: req.body.subModel,
         modelYear: req.body.modelYear,

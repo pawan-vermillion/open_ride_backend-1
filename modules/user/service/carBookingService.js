@@ -548,7 +548,7 @@ class CarBookingService {
           cgst,
           commisionAmmount,
           partnerAmmount,
-          userAmmount: userAmount,
+          userAmmount: Math.round(userAmount),
           walletBalance,
           orderId,
           totalCommisionTax: commisionAmmount + sgst + cgst,
