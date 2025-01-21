@@ -164,19 +164,31 @@ class CarBookingService {
         let walletBalance = parseFloat(
           (await User.findById(booking.userId))?.walletBalance || 0
         );
+        console.log("this is wallet balance avalable ", walletBalance);
         const amountToDeduct = Math.min(walletBalance, userAmount);
-        const userWalletHistory = new WalletBalance({
-          partnerId: booking.partnerId,
-          userId: booking.userId,
-          bookingId: booking._id,
-          transactionType: "Debit",
-          paymentId: booking.genratedBookingId,
-          amount: amountToDeduct,
-        });
-        await userWalletHistory.save();
-        walletBalance -= amountToDeduct;
-        await User.findByIdAndUpdate(booking.userId, { walletBalance });
+       
 
+
+          const userWalletHistory = new WalletBalance({
+            partnerId: booking.partnerId,
+            userId: booking.userId,
+            bookingId: booking._id,
+            transactionType: "Debit",
+            paymentId: booking.genratedBookingId,
+            amount: booking.walletUsages,
+          });
+          await userWalletHistory.save();
+        
+        
+    
+      
+
+     
+       
+        const finduser = await User.findById(booking.userId);
+        finduser.walletBalance -= booking.walletUsages;
+        await finduser.save();
+        console.log(finduser)
         return {
           success: true,
           message: "Payment directly verified and booking updated successfully.",
@@ -573,6 +585,7 @@ class CarBookingService {
           
         },
         bookedDates,
+        walletUsages:walletUsage,
         status: "unPaid",
         expiresAt: moment().add(30, "minutes").toDate(),
       };
