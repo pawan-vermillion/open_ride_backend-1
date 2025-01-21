@@ -130,7 +130,7 @@ class CarBookingService {
     
       
       if (userAmount <= 0) {
-        booking.status = "unPaid";
+        booking.status = "pending";
         booking.paymentDetails.isPaymentVerified = true;
         booking.paymentDetails.paymentId = paymentId || `direct-${Date.now()}`;
         booking.paymentDetails.orderId = orderId || `direct-${Date.now()}`;
@@ -193,7 +193,7 @@ class CarBookingService {
         throw new Error("Payment verification failed");
       }
   
-      booking.status = "unPaid";
+      booking.status = "pending";
       booking.paymentDetails.isPaymentVerified = true;
       booking.paymentDetails.paymentId = paymentId;
       booking.paymentDetails.orderId = orderId;
