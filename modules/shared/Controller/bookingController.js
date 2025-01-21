@@ -240,6 +240,36 @@ class BookingController {
           { $inc: { useableWalletBalance: updateAmountStatus.amount } },
           { new: true }
         );
+        const booking = await CarBooking.findById({ _id: bookingId });
+        const totalAmount =
+          booking.summary.subTotal -
+          booking.summary.discount -
+          booking.summary.commisionAmmount -
+          booking.summary.totalTax;
+        
+        const partner = await Partner.findById(booking.partnerId);
+        if (!partner) {
+          throw new Error("Partner not found");
+        }
+      
+        partner.walletBalance =
+          (parseFloat(partner.walletBalance) || 0) + totalAmount;
+  
+        const partnerWalletHistory = new walletHistory({
+          partnerId: booking.partnerId,
+          userId: booking.userId,
+          bookingId: booking._id,
+          transactionType: "Credit",
+          genratedBookingId: booking.genratedBookingId,
+          UiType: "Wallet",
+          status: "Confirmed",
+          isWithdrewble: true,
+          amount: totalAmount,
+        });
+  
+        await partnerWalletHistory.save();
+        await partner.save();
+
 
         if (updatedBooking.nModified === 0) {
           return res

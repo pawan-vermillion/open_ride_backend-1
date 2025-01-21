@@ -136,30 +136,41 @@ class CarBookingService {
         booking.paymentDetails.orderId = orderId || `direct-${Date.now()}`;
         await booking.save();
   
-        const totalAmount =
-          booking.summary.subTotal -
-          booking.summary.discount -
-          booking.summary.commisionAmmount -
-          booking.summary.totalTax;
+        // const totalAmount =
+        //   booking.summary.subTotal -
+        //   booking.summary.discount -
+        //   booking.summary.commisionAmmount -
+        //   booking.summary.totalTax;
   
       
-        partner.walletBalance =
-          (parseFloat(partner.walletBalance) || 0) + totalAmount;
+        // partner.walletBalance =
+        //   (parseFloat(partner.walletBalance) || 0) + totalAmount;
   
-        const partnerWalletHistory = new walletHistory({
+        // const partnerWalletHistory = new walletHistory({
+        //   partnerId: booking.partnerId,
+        //   userId: booking.userId,
+        //   bookingId: booking._id,
+        //   transactionType: "Credit",
+        //   genratedBookingId: booking.genratedBookingId,
+        //   UiType: "Wallet",
+        //   status: "Confirmed",
+        //   isWithdrewble: false,
+        //   amount: totalAmount,
+        // });
+  
+        // await partnerWalletHistory.save();
+        // await partner.save();
+
+
+        const userWalletHistory = new WalletBalance({
           partnerId: booking.partnerId,
           userId: booking.userId,
           bookingId: booking._id,
-          transactionType: "Credit",
-          genratedBookingId: booking.genratedBookingId,
-          UiType: "Wallet",
-          status: "Confirmed",
-          isWithdrewble: false,
-          amount: totalAmount,
+          transactionType: "Debit",
+          paymentId: booking.genratedBookingId,
+          amount: amountToDeduct,
         });
-  
-        await partnerWalletHistory.save();
-        await partner.save();
+        await userWalletHistory.save();
   
         return {
           success: true,
@@ -212,23 +223,23 @@ class CarBookingService {
         await userWalletHistory.save();
       }
   
-      partner.walletBalance =
-        (parseFloat(partner.walletBalance) || 0) + totalAmount;
+      // partner.walletBalance =
+      //   (parseFloat(partner.walletBalance) || 0) + totalAmount;
   
-      const partnerWalletHistory = new walletHistory({
-        partnerId: booking.partnerId,
-        userId: booking.userId,
-        bookingId: booking._id,
-        transactionType: "Credit",
-        genratedBookingId: booking.genratedBookingId,
-        UiType: "Wallet",
-        status: "Confirmed",
-        isWithdrewble: false,
-        amount: totalAmount,
-      });
+      // const partnerWalletHistory = new walletHistory({
+      //   partnerId: booking.partnerId,
+      //   userId: booking.userId,
+      //   bookingId: booking._id,
+      //   transactionType: "Credit",
+      //   genratedBookingId: booking.genratedBookingId,
+      //   UiType: "Wallet",
+      //   status: "Confirmed",
+      //   isWithdrewble: false,
+      //   amount: totalAmount,
+      // });
   
-      await partnerWalletHistory.save();
-      await partner.save();
+      // await partnerWalletHistory.save();
+      // await partner.save();
   
       return booking;
     } catch (error) {

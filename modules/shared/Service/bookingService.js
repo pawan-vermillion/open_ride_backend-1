@@ -3,7 +3,8 @@ const User = require("../../user/model/user");
 const Partner = require("../../partner/model/partner");
 const WalletHistory = require("../../user/model/walletBalance");
 const moment = require("moment");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const WalletBalance = require("../../user/model/walletBalance");
 
 class BookingService {
   canCancelBooking = async (booking) => {
@@ -39,15 +40,15 @@ class BookingService {
       if (!user) {
         return { error: "User not found", statusCode: 404 };
       }
-
+      const netAmount = booking.summary.subTotal - booking.summary.discount;
       // Update wallet balance with the refund amount
-      user.walletBalance += booking.summary.partnerAmmount;
+      user.walletBalance += netAmount;
       await user.save();
 
       const transactionType = "Credit";
 
       try {
-        const walletHistoryEntry = new WalletHistory({
+        const walletHistoryEntry = new WalletBalance({
           userId: booking.userId,
           partnerId: booking.partnerId,
           transactionType,
@@ -170,6 +171,7 @@ class BookingService {
         );
     
         const totalPages = Math.ceil(totalDocuments / limit);
+
     
         return {
           totalDocuments,
