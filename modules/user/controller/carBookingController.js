@@ -173,7 +173,7 @@ class CarBookingController {
   async verifyPayment(req, res) {
     try {
       const { orderId, paymentId, signature, bookingId } = req.body;
-      console.log(req.body)
+    
       const result = await CarBookingService.bookingVerification({
         orderId,
         paymentId,

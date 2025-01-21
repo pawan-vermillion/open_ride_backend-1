@@ -130,7 +130,7 @@ class CarBookingService {
     
       
       if (userAmount <= 0) {
-        booking.status = "pending";
+        booking.status = "unPaid";
         booking.paymentDetails.isPaymentVerified = true;
         booking.paymentDetails.paymentId = paymentId || `direct-${Date.now()}`;
         booking.paymentDetails.orderId = orderId || `direct-${Date.now()}`;
