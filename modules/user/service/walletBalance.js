@@ -13,6 +13,7 @@ class WalletBalanceService {
     
            
             const walletHistoryData = await WalletBalance.find({ userId: new mongoose.Types.ObjectId(userId) })
+                .populate('bookingId', 'genratedBookingId')
                 .sort({ createdAt: -1 }) 
                 .skip(skip)
                 .limit(pageSize);
@@ -22,6 +23,10 @@ class WalletBalanceService {
                 ...item._doc,
                 createdAt: new Date(item.createdAt).toISOString().split('T')[0],
                 updatedAt: new Date(item.updatedAt).toISOString().split('T')[0],
+                genratedBookingId: item.bookingId ? item.bookingId.genratedBookingId : "" ,
+                UiType:"Wallet",
+                bookingId: ""
+               
             }));
     
             return formattedData;

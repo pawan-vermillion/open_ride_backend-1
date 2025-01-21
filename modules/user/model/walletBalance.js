@@ -13,9 +13,10 @@ const walletBalanceSchema = new mongoose.Schema({
    },
    bookingId :{
     type :mongoose.Schema.Types.ObjectId,
-    ref:"Booking",
+    ref:"CarBooking",
     required:true
    },
+  
    transactionType :{
     type: String,
     enum: ["Credit", "Debit", "Withdraw", "Refund"],

@@ -16,7 +16,7 @@ class WalletBalanceController {
 
             return res.status(200).json(walletHistoryData);
         } catch (error) {
-            res.status(500).josn({
+            res.status(500).json({
                 error: error.message
             })
         }
