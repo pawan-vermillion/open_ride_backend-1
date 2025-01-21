@@ -160,6 +160,7 @@ class CarBookingService {
   
         // await partnerWalletHistory.save();
         // await partner.save();
+
         let walletBalance = parseFloat(
           (await User.findById(booking.userId))?.walletBalance || 0
         );
@@ -173,7 +174,11 @@ class CarBookingService {
           amount: amountToDeduct,
         });
         await userWalletHistory.save();
-  
+        await User.findByIdAndUpdate(
+          booking.userId,
+          { $inc: { walletBalance: -amountToDeduct } },
+          { new: true }
+        );
         return {
           success: true,
           message: "Payment directly verified and booking updated successfully.",
