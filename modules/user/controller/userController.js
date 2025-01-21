@@ -20,8 +20,9 @@ class UserController {
         try {
             const userId = req.user.id;
             const userData = req.body;
-
-            if (req.file) {
+        
+            if (req.file !== undefined) {
+      
                 const profileImageURL = await uploadToCloudinary(
                   req,
                   req.file.path,
