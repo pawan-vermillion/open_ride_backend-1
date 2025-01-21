@@ -69,23 +69,23 @@ class BookingService {
         return { error: "Partner not found", statusCode: 404 };
       }
 
-      partner.walletBalance -= booking.summary.partnerAmmount;
+      // partner.walletBalance -= booking.summary.partnerAmmount;
 
-      await partner.save();
-      const walletHistoryEntryForPartner = new WalletHistory({
-        userId: booking.userId,
-        partnerId: booking.partnerId,
-        transactionType: "Debit",
-        genratedBookingId:booking.genratedBookingId,
-        paymentId:booking.paymentDetails.paymentId,
-        amount: booking.summary.partnerAmmount,
-        bookingId: booking._id,
-        UiType:"Wallet",
-        status:"Confirmed",
-        isWithdrewble:false
-      });
+      // await partner.save();
+      // const walletHistoryEntryForPartner = new WalletHistory({
+      //   userId: booking.userId,
+      //   partnerId: booking.partnerId,
+      //   transactionType: "Debit",
+      //   genratedBookingId:booking.genratedBookingId,
+      //   paymentId:booking.paymentDetails.paymentId,
+      //   amount: booking.summary.partnerAmmount,
+      //   bookingId: booking._id,
+      //   UiType:"Wallet",
+      //   status:"Confirmed",
+      //   isWithdrewble:false
+      // });
 
-      await walletHistoryEntryForPartner.save();
+      // await walletHistoryEntryForPartner.save();
 
       return { message: "Booking cancelled successfully" };
     } catch (error) {
