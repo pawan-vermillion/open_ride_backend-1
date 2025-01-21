@@ -266,9 +266,12 @@ class BookingController {
           isWithdrewble: true,
           amount: totalAmount,
         });
+        console.log(partnerWalletHistory)
   
         await partnerWalletHistory.save();
         await partner.save();
+
+
 
 
         if (updatedBooking.nModified === 0) {

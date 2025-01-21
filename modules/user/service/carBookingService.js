@@ -160,8 +160,10 @@ class CarBookingService {
   
         // await partnerWalletHistory.save();
         // await partner.save();
-
-
+        let walletBalance = parseFloat(
+          (await User.findById(booking.userId))?.walletBalance || 0
+        );
+        const amountToDeduct = Math.min(walletBalance, userAmount);
         const userWalletHistory = new WalletBalance({
           partnerId: booking.partnerId,
           userId: booking.userId,
@@ -191,7 +193,7 @@ class CarBookingService {
         throw new Error("Payment verification failed");
       }
   
-      booking.status = "pending";
+      booking.status = "unPaid";
       booking.paymentDetails.isPaymentVerified = true;
       booking.paymentDetails.paymentId = paymentId;
       booking.paymentDetails.orderId = orderId;
