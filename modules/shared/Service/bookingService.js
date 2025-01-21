@@ -53,7 +53,7 @@ class BookingService {
           partnerId: booking.partnerId,
           transactionType,
           paymentId:booking.paymentDetails.paymentId,
-          amount: booking.summary.partnerAmmount,
+          amount: netAmount,
           bookingId: booking._id,
         });
 
