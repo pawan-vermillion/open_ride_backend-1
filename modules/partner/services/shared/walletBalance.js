@@ -91,7 +91,7 @@ class WalletBalanceService {
             await withdrawRequest.save({ session });
     
         
-            partner.walletBalance -= amount;
+            // partner.walletBalance -= amount;
             await partner.save({ session });
     
             await session.commitTransaction();
