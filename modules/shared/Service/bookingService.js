@@ -5,6 +5,7 @@ const WalletHistory = require("../../user/model/walletBalance");
 const moment = require("moment");
 const mongoose = require("mongoose");
 const WalletBalance = require("../../user/model/walletBalance");
+const Driver = require("../../partner/model/driver");
 
 class BookingService {
   canCancelBooking = async (booking) => {
@@ -86,6 +87,13 @@ class BookingService {
       // });
 
       // await walletHistoryEntryForPartner.save();
+
+
+      const updatedDriver = await Driver.updateOne(
+        { _id: booking.driverId, "trips.bookingId": bookingId },
+        { $set: { "trips.$.status": "completed" } }
+      );
+
 
       return { message: "Booking cancelled successfully" };
     } catch (error) {
