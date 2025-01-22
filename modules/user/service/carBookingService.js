@@ -218,7 +218,7 @@ class CarBookingService {
       }
   
    
-  
+      const finduser = await User.findById(booking.userId);
       return {
         success: true,
         message: "Payment verified and booking updated successfully.",
