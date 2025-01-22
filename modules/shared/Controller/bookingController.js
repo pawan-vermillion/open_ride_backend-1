@@ -175,7 +175,7 @@ class BookingController {
           const tripFromDateTime = new Date(trip.fromDateTime);
           const tripToDateTime = new Date(trip.toDateTime);
           return (
-            pickupDateTime < tripToDateTime && returnDateTime > tripFromDateTime
+            trip.status !== "completed" &&  pickupDateTime < tripToDateTime && returnDateTime > tripFromDateTime
           );
         });
 
