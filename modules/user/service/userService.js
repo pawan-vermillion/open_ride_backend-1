@@ -66,7 +66,7 @@ class UserService {
         throw error;
       }
 
-      if (userData.profileImage) {
+      if (userData.profileImage !== "") {
         if (user.profileImage) {
           const oldImagePublicId = user.profileImage
             .split("/")

@@ -71,7 +71,7 @@ class PartnerService {
         throw error;
       }
 
-      if (partnerData.profileImage !== undefined) {
+      if (partnerData.profileImage !== "") {
         if (partner.profileImage) {
           const oldImagePublicId = partner.profileImage
             .split("/")
