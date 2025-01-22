@@ -228,26 +228,10 @@ class BookingController {
       if (status === "completed") {
         const updatedBooking = await CarBooking.updateOne(
           { _id: bookingId },
-          { $set: { status: "completed" } }
+          { $set: { status: "complete" } }
         );
 
-        // this full comment can be delete after testing
-        // const updateAmountStatus = await walletHistory.findOneAndUpdate(
-        //   { bookingId: bookingId },
-        //   { $set: { isWithdrewble: true } },
-        //   { new: true }
-        // );
-        // console.log(checkBooking.partnerId)
-        // const updateAmountStatus = await Partner.findById(
-        //   checkBooking.partnerId
-        // );
-        // console.log(updateAmountStatus)
-
-        // const updatedPartnerUsebleBalance = await Partner.findOneAndUpdate(
-        //   { _id: updateAmountStatus._id },
-        //   { $inc: { useableWalletBalance: updateAmountStatus.amount } },
-        //   { new: true }
-        // );
+      
         const booking = await CarBooking.findById({ _id: bookingId });
         const totalAmount =
           booking.summary.subTotal -
