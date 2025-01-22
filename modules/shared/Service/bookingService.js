@@ -90,13 +90,14 @@ class BookingService {
 
 
       const updatedDriver = await Driver.updateOne(
-        { _id: booking.driverId, "trips.bookingId": bookingId },
+        { _id: booking.assignedDriver, "trips.bookingId": bookingId }, 
         { $set: { "trips.$.status": "completed" } }
       );
-
+     
 
       return { message: "Booking cancelled successfully" };
     } catch (error) {
+      console.log(error)
       return { error: "Internal Server Error", statusCode: 500 };
     }
   };
