@@ -283,11 +283,13 @@ class BookingController {
             .json({ message: "Failed to update the driver's trip status" });
         }
 
+
+
         return res
           .status(200)
           .json({
             message:
-              "Booking status updated to 'completed' and driver's trip status updated successfully",
+              "Booking status updated to 'completed' and driver's trip status updated successfully", partnerWallet:Math.round(partner.walletBalance)
           });
       }
     } catch (error) {

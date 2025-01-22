@@ -136,35 +136,12 @@ class CarBookingService {
         booking.paymentDetails.orderId = orderId || `direct-${Date.now()}`;
         await booking.save();
   
-        // const totalAmount =
-        //   booking.summary.subTotal -
-        //   booking.summary.discount -
-        //   booking.summary.commisionAmmount -
-        //   booking.summary.totalTax;
-  
       
-        // partner.walletBalance =
-        //   (parseFloat(partner.walletBalance) || 0) + totalAmount;
-  
-        // const partnerWalletHistory = new walletHistory({
-        //   partnerId: booking.partnerId,
-        //   userId: booking.userId,
-        //   bookingId: booking._id,
-        //   transactionType: "Credit",
-        //   genratedBookingId: booking.genratedBookingId,
-        //   UiType: "Wallet",
-        //   status: "Confirmed",
-        //   isWithdrewble: false,
-        //   amount: totalAmount,
-        // });
-  
-        // await partnerWalletHistory.save();
-        // await partner.save();
 
         let walletBalance = parseFloat(
           (await User.findById(booking.userId))?.walletBalance || 0
         );
-        console.log("this is wallet balance avalable ", walletBalance);
+     
         const amountToDeduct = Math.min(walletBalance, userAmount);
        
 
@@ -240,25 +217,13 @@ class CarBookingService {
         await userWalletHistory.save();
       }
   
-      // partner.walletBalance =
-      //   (parseFloat(partner.walletBalance) || 0) + totalAmount;
+   
   
-      // const partnerWalletHistory = new walletHistory({
-      //   partnerId: booking.partnerId,
-      //   userId: booking.userId,
-      //   bookingId: booking._id,
-      //   transactionType: "Credit",
-      //   genratedBookingId: booking.genratedBookingId,
-      //   UiType: "Wallet",
-      //   status: "Confirmed",
-      //   isWithdrewble: false,
-      //   amount: totalAmount,
-      // });
-  
-      // await partnerWalletHistory.save();
-      // await partner.save();
-  
-      return booking;
+      return {
+        success: true,
+        message: "Payment verified and booking updated successfully.",
+        booking,userWallet:Math.round(finduser.walletBalance)
+      };
     } catch (error) {
       console.error(error);
       throw new Error(error.message);

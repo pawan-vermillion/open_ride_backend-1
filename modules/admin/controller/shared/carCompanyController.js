@@ -94,7 +94,7 @@ console.log(companyId)
             const { modelId } = req.params;
 
             const result = await CarCompanyService.createSubModel({ subModel: carData.subModel, modelId });
-            res.status(201).json(result);
+            res.status(200).json(result);
         } catch (error) {
             res.status(500).json({
                 message: error.message

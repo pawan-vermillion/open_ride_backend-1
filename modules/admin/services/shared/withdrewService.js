@@ -100,9 +100,10 @@ async approvedRequest(requestId) {
 
   const partnerId = await Partner.findByIdAndUpdate(
     withdrewRequest.partnerId,
-    { $inc: { useableWalletBalance: -withdrewRequest.amount ,walletBalance: -withdrewRequest.amount} },
+    { $inc: { walletBalance: -withdrewRequest.amount } },
     { new: true }
   );
+ 
 
   
 
