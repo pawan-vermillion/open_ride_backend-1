@@ -77,9 +77,9 @@ class DriverService {
               partnerId: partnerId,
               phoneNumber: phoneNumber
             });
-      
+        
             // If the phone number is already registered, throw an error
-            if (checkPhone) {
+            if (checkPhone && checkPhone._id.toString() !== existingDriver._id.toString()) {
               throw new Error("This phone number is already registered with the same partner. A partner cannot add the same phone number for a driver more than once.");
             }
           }
