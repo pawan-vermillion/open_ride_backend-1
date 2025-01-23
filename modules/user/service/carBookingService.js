@@ -331,15 +331,15 @@ class CarBookingService {
 
       const hoursDifference = returnDateTime.diff(pickUpDateTime, "hours");
       if (hoursDifference < 12) {
-        return { message: "There must be at least 12 hours between pick-up and return times." };
-        }
+        throw new Error  ( "There must be at least 12 hours between pick-up and return times.");
+      }
   
       if (pickUpDateTime.isBefore(moment(), "minute")) {
-        return ({message:"Pick-up date and time cannot be in the past."});
+        throw new Error ("Pick-up date and time cannot be in the past.");
       }
   
       if (returnDateTime.isBefore(pickUpDateTime)) {
-        return ({message:"Return date cannot be before pick-up date."});
+        throw new Error  ("Return date cannot be before pick-up date.");
       }
   
       let query = {
