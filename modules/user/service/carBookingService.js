@@ -326,15 +326,15 @@ class CarBookingService {
       const returnDateTime = moment(`${returnDate} ${returnTime}`, "YYYY-MM-DD HH:mm");
   
       if (!pickUpDate || !pickUpTime || !returnDate || !returnTime || !latitude || !longitude) {
-        throw new Error("All mandatory fields must be provided.");
+        return ({message:"All mandatory fields must be provided."});
       }
   
       if (pickUpDateTime.isBefore(moment(), "minute")) {
-        throw new Error("Pick-up date and time cannot be in the past.");
+        return ({message:"Pick-up date and time cannot be in the past."});
       }
   
       if (returnDateTime.isBefore(pickUpDateTime)) {
-        throw new Error("Return date cannot be before pick-up date.");
+        return ({message:"Return date cannot be before pick-up date."});
       }
   
       let query = {

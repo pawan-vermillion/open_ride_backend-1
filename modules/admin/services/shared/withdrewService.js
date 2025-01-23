@@ -116,13 +116,14 @@ async approvedRequest(requestId) {
 
 async rejectRequest(requestId) {
   try {
-    const withdrewRequest = await WithdrawRequest.findById(requestId);
+   
+    const withdrewRequest = await walletHistory.findById(requestId);
 
-    if (!withdrewRequest || withdrewRequest.status !== "pending") {
+    if (!withdrewRequest || withdrewRequest.status !== "Pending") {
       throw new Error("Invalid or already processed request");
     }
 
-    withdrewRequest.status = "rejected";
+    withdrewRequest.status = "Rejected";
     await withdrewRequest.save();
 
    
@@ -132,12 +133,13 @@ async rejectRequest(requestId) {
       throw new Error("Partner not found");
     }
 
-    partner.walletBalance += withdrewRequest.amount;
+    // partner.walletBalance += withdrewRequest.amount;
     await partner.save();
 
     return withdrewRequest;
 
   } catch (error) {
+    console.log(error)
     throw new Error(`Error rejecting request: ${error.message}`);
   }
 }

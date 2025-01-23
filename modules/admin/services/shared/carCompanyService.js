@@ -9,6 +9,11 @@ class CarCompanyService {
     async createCarCompany({ carCompanyData }) {
         try {
 
+            const isCarExists = await CarCompany.findOne({ name: carCompanyData.carCompany });
+            if (isCarExists) {
+                return { message: "Car Company already exists" }
+            }
+
             const create = await CarCompany.create({
                 carCompany: carCompanyData.carCompany,
                 logoImage: carCompanyData.logoImage,

@@ -55,7 +55,7 @@ class WalletBalanceService {
         try {
             session.startTransaction();
     
-           
+            console.log(amount)
             const existingRequest = await walletHistory.findOne({
                 partnerId,
                 status: "Pending",
@@ -72,8 +72,8 @@ class WalletBalanceService {
             }
     
             const walletBalance = partner.walletBalance;
-    
-    
+            console.log(walletBalance)
+            console.log(walletBalance < amount)
             if (walletBalance < amount) {
                 throw new Error("Insufficient balance");
             }
