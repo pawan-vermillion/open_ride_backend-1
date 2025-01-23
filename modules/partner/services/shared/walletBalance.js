@@ -85,7 +85,7 @@ class WalletBalanceService {
                 transactionType:"Withdraw",
                 UiType:"Withdraw",
                 status: "Pending",
-                isWithdrewble:false
+                isWithdrewble:false 
             });
     
             await withdrawRequest.save({ session });
