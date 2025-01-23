@@ -328,6 +328,11 @@ class CarBookingService {
       if (!pickUpDate || !pickUpTime || !returnDate || !returnTime || !latitude || !longitude) {
         return ({message:"All mandatory fields must be provided."});
       }
+
+      const hoursDifference = returnDateTime.diff(pickUpDateTime, "hours");
+      if (hoursDifference < 12) {
+        return { message: "There must be at least 12 hours between pick-up and return times." };
+        }
   
       if (pickUpDateTime.isBefore(moment(), "minute")) {
         return ({message:"Pick-up date and time cannot be in the past."});
