@@ -70,8 +70,10 @@ class PartnerService {
         const error = new Error("Partner not found");
         throw error;
       }
-
-      if ( partnerData.profileImage !== "" && partnerData.profileImage !== null && partnerData.profileImage !== undefined) {
+      console.log( typeof(partnerData.profileImage) )
+      if (  partnerData.profileImage &&
+        partnerData.profileImage !== "" &&
+        partnerData.profileImage !== null) {
         if (partner.profileImage) {
           const oldImagePublicId = partner.profileImage
             .split("/")
