@@ -70,7 +70,7 @@ class PartnerService {
         const error = new Error("Partner not found");
         throw error;
       }
-      console.log( typeof(partnerData.profileImage) )
+    
       if (  partnerData.profileImage &&
         partnerData.profileImage !== "" &&
         partnerData.profileImage !== null) {

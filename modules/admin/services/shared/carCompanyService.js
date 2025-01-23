@@ -194,13 +194,10 @@ class CarCompanyService {
     
          
             await SubModel.create({ subModel, modelId });
-           throw new Error("SubModel Added Successfully")
+           return ("SubModel Added Successfully")
         } catch (error) {
             
-            return {
-                status: 500,
-                message: `Unexpected Error: ${error.message}`
-            };
+            throw new Error(`Unexpected Error:`);
         }
     }
     

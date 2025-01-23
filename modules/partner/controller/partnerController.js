@@ -17,7 +17,7 @@ class PartnerController {
     try {
       const PartnerId = req.user.id;
       const partnerData = req.body;
-        console.log(req.file)
+     
       if ( req.file && req.file.path) {
         const profileImageURL = await uploadToCloudinary(
           req,
