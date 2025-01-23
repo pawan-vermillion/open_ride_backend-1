@@ -571,6 +571,15 @@ class CarBookingService {
         { path: "bodyStyle", select: "bodyStyle" },
         { path: "subModel", select: "subModel" },
       ]);
+
+      const getUser = await User.findById(bookingData.userId);
+
+     const  populateUser= {
+        firstName: getUser?.firstName,
+        lastName: getUser?.lastName,
+        phoneNumber: getUser?.phoneNumber,
+        profileImage: getUser?.profileImage,
+      }
       const populatedCar = { carId: carId,
         carCompany: populatedCarDetails?.companyName?.carCompany, // Example field
         carModel: populatedCarDetails?.modelName?.model || "",
@@ -592,7 +601,7 @@ class CarBookingService {
     
       await booking.save();
 
-      return {booking,populatedCar};
+      return {booking,populatedCar,populateUser};
     } catch (error) {
       console.log(error);
       throw new Error(error.message);
