@@ -71,7 +71,7 @@ class PartnerService {
         throw error;
       }
 
-      if (partnerData.profileImage !== "") {
+      if ( partnerData.profileImage !== "" && partnerData.profileImage !== null && partnerData.profileImage !== undefined) {
         if (partner.profileImage) {
           const oldImagePublicId = partner.profileImage
             .split("/")
@@ -92,6 +92,7 @@ class PartnerService {
       ).select("-__v -password -createdAt -updatedAt");
       return updatePartner;
     } catch (error) {
+      console.log(error)
       throw error;
     }
   }
