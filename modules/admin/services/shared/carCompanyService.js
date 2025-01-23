@@ -197,7 +197,7 @@ class CarCompanyService {
            return ("SubModel Added Successfully")
         } catch (error) {
             
-            throw new Error(`Unexpected Error:`);
+            throw new Error(error.message);
         }
     }
     
