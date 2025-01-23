@@ -75,6 +75,7 @@ class RepaircarService {
             .sort({ createdAt: -1 })
             .populate({
                 path: 'carId',
+                match: { isDelete: false },
                 select: 'companyName modelName subModel bodyStyle modelYear rating -_id exteriorImage',
                 populate: [
                     {
