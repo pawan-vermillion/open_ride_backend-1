@@ -170,9 +170,7 @@ class CarCompanyService {
 
             const create = await BodyStyle.create(carData);
 
-            return {
-                message: "Car Body Style Added Successfully"
-            };
+            throw new Error("Car Body Style Added Successfully")
         } catch (error) {
             throw error;
         }
@@ -185,27 +183,18 @@ class CarCompanyService {
        
             const submodel = await CarModel.findById(modelId);
             if (!submodel) {
-                return {
-                   
-                    message: "Model Not Found"
-                };
+               throw new Error("Model Not Found");
             }
     
         
             const existingSubModel = await SubModel.findOne({ subModel, modelId });
             if (existingSubModel) {
-                return {
-               
-                    message: "SubModel already exists"
-                };
+                throw new Error("SubModel already exists")
             }
     
          
             await SubModel.create({ subModel, modelId });
-            return {
-                
-                message: "SubModel Added Successfully"
-            };
+           throw new Error("SubModel Added Successfully")
         } catch (error) {
             
             return {
