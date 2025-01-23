@@ -39,7 +39,7 @@ connectMongoDb(process.env.DB_URL)
   .catch((error) => console.log(`MongoDB Error ${error}`));
 
   app.get('/', (req, res) => {
-    res.status(200).json("Welcome To The Open Ride Backend 2");
+    res.status(200).json("Welcome To The Open Ride Backend 3");
   });
 
 // Check the environment variable
