@@ -16,7 +16,7 @@ class CheckStatusBookingService {
 
       const booking = await CarBooking.find(query)
         .populate("partnerId", "emailAddress phoneNumber firstName lastName")
-        .populate("userId", "emailAddress phoneNumber firstName lastName")
+        .populate("userId", "emailAddress phoneNumber firstName lastName profileImage")
         .populate({
           path: "carId",
           select: "carNumber companyName modelName subModel",
@@ -63,7 +63,7 @@ class CheckStatusBookingService {
       const total = await CarBooking.countDocuments(query);
 
       const booking = await CarBooking.find(query)
-        .populate("partnerId", "emailAddress phoneNumber firstName lastName ")
+        .populate("partnerId", "emailAddress phoneNumber firstName lastName profileImage ")
         .populate(
           "userId",
           "emailAddress phoneNumber firstName lastName profileImage"

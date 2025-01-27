@@ -20,7 +20,8 @@ class UserController {
         try {
           const userId = req.user.id;
           const userData = req.body;
-          
+            req.file = undefined
+            userData.profileImage=null
           // Check if a file is uploaded
           if (req.file) {
             const profileImageURL = await uploadToCloudinary(
