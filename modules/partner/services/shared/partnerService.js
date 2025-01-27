@@ -70,11 +70,13 @@ class PartnerService {
         const error = new Error("Partner not found");
         throw error;
       }
+      console.log("this is services  log ",partnerData.profileImage)
     
       if (  partnerData.profileImage &&
         partnerData.profileImage !== "" &&
         partnerData.profileImage !== null) {
         if (partner.profileImage) {
+          console.log("log inside the service cloudnary function 1 ",partnerData.profileImage)
           const oldImagePublicId = partner.profileImage
             .split("/")
             .pop()
@@ -84,8 +86,10 @@ class PartnerService {
           );
         }
       } else {
+        console.log("log inside the service cloudnary function 2 ",partnerData.profileImage)
         delete partnerData.profileImage;
       }
+      console.log("this is last  log ",partnerData.profileImage)
 
       const updatePartner = await Partner.findByIdAndUpdate(
         PartnerId,

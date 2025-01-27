@@ -17,7 +17,8 @@ class PartnerController {
     try {
       const PartnerId = req.user.id;
       const partnerData = req.body;
-     
+      console.log("log in controller 1 ",partnerData.profileImage)
+      console.log("log in controller req.file ",req.file)
       if ( req.file && req.file.path) {
         const profileImageURL = await uploadToCloudinary(
           req,
@@ -26,9 +27,10 @@ class PartnerController {
         );
         partnerData.profileImage = profileImageURL;
       }
+      console.log("log inside the contriller 2  ",partnerData.profileImage)
 
       const result = await PartnerService.updatePartner(partnerData, PartnerId);
-
+      console.log("reult in controller ",partnerData)
       return res.status(201).json({
         message: "Update Successfully",
 
