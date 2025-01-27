@@ -70,27 +70,23 @@ class PartnerService {
         const error = new Error("Partner not found");
         throw error;
       }
-      console.log("this is services  log ",partnerData.profileImage)
-    
-      if (  partnerData.profileImage &&
-        partnerData.profileImage !== "" &&
-        partnerData.profileImage !== null) {
+  
+      console.log("this is services log ", partnerData.profileImage);
+  
+      // Only process if a new profile image is provided
+      if (partnerData.profileImage && partnerData.profileImage !== "null") {
         if (partner.profileImage) {
-          console.log("log inside the service cloudnary function 1 ",partnerData.profileImage)
-          const oldImagePublicId = partner.profileImage
-            .split("/")
-            .pop()
-            .split(".")[0];
-          await cloudinary.uploader.destroy(
-            `uploads/partner/profile/${oldImagePublicId}`
-          );
+          console.log("log inside the service cloudinary function 1 ", partnerData.profileImage);
+          const oldImagePublicId = partner.profileImage.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(`uploads/partner/profile/${oldImagePublicId}`);
         }
       } else {
-        console.log("log inside the service cloudnary function 2 ",partnerData.profileImage)
-        delete partnerData.profileImage;
+        console.log("log inside the service cloudinary function 2 ", partnerData.profileImage);
+        delete partnerData.profileImage; // Prevent overwriting with `null`
       }
-      console.log("this is last  log ",partnerData.profileImage)
-
+  
+      console.log("this is last log ", partnerData.profileImage);
+  
       const updatePartner = await Partner.findByIdAndUpdate(
         PartnerId,
         partnerData,
@@ -98,7 +94,7 @@ class PartnerService {
       ).select("-__v -password -createdAt -updatedAt");
       return updatePartner;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw error;
     }
   }

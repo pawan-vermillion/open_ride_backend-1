@@ -17,27 +17,26 @@ class PartnerController {
     try {
       const PartnerId = req.user.id;
       const partnerData = req.body;
-      console.log("log in controller 1 ",partnerData.profileImage)
-      console.log("log in controller req.file ",req.file)
-      if ( req.file !== undefined && partnerData.profileImage !== null) {
-        const profileImageURL = await uploadToCloudinary(
-          req,
-          req.file.path,
-          "profileImage"
-        );
+  
+      console.log("log in controller 1 ", partnerData.profileImage);
+      console.log("log in controller req.file ", req.file);
+  
+      if (req.file) {
+        const profileImageURL = await uploadToCloudinary(req, req.file.path, "profileImage");
         partnerData.profileImage = profileImageURL;
       }
-      console.log("log inside the contriller 2  ",partnerData.profileImage)
-
+  
+      console.log("log inside the controller 2 ", partnerData.profileImage);
+  
       const result = await PartnerService.updatePartner(partnerData, PartnerId);
-      console.log("reult in controller ",partnerData)
+  
+      console.log("result in controller ", result);
       return res.status(201).json({
         message: "Update Successfully",
-
         result,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.status(404).json({ message: error.message });
     }
   };
