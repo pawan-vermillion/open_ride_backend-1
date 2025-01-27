@@ -1,21 +1,33 @@
+version: '3'
 services:
+  # RabbitMQ service
   rabbitmq:
-    image: rabbitmq:3-management
+    image: "rabbitmq:management"  # RabbitMQ with management plugin
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"  # RabbitMQ default port
+      - "15672:15672" # RabbitMQ management UI (optional)
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # Persist RabbitMQ data
 
-  app:
+  # Node.js backend service
+  nodejs:
     build:
       context: .
-    container_name: ride
+      dockerfile: dockerfile
+    container_name: ride-open
     ports:
       - "3002:3002"
+    environment:
+      - RABBITMQ_URL=rabbitmq://rabbitmq:5672  # For internal RabbitMQ communication
+       # Expose the port for the Node.js app
     depends_on:
       - rabbitmq
-    environment:
-      RABBITMQ_URL: amqp://localhost:15673 # Use rabbitmq as the hostname, not localhost
+    volumes:
+      - ./src:/app/src
+
+volumes:
+  rabbitmq_data:

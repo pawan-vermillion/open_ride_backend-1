@@ -46,6 +46,7 @@ connectMongoDb(process.env.DB_URL)
 const environment = process.env.DEV;
 
 if (environment === "production") { 
+  console.log( process.env.DEV)
   // If in production, establish RabbitMQ connection
   connectRabbitMq()
     .then(() => {
