@@ -71,21 +71,21 @@ class PartnerService {
         throw error;
       }
   
-      console.log("this is services log ", partnerData.profileImage);
+    
   
-      // Only process if a new profile image is provided
+    
       if (partnerData.profileImage && partnerData.profileImage !== "null") {
         if (partner.profileImage) {
-          console.log("log inside the service cloudinary function 1 ", partnerData.profileImage);
+        
           const oldImagePublicId = partner.profileImage.split("/").pop().split(".")[0];
           await cloudinary.uploader.destroy(`uploads/partner/profile/${oldImagePublicId}`);
         }
       } else {
-        console.log("log inside the service cloudinary function 2 ", partnerData.profileImage);
-        delete partnerData.profileImage; // Prevent overwriting with `null`
+  
+        delete partnerData.profileImage; 
       }
   
-      console.log("this is last log ", partnerData.profileImage);
+      
   
       const updatePartner = await Partner.findByIdAndUpdate(
         PartnerId,

@@ -65,27 +65,29 @@ class UserService {
         error.statusCode = 404;
         throw error;
       }
-
-      if (userData.profileImage !== "") {
+      
+  
+      // Handle profile image update
+      if (userData.profileImage && userData.profileImage !== "null") {
         if (user.profileImage) {
-          const oldImagePublicId = user.profileImage
-            .split("/")
-            .pop()
-            .split(".")[0];
+          const oldImagePublicId = user.profileImage.split("/").pop().split(".")[0];
           await cloudinary.uploader.destroy(
             `uploads/user/profile/${oldImagePublicId}`
           );
         }
       } else {
-        delete userData.profileImage;
+        delete userData.profileImage; // Ensure no overwriting with null
       }
+  
       const updatedUser = await User.findByIdAndUpdate(userId, userData, {
         new: true,
       }).select("-__v -password -createdAt -updatedAt");
+  
       return updatedUser;
     } catch (error) {
       throw error;
     }
   }
+  
 }
 module.exports = new UserService();
