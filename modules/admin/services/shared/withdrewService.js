@@ -50,6 +50,7 @@ class WithdrawRequestService {
               lastName: '$partnerInfo.lastName',
               emailAddress: '$partnerInfo.emailAddress',
               phoneNumber: '$partnerInfo.phoneNumber',
+              profileImage: '$partnerInfo.profileImage'
             },
             availableWalletBalance: 1,
             createdAt: 1,
